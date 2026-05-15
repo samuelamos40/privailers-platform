@@ -1,36 +1,29 @@
 :root {
   --primary-blue: #003366;
-  --primary-light: #335c85; /* lighter shade for hover etc */
-  --accent-teal: #00b8d4; /* Vibrant teal for energy */
+  --primary-light: #004080; 
+  --accent-teal: #00b8d4; 
   --accent-teal-dark: #008ba3;
-  --background: #f8f9fa; /* slightly off-white not pure white for modern feel */
-  --foreground: #1a1a1a;
-  --text-muted: #666666;
-  --border-color: #e5e7eb;
+  --background: #ffffff;
+  --foreground: #003366;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
   --white: #ffffff;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Optional dark mode override, keeping it simple for now or matching brand */
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-  height: 100%;
+  
+  --font-heading: var(--font-poppins);
+  --font-body: var(--font-roboto);
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: var(--font-poppins), sans-serif;
+  font-family: var(--font-body), sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading), sans-serif;
+  font-weight: 700;
 }
 
 * {
@@ -77,9 +70,183 @@ a {
   border-color: var(--accent-teal-dark);
 }
 
+.btn-outline {
+  background-color: transparent;
+  color: var(--primary-blue);
+  border: 1px solid var(--primary-blue);
+}
+
+.btn-outline:hover {
+  background-color: rgba(0, 51, 102, 0.05);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--foreground);
+  border: 1px solid transparent;
+}
+
+.btn-ghost:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+
 .container {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
+}
+
+/* Mobile Layout Utilities */
+.sidebar-nav {
+  width: 280px;
+  background-color: #ffffff;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  padding: 2.5rem 1.5rem;
+  border-right: 1px solid #e2e8f0;
+  z-index: 50;
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+}
+
+/* Custom Scrollbar for Sidebar */
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+.sidebar-nav.admin::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-nav.admin {
+  width: 250px;
+  background-color: #1e293b;
+  color: var(--white);
+  padding: 2rem;
+  border-right: none;
+}
+
+.main-content {
+  margin-left: 280px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content.admin {
+  margin-left: 250px;
+  padding: 2.5rem;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+}
+
+.table-responsive {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+
+.mobile-topbar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  z-index: 40;
+  position: sticky;
+  top: 0;
+}
+
+.mobile-topbar.admin {
+  background-color: #1e293b;
+  color: white;
+  border-bottom: none;
+}
+
+.course-player-grid {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  min-height: calc(100vh - 80px);
+}
+
+.dashboard-grid-2-1 {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-grid-2-1 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mobile-menu-btn {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .sidebar-nav {
+    transform: translateX(-100%);
+  }
+  .sidebar-nav.open {
+    transform: translateX(0);
+  }
+  
+  .main-content,
+  .main-content.admin {
+    margin-left: 0;
+  }
+
+  .mobile-topbar {
+    display: flex;
+  }
+
+  .course-player-grid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .main-content.admin {
+    padding: 1.5rem 1rem;
+  }
+
+  .desktop-nav {
+    display: none !important;
+  }
+  
+  .mobile-menu-btn {
+    display: block !important;
+  }
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+  h2 {
+    font-size: 1.25rem !important;
+  }
+  
+  .container {
+    padding: 0 1rem;
+  }
 }

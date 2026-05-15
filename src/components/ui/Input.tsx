@@ -36,7 +36,8 @@ const Input: React.FC<InputProps> = ({ label, error, className = '', id, ...prop
                     fontSize: '1rem',
                     fontFamily: 'inherit',
                     transition: 'border-color 0.2s',
-                    backgroundColor: 'var(--background)'
+                    backgroundColor: '#ffffff',
+                    color: '#0f172a'
                 }}
                 {...props}
             />
