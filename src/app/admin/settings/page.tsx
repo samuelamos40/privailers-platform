@@ -33,6 +33,7 @@ export default function AdminSettingsPage() {
         instagram_url: '',
         twitter_url: '',
         facebook_url: '',
+        linkedin_url: '',
         // System
         maintenance_mode: 'false',
         allow_registrations: 'true',
@@ -148,6 +149,11 @@ export default function AdminSettingsPage() {
                     <InputGroup label="Facebook URL">
                         <input type="text" value={settings.facebook_url} onChange={e => setSettings({ ...settings, facebook_url: e.target.value })}
                             placeholder="https://facebook.com/..."
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1' }} />
+                    </InputGroup>
+                    <InputGroup label="LinkedIn URL">
+                        <input type="text" value={settings.linkedin_url} onChange={e => setSettings({ ...settings, linkedin_url: e.target.value })}
+                            placeholder="https://linkedin.com/company/..."
                             style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1' }} />
                     </InputGroup>
                     <InputGroup label="Twitter / X URL">
