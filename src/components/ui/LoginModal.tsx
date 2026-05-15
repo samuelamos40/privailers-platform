@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 import Button from './Button';
 import Input from './Input';
 
@@ -17,10 +18,12 @@ export default function LoginModal({ isOpen, onClose, onSuccess, initialMode = '
     const { signIn } = useAuth();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [successMsg, setSuccessMsg] = useState('');
     
     // Form states
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [fullName, setFullName] = useState('');
 
     if (!isOpen) return null;
@@ -28,6 +31,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess, initialMode = '
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        setSuccessMsg('');
         setLoading(true);
 
         try {
@@ -36,11 +40,39 @@ export default function LoginModal({ isOpen, onClose, onSuccess, initialMode = '
                 if (onSuccess) onSuccess();
                 onClose();
             } else {
-                // For registration, we still want to keep it simple or redirect to the full registration
-                // But for a "Udemy" feel, we can do a quick sign up here
-                // For now, let's just redirect to register if they want full registration, 
-                // OR implement a quick signup.
-                window.location.href = `/register?redirectTo=${window.location.pathname}`;
+                // Validate passwords match
+                if (password !== confirmPassword) {
+                    setError('Passwords do not match');
+                    setLoading(false);
+                    return;
+                }
+                if (password.length < 6) {
+                    setError('Password must be at least 6 characters');
+                    setLoading(false);
+                    return;
+                }
+
+                // Sign up directly in the modal
+                const { error: signUpError } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            full_name: fullName,
+                            role: 'student'
+                        }
+                    }
+                });
+
+                if (signUpError) throw signUpError;
+
+                setSuccessMsg('Account created! You can now sign in.');
+                // Auto-switch to login mode after a brief delay
+                setTimeout(() => {
+                    setSuccessMsg('');
+                    setMode('login');
+                    setConfirmPassword('');
+                }, 2000);
             }
         } catch (err: any) {
             setError(err.message || 'Authentication failed');
@@ -97,13 +129,19 @@ export default function LoginModal({ isOpen, onClose, onSuccess, initialMode = '
                         {mode === 'login' ? 'Welcome Back' : 'Join Privailers'}
                     </h2>
                     <p style={{ color: '#64748b' }}>
-                        {mode === 'login' ? 'Login to continue your learning journey' : 'Create an account to start learning'}
+                        {mode === 'login' ? 'Login to continue your learning journey' : 'Create a free account to start learning'}
                     </p>
                 </div>
 
                 {error && (
                     <div style={{ padding: '0.75rem', backgroundColor: '#fee2e2', color: '#991b1b', borderRadius: '0.5rem', marginBottom: '1.5rem', fontSize: '0.875rem', textAlign: 'center' }}>
                         {error}
+                    </div>
+                )}
+
+                {successMsg && (
+                    <div style={{ padding: '0.75rem', backgroundColor: '#dcfce7', color: '#166534', borderRadius: '0.5rem', marginBottom: '1.5rem', fontSize: '0.875rem', textAlign: 'center' }}>
+                        {successMsg}
                     </div>
                 )}
 
@@ -134,6 +172,16 @@ export default function LoginModal({ isOpen, onClose, onSuccess, initialMode = '
                         placeholder="••••••••"
                         required
                     />
+                    {mode === 'register' && (
+                        <Input
+                            label="Confirm Password"
+                            type="password"
+                            value={confirmPassword}
+                            onChange={e => setConfirmPassword(e.target.value)}
+                            placeholder="••••••••"
+                            required
+                        />
+                    )}
 
                     <Button
                         type="submit"
@@ -148,13 +196,13 @@ export default function LoginModal({ isOpen, onClose, onSuccess, initialMode = '
                 <div style={{ marginTop: '2rem', textAlign: 'center', fontSize: '0.9rem', color: '#64748b' }}>
                     {mode === 'login' ? (
                         <>
-                            Don't have an account?{' '}
-                            <button onClick={() => setMode('register')} style={{ background: 'none', border: 'none', color: '#2563eb', fontWeight: 700, cursor: 'pointer', padding: 0 }}>Sign Up</button>
+                            Don&apos;t have an account?{' '}
+                            <button onClick={() => { setMode('register'); setError(''); }} style={{ background: 'none', border: 'none', color: '#2563eb', fontWeight: 700, cursor: 'pointer', padding: 0 }}>Sign Up</button>
                         </>
                     ) : (
                         <>
                             Already have an account?{' '}
-                            <button onClick={() => setMode('login')} style={{ background: 'none', border: 'none', color: '#2563eb', fontWeight: 700, cursor: 'pointer', padding: 0 }}>Sign In</button>
+                            <button onClick={() => { setMode('login'); setError(''); }} style={{ background: 'none', border: 'none', color: '#2563eb', fontWeight: 700, cursor: 'pointer', padding: 0 }}>Sign In</button>
                         </>
                     )}
                 </div>
