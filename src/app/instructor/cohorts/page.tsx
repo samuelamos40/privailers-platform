@@ -164,7 +164,7 @@ export default function CohortManagementPage() {
         const { data: classData } = await supabase.from('cohort_classes').select('*').eq('cohort_id', cohort.id).order('scheduled_at', { ascending: true });
         setClasses(classData || []);
 
-        const { data: annData } = await supabase.from('cohort_announcements').select('*').eq('cohort_id', cohort.id).order('created_at', { descending: true });
+        const { data: annData } = await supabase.from('cohort_announcements').select('*').eq('cohort_id', cohort.id).order('created_at', { ascending: false });
         setAnnouncements(annData || []);
     };
 
