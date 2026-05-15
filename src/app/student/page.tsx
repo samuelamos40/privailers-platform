@@ -8,6 +8,7 @@ import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import CourseIcon from '@/components/ui/CourseIcon';
+import Card from '@/components/ui/Card';
 
 // Premium Light Card
 const LightCard = ({ children, style, className }: { children: React.ReactNode, style?: React.CSSProperties, className?: string }) => (
@@ -450,7 +451,7 @@ export default function StudentDashboard() {
                         {/* Right Side: Image/Graphics */}
                         <div className="hero-image" style={{
                             backgroundColor: '#6366f1',
-                            backgroundImage: `url(${heroCourse?.course?.image_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800'})`,
+                            backgroundImage: `url(${ (heroCourse?.course as any)?.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800'})`,
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
                             display: 'flex',

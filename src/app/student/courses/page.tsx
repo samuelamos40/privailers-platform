@@ -23,6 +23,8 @@ const LightCard = ({ children, style, className, onClick }: { children: React.Re
 
 type EnrollmentWithCourse = Enrollment & {
     course: Course;
+    cohort?: any;
+    cohort_id?: string;
 };
 
 const GRADIENTS = [

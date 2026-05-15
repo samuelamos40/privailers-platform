@@ -159,7 +159,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
                 .from('cohort_announcements')
                 .select('*')
                 .eq('cohort_id', enrollmentData.cohort_id)
-                .order('created_at', { descending: true });
+                .order('created_at', { ascending: false });
             
             setCohortClasses(cClasses || []);
             setCohortAnnouncements(cAnn || []);

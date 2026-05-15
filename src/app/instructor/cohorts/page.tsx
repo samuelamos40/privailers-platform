@@ -20,6 +20,7 @@ interface Cohort {
     price?: number;
     batch_plan?: string;
     status: string;
+    instructor_id?: string;
 }
 
 interface CohortClass {
@@ -29,6 +30,8 @@ interface CohortClass {
     meeting_link?: string;
     assignment_details?: string;
     use_internal_room?: boolean;
+    status?: string;
+    recording_url?: string;
 }
 
 interface CohortAnnouncement {
