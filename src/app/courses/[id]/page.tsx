@@ -87,7 +87,7 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ id: st
                     </p>
                     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
                         {user ? (
-                            <Link href={`/student/courses/${course.id}`}>
+                            <Link href={course.tier === 'paid' ? `/checkout?type=course&id=${course.id}` : `/student/courses/${course.id}`}>
                                 <Button variant="primary" size="lg" style={{ backgroundColor: '#38bdf8', color: '#0f172a', fontWeight: 700, padding: '1rem 2.5rem', fontSize: '1.1rem' }}>
                                     {course.tier === 'paid' ? `Enroll for ₦${course.price?.toLocaleString() || '0'}` : 'Enroll for Free'}
                                 </Button>
@@ -186,9 +186,9 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ id: st
                             </div>
                             
                             {user ? (
-                                <Link href={`/student/courses/${course.id}`} style={{ display: 'block' }}>
+                                <Link href={course.tier === 'paid' ? `/checkout?type=course&id=${course.id}` : `/student/courses/${course.id}`} style={{ display: 'block' }}>
                                     <Button variant="primary" style={{ width: '100%', justifyContent: 'center', padding: '1rem', fontSize: '1.1rem' }}>
-                                        Start Learning
+                                        {course.tier === 'paid' ? 'Proceed to Payment' : 'Start Learning'}
                                     </Button>
                                 </Link>
                             ) : (
@@ -197,7 +197,7 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ id: st
                                     variant="primary" 
                                     style={{ width: '100%', justifyContent: 'center', padding: '1rem', fontSize: '1.1rem' }}
                                 >
-                                    Start Learning
+                                    {course.tier === 'paid' ? 'Proceed to Payment' : 'Start Learning'}
                                 </Button>
                             )}
                         </div>
@@ -211,10 +211,11 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ id: st
             <LoginModal 
                 isOpen={isLoginModalOpen} 
                 onClose={() => setIsLoginModalOpen(false)}
-                onSuccess={() => {
-                    // Refresh will happen automatically because of AuthContext
-                    // But we can add extra logic here if needed
-                }}
+                redirectAfterAuth={
+                    course?.tier === 'paid' 
+                        ? `/checkout?type=course&id=${course.id}` 
+                        : `/student/courses/${course.id}`
+                }
             />
         </div>
     );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import Button from './Button';
@@ -11,10 +12,12 @@ interface LoginModalProps {
     onClose: () => void;
     onSuccess?: () => void;
     initialMode?: 'login' | 'register';
+    redirectAfterAuth?: string;
 }
 
-export default function LoginModal({ isOpen, onClose, onSuccess, initialMode = 'login' }: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose, onSuccess, initialMode = 'login', redirectAfterAuth }: LoginModalProps) {
     const [mode, setMode] = useState<'login' | 'register'>(initialMode);
+    const router = useRouter();
     const { signIn } = useAuth();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -37,7 +40,11 @@ export default function LoginModal({ isOpen, onClose, onSuccess, initialMode = '
         try {
             if (mode === 'login') {
                 await signIn(email, password);
-                if (onSuccess) onSuccess();
+                if (redirectAfterAuth) {
+                    router.push(redirectAfterAuth);
+                } else if (onSuccess) {
+                    onSuccess();
+                }
                 onClose();
             } else {
                 // Validate passwords match
@@ -66,13 +73,17 @@ export default function LoginModal({ isOpen, onClose, onSuccess, initialMode = '
 
                 if (signUpError) throw signUpError;
 
-                setSuccessMsg('Account created! You can now sign in.');
-                // Auto-switch to login mode after a brief delay
-                setTimeout(() => {
-                    setSuccessMsg('');
-                    setMode('login');
-                    setConfirmPassword('');
-                }, 2000);
+                // Auto-sign in after registration
+                await signIn(email, password);
+
+                if (redirectAfterAuth) {
+                    router.push(redirectAfterAuth);
+                    onClose();
+                } else {
+                    setSuccessMsg('Account created! Signing you in...');
+                    if (onSuccess) onSuccess();
+                    setTimeout(() => onClose(), 1500);
+                }
             }
         } catch (err: any) {
             setError(err.message || 'Authentication failed');
