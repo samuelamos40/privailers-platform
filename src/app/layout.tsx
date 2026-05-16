@@ -18,6 +18,10 @@ const roboto = Roboto({
 export const metadata: Metadata = {
   title: "Privailers Data Consult",
   description: "Empowering Insights. Driving Growth.",
+  icons: {
+    icon: "/images/icons/favicon.png",
+    apple: "/images/icons/favicon.png",
+  },
 };
 
 export default function RootLayout({
