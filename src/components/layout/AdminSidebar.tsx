@@ -12,6 +12,8 @@ const AdminSidebar = ({ isOpen, onClose }: { isOpen?: boolean, onClose?: () => v
         { href: '/admin/leads', label: 'Lead CRM' },
         { href: '/admin/subscribers', label: 'Newsletter 📧' },
         { href: '/admin/coupons', label: 'Promo Coupons 🎟️' },
+        { href: '/admin/ambassadors', label: 'Ambassadors 🤝' },
+        { href: '/admin/referrals', label: 'Referrals 💰' },
         { href: '/admin/settings', label: 'Settings' },
         { href: '/courses', label: 'Public Catalog 🎓' },
         { href: '/', label: 'Logout' },

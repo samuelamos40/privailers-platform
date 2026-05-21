@@ -19,6 +19,7 @@ export default function RegisterClient() {
     const [premiumCourses, setPremiumCourses] = useState<any[]>([]);
     const [selectedCohortId, setSelectedCohortId] = useState('');
     const [selectedCourseId, setSelectedCourseId] = useState('');
+    const [refCode, setRefCode] = useState(searchParams.get('ref') || '');
 
     const [formData, setFormData] = useState({
         fullName: '',
@@ -57,7 +58,8 @@ export default function RegisterClient() {
     // CONFIG FOR PAYSTACK
     const cohort = activeCohorts.find(c => c.id === selectedCohortId);
     const course = premiumCourses.find(c => c.id === selectedCourseId);
-    const price = intent === 'cohort' ? Number(cohort?.price || 0) : intent === 'paid' ? Number(course?.price || 0) : 0;
+    const basePrice = intent === 'cohort' ? Number(cohort?.price || 0) : intent === 'paid' ? Number(course?.price || 0) : 0;
+    const price = basePrice; // Discount applied at checkout via ref code
 
     const paystackConfig = {
         reference: `REG_${new Date().getTime()}`,
@@ -131,6 +133,30 @@ export default function RegisterClient() {
                 ? 'Account created and payment confirmed! Welcome to Privailers.' 
                 : 'Account created successfully! Welcome to Privailers.';
             
+            // Record referral for free registrations (paid ones are tracked at checkout)
+            if (!isPaid && refCode && authData?.user) {
+                const { data: amb } = await supabase
+                    .from('ambassadors')
+                    .select('*')
+                    .eq('referral_code', refCode.toUpperCase())
+                    .eq('is_active', true)
+                    .single();
+                
+                if (amb) {
+                    await supabase.from('referrals').insert([{
+                        ambassador_id: amb.id,
+                        referred_user_id: authData.user.id,
+                        referred_email: formData.email,
+                        amount_paid: 0,
+                        commission_amount: 0,
+                        commission_paid: false
+                    }]);
+                    await supabase.from('ambassadors').update({
+                        total_referrals: (amb.total_referrals || 0) + 1
+                    }).eq('id', amb.id);
+                }
+            }
+
             alert(successMessage);
             if (redirectTo) {
                 router.push(`/login?redirectTo=${encodeURIComponent(redirectTo)}`);
@@ -162,15 +188,30 @@ export default function RegisterClient() {
         }
 
         if ((intent === 'cohort' || intent === 'paid') && price > 0) {
-            initializePayment({
-                onSuccess: () => {
-                    executeRegistration(true);
-                },
-                onClose: () => {
-                    setError("Payment cancelled. Account not created.");
-                    setLoading(false);
+            // Redirect to checkout with ref code so discount + referral tracking happens there
+            const courseId = intent === 'cohort' ? selectedCohortId : selectedCourseId;
+            const checkoutType = intent === 'cohort' ? 'cohort' : 'course';
+            // First create the account
+            const { data: authData, error: authError } = await supabase.auth.signUp({
+                email: formData.email,
+                password: formData.password,
+                options: {
+                    data: {
+                        full_name: formData.fullName,
+                        role: 'student'
+                    }
                 }
             });
+            if (authError) {
+                setError(authError.message);
+                setLoading(false);
+                return;
+            }
+            // Sign in
+            await supabase.auth.signInWithPassword({ email: formData.email, password: formData.password });
+            // Redirect to checkout
+            const refParam = refCode ? `&ref=${refCode.toUpperCase()}` : '';
+            router.push(`/checkout?type=${checkoutType}&id=${courseId}${refParam}`);
         } else {
             executeRegistration(false);
         }
@@ -331,6 +372,24 @@ export default function RegisterClient() {
                             placeholder="••••••••"
                             required
                         />
+
+                        <div style={{ padding: '0.75rem', border: '1px dashed #cbd5e1', borderRadius: '0.5rem', backgroundColor: '#fafbfc' }}>
+                            <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '0.4rem' }}>
+                                🎟️ Referral / Promo Code (optional)
+                            </label>
+                            <input
+                                type="text"
+                                value={refCode}
+                                onChange={(e) => setRefCode(e.target.value.toUpperCase().replace(/\s/g, ''))}
+                                placeholder="e.g. DAVE20"
+                                style={{ width: '100%', padding: '0.6rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}
+                            />
+                            {refCode && (
+                                <p style={{ fontSize: '0.7rem', color: '#059669', marginTop: '0.25rem' }}>
+                                    ✓ Code will be applied at checkout for paid courses
+                                </p>
+                            )}
+                        </div>
 
                         <Button
                             type="submit"
