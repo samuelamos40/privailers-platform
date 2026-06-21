@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
 const Footer = () => {
@@ -11,7 +11,7 @@ const Footer = () => {
     const [socials, setSocials] = useState({ twitter: '#', instagram: '#', facebook: '#', linkedin: '#' });
 
     // Fetch social links from database on load
-    useState(() => {
+    useEffect(() => {
         const fetchSettings = async () => {
             const { data } = await supabase
                 .from('app_settings')
@@ -32,7 +32,7 @@ const Footer = () => {
             }
         };
         fetchSettings();
-    });
+    }, []);
 
     const handleSubscribe = async (e: React.FormEvent) => {
         e.preventDefault();
