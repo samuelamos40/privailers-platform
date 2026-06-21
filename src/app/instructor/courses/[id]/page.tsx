@@ -163,7 +163,8 @@ export default function CourseEditorPage({ params }: { params: Promise<{ id: str
                 description: course.description,
                 duration: course.duration,
                 price: course.price,
-                tier: course.tier
+                tier: course.tier,
+                published: course.published
             })
             .eq('id', courseId);
 
@@ -441,10 +442,20 @@ export default function CourseEditorPage({ params }: { params: Promise<{ id: str
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
                         {!isEditingCourse ? (
                             <>
-                                <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#1e293b', margin: 0 }}>
+                                <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#1e293b', margin: 0, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                     {course?.title}
+                                    <span style={{ 
+                                        fontSize: '0.8rem', 
+                                        padding: '0.25rem 0.6rem', 
+                                        borderRadius: '1rem', 
+                                        backgroundColor: course?.published ? '#dcfce7' : '#f1f5f9', 
+                                        color: course?.published ? '#166534' : '#64748b',
+                                        border: `1px solid ${course?.published ? '#bbf7d0' : '#e2e8f0'}`
+                                    }}>
+                                        {course?.published ? 'Published' : 'Draft'}
+                                    </span>
                                 </h1>
-                                <Button variant="ghost" size="sm" onClick={() => setIsEditingCourse(true)}>✎ Edit Title</Button>
+                                <Button variant="ghost" size="sm" onClick={() => setIsEditingCourse(true)}>✎ Edit Details</Button>
                             </>
                         ) : (
                             <form onSubmit={handleUpdateCourse} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', backgroundColor: 'white', padding: '1.5rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
@@ -474,7 +485,19 @@ export default function CourseEditorPage({ params }: { params: Promise<{ id: str
                                 {course.tier === 'paid' && (
                                     <Input label="Price (₦)" type="number" value={course.price || ''} onChange={(e) => setCourse({ ...course, price: parseFloat(e.target.value) })} />
                                 )}
-                                <div style={{ display: 'flex', gap: '1rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                    <input 
+                                        type="checkbox" 
+                                        id="published" 
+                                        checked={course.published || false} 
+                                        onChange={(e) => setCourse({ ...course, published: e.target.checked })}
+                                        style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer' }}
+                                    />
+                                    <label htmlFor="published" style={{ fontSize: '0.9rem', fontWeight: 600, color: '#1e293b', cursor: 'pointer' }}>
+                                        Publish Course (Make visible to students)
+                                    </label>
+                                </div>
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
                                     <Button type="submit" variant="primary">Save Changes</Button>
                                     <Button type="button" variant="outline" onClick={() => setIsEditingCourse(false)}>Cancel</Button>
                                 </div>
