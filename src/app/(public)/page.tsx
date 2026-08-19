@@ -69,11 +69,11 @@ export default function Home() {
                 <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '2rem', textAlign: 'center' }}>
                         <div>
-                            <div style={{ fontSize: '2.5rem', fontWeight: 700, color: '#0f172a' }}>500+</div>
+                            <div style={{ fontSize: '2.5rem', fontWeight: 700, color: '#0f172a' }}>75+</div>
                             <div style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 600, textTransform: 'uppercase' }}>Students Trained</div>
                         </div>
                         <div>
-                            <div style={{ fontSize: '2.5rem', fontWeight: 700, color: '#0f172a' }}>50+</div>
+                            <div style={{ fontSize: '2.5rem', fontWeight: 700, color: '#0f172a' }}>2+</div>
                             <div style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 600, textTransform: 'uppercase' }}>Corporate Projects</div>
                         </div>
                         <div>
