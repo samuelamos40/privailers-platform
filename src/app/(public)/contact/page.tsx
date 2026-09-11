@@ -32,7 +32,7 @@ export default function ContactPage() {
                             </div>
                             <div>
                                 <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.25rem', color: 'var(--foreground)' }}>Phone</h3>
-                                <p style={{ color: 'var(--text-muted)' }}>+234 812 345 6789</p>
+                                <p style={{ color: 'var(--text-muted)' }}>+234 707 886 5107</p>
                                 <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Mon-Fri from 9am to 6pm</p>
                             </div>
                         </div>
@@ -43,7 +43,7 @@ export default function ContactPage() {
                             </div>
                             <div>
                                 <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.25rem', color: 'var(--foreground)' }}>Email</h3>
-                                <p style={{ color: 'var(--text-muted)' }}>info@privailers.com</p>
+                                <p style={{ color: 'var(--text-muted)' }}>privailerdataconsult@gmail.com</p>
                                 <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>For general inquiries and support</p>
                             </div>
                         </div>
@@ -54,8 +54,8 @@ export default function ContactPage() {
                             </div>
                             <div>
                                 <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.25rem', color: 'var(--foreground)' }}>Office</h3>
-                                <p style={{ color: 'var(--text-muted)' }}>123 Data Drive, Victoria Island</p>
-                                <p style={{ color: 'var(--text-muted)' }}>Lagos, Nigeria</p>
+                                <p style={{ color: 'var(--text-muted)' }}>Operating Remotely</p>
+                                <p style={{ color: 'var(--text-muted)' }}>Global Access</p>
                             </div>
                         </div>
                     </div>
@@ -88,13 +88,6 @@ export default function ContactPage() {
                 </Card>
             </div>
 
-            {/* Map Placeholder */}
-            <div style={{ marginBottom: '6rem' }}>
-                <div style={{ height: '400px', backgroundColor: '#e2e8f0', borderRadius: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '1.5rem', fontWeight: 600 }}>
-                    Create Google Map Placeholder Here
-                </div>
-            </div>
-
             {/* FAQs */}
             <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                 <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '2rem', textAlign: 'center', color: 'var(--primary-blue)' }}>Common Questions</h2>
@@ -105,7 +98,7 @@ export default function ContactPage() {
                     },
                     {
                         title: "Where are you located?",
-                        content: "Our main office is in Victoria Island, Lagos, but we serve clients and students globally through our online platform."
+                        content: "We operate remotely with global access, serving clients and students worldwide through our online platform."
                     },
                     {
                         title: "Do you offer consultations?",
