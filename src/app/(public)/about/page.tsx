@@ -15,31 +15,22 @@ export default function AboutPage() {
         <div className="container" style={{ padding: '4rem 1rem' }}>
             <div style={{ textAlign: 'center', marginBottom: '5rem' }}>
                 <h1 style={{ fontSize: '3rem', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--primary-blue)' }}>About Privailers</h1>
-                <p style={{ fontSize: '1.25rem', lineHeight: 1.8, maxWidth: '800px', margin: '0 auto', color: 'var(--text-muted)' }}>
-                    We are a team of data scientists, educators, and strategists dedicated to making data accessible, understandable, and actionable for everyone.
+                <p style={{ fontSize: '1.25rem', lineHeight: 1.8, maxWidth: '900px', margin: '0 auto', color: 'var(--text-muted)' }}>
+                    Privailers Data Consult is a Nigerian-based EdTech and data analytics consultancy poised to bridge the critical skills gap in Africa's digital economy. We empower businesses to make smarter, data-driven decisions while equipping individuals with practical, job-ready analytical skills.
                 </p>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem', marginBottom: '6rem' }}>
                 <div>
-                    <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--primary-blue)' }}>Our Mission</h2>
+                    <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--primary-blue)' }}>Our Vision & Mission</h2>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--primary-blue)', marginBottom: '0.5rem' }}>Vision</h3>
                     <p style={{ fontSize: '1.125rem', lineHeight: 1.8, color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-                        To democratize data analysis by providing high-quality consultancy for businesses and practical, top-tier training for aspiring data professionals.
+                        To empower businesses with data-driven insights and develop a new generation of highly skilled, globally competitive data professionals across Africa.
                     </p>
-                    <ul style={{ listStyle: 'none', padding: 0, color: 'var(--text-muted)', lineHeight: 1.8 }}>
-                        <li style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center' }}>
-                            <span style={{ color: 'var(--accent-teal-dark)', marginRight: '0.75rem' }}>✓</span>
-                            Empowering informed decision-making.
-                        </li>
-                        <li style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center' }}>
-                            <span style={{ color: 'var(--accent-teal-dark)', marginRight: '0.75rem' }}>✓</span>
-                            Bridging the skills gap in the tech industry.
-                        </li>
-                        <li style={{ display: 'flex', alignItems: 'center' }}>
-                            <span style={{ color: 'var(--accent-teal-dark)', marginRight: '0.75rem' }}>✓</span>
-                            Fostering a community of continuous learners.
-                        </li>
-                    </ul>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--primary-blue)', marginBottom: '0.5rem' }}>Mission</h3>
+                    <p style={{ fontSize: '1.125rem', lineHeight: 1.8, color: 'var(--text-muted)' }}>
+                        To deliver accessible, high-quality data consulting and an integrated EdTech learning ecosystem that bridges the gap between business intelligence needs and professional career development.
+                    </p>
                 </div>
                 <div style={{ position: 'relative', height: '100%', minHeight: '350px', borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}>
                     <Image
@@ -77,13 +68,13 @@ export default function AboutPage() {
 
             {/* Our Story / Timeline */}
             <div style={{ marginBottom: '6rem', backgroundColor: '#f8fafc', padding: '4rem 2rem', borderRadius: '1rem' }}>
-                <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '3rem', textAlign: 'center', color: 'var(--primary-blue)' }}>Our Journey</h2>
+                <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '3rem', textAlign: 'center', color: 'var(--primary-blue)' }}>Our Journey & Impact</h2>
                 <div style={{ maxWidth: '800px', margin: '0 auto', position: 'relative', paddingLeft: '2rem', borderLeft: '2px solid var(--border-color)' }}>
                     {[
-                        { year: '2018', title: 'The Beginning', desc: 'Founded with a single laptop and a vision to make data accessible to local businesses.' },
+                        { year: '2018', title: 'The Beginning', desc: 'Founded with a vision to make data accessible to local businesses.' },
                         { year: '2020', title: 'First Training Cohort', desc: 'Launched our training arm to address the growing demand for skilled data analysts.' },
-                        { year: '2022', title: 'Corporate Partnerships', desc: 'Partnered with major retail chains to optimize their supply chain operations.' },
-                        { year: '2024', title: 'Platform Launch', desc: 'Unveiling our digital platform to scale our impact globally.' }
+                        { year: '2024', title: 'Platform Launch & Growth', desc: 'Unveiled our proprietary digital learning ecosystem. Our inaugural Advanced Data Analytics bootcamp successfully graduated a cohort where students immediately secured full-time employment and internships.' },
+                        { year: 'Future', title: 'Privailers Innovation Hub', desc: 'Expanding our physical footprint with plans for the Privailers Innovation Hub in Ado-Ekiti, further solidifying our position in Nigeria\'s rapidly expanding EdTech market.' }
                     ].map((event, i) => (
                         <div key={i} style={{ marginBottom: '3rem', position: 'relative' }}>
                             <div style={{
