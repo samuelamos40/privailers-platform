@@ -71,9 +71,8 @@ export default function AboutPage() {
                 <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '3rem', textAlign: 'center', color: 'var(--primary-blue)' }}>Our Journey & Impact</h2>
                 <div style={{ maxWidth: '800px', margin: '0 auto', position: 'relative', paddingLeft: '2rem', borderLeft: '2px solid var(--border-color)' }}>
                     {[
-                        { year: '2018', title: 'The Beginning', desc: 'Founded with a vision to make data accessible to local businesses.' },
-                        { year: '2020', title: 'First Training Cohort', desc: 'Launched our training arm to address the growing demand for skilled data analysts.' },
-                        { year: '2024', title: 'Platform Launch & Growth', desc: 'Unveiled our proprietary digital learning ecosystem. Our inaugural Advanced Data Analytics bootcamp successfully graduated a cohort where students immediately secured full-time employment and internships.' },
+                        { year: '2025', title: 'The Beginning', desc: 'Founded with a vision to make data accessible to local businesses and launched our first training cohort to address the growing demand for skilled data analysts.' },
+                        { year: '2026', title: 'Platform Launch & Growth', desc: 'Unveiled our proprietary digital learning ecosystem. Our inaugural Advanced Data Analytics bootcamp successfully graduated a cohort where students immediately secured full-time employment and internships.' },
                         { year: 'Future', title: 'Privailers Innovation Hub', desc: 'Expanding our physical footprint with plans for the Privailers Innovation Hub in Ado-Ekiti, further solidifying our position in Nigeria\'s rapidly expanding EdTech market.' }
                     ].map((event, i) => (
                         <div key={i} style={{ marginBottom: '3rem', position: 'relative' }}>
