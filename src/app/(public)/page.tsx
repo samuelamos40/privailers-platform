@@ -195,19 +195,19 @@ export default function Home() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
                         {[
                             {
-                                quote: "The Data Analysis Bootcamp completely changed my career trajectory. I went from a novice to landing a role at a fintech startup in just 4 months.",
-                                author: "Sarah J.",
-                                role: "Data Analyst @ PayStack"
+                                quote: "Joining the Privailers Data Analytics Bootcamp was a game-changer for me. The classes were practical, beginner-friendly, and highly impactful. I gained hands-on experience with tools like Excel and I now feel confident analyzing data and drawing meaningful insights. I highly recommend it to anyone looking to build real data skills.",
+                                author: "Aichenede Joy Omonigho",
+                                role: "Data Analytics Student"
                             },
                             {
-                                quote: "Privailers' consultancy uncovered inefficiencies in our supply chain that saved us over ₦5M in the first quarter alone. Highly recommended.",
-                                author: "Emmanuel O.",
-                                role: "Operations Manager, RetailGiant"
+                                quote: "Enrolling in the one-month data analysis program at Privailers Data Consult was a game-changer for my career. In just four weeks, I went from having zero technical knowledge to being comfortable cleaning data and building insightful dashboards. The curriculum is incredibly structured, and the focus on practical, real-world projects made all the difference.",
+                                author: "Oyinlola Abdulrahman O.",
+                                role: "Data Analytics Student"
                             },
                             {
-                                quote: "The hands-on projects were the best part. I built a real portfolio that I could show to recruiters. The mentorship is top-notch.",
-                                author: "David K.",
-                                role: "Junior Data Scientist"
+                                quote: "This Data Analytics Bootcamp has been a transformative experience! I've gained practical skills in data analysis and visualization. The hands-on projects and expert instructors have helped me unlock my potential. I'm now confident to drive data-driven decisions and take my career to the next level!",
+                                author: "Adeojo Rildwan",
+                                role: "Data Analytics Student"
                             }
                         ].map((testimonial, i) => (
                             <div key={i} style={{
