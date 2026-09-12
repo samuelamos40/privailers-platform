@@ -99,19 +99,22 @@ export default function AboutPage() {
                 <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '3rem', textAlign: 'center', color: 'var(--primary-blue)' }}>Meet the Team</h2>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
                     <TeamMemberCard
-                        name="Dr. Amina Z."
-                        role="Founder & Principal Consultant"
-                        bio="With over 15 years in data science, Amina leads the consultancy arm, helping businesses translate numbers into growth."
+                        name="Aguoha Confidence Emeka"
+                        role="Junior Data Analyst"
+                        bio="A dedicated analyst focused on uncovering hidden trends and driving data-informed decisions."
+                        imageUrl="/images/team/aguoha.jpg"
                     />
                     <TeamMemberCard
-                        name="John Doe"
-                        role="Lead Instructor"
-                        bio="A passionate educator and former Data Analyst at TechCorp, John shapes the curriculum for our academy."
+                        name="Muhammmad Yunusa Liman"
+                        role="Junior Data Analyst"
+                        bio="Passionate about turning raw data into actionable insights for business growth and operational efficiency."
+                        imageUrl="/images/team/muhammad.jpg"
                     />
                     <TeamMemberCard
-                        name="Sarah K."
-                        role="Business Strategy Lead"
-                        bio="Sarah combines her MBA background with data insights to ensure our solutions drive real ROI for clients."
+                        name="Duru Grace Chigozie"
+                        role="Junior Data Analyst"
+                        bio="Specializes in data storytelling and visualization, helping organizations make sense of complex datasets."
+                        imageUrl="/images/team/duru.jpg"
                     />
                 </div>
             </div>
