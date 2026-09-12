@@ -100,19 +100,19 @@ export default function AboutPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
                     <TeamMemberCard
                         name="Aguoha Confidence Emeka"
-                        role="Junior Data Analyst"
+                        role="Data Analyst"
                         bio="A dedicated analyst focused on uncovering hidden trends and driving data-informed decisions."
                         imageUrl="/images/team/aguoha.jpg"
                     />
                     <TeamMemberCard
                         name="Muhammmad Yunusa Liman"
-                        role="Junior Data Analyst"
+                        role="Data Analyst"
                         bio="Passionate about turning raw data into actionable insights for business growth and operational efficiency."
                         imageUrl="/images/team/muhammad.jpg"
                     />
                     <TeamMemberCard
                         name="Duru Grace Chigozie"
-                        role="Junior Data Analyst"
+                        role="Data Analyst"
                         bio="Specializes in data storytelling and visualization, helping organizations make sense of complex datasets."
                         imageUrl="/images/team/duru.jpg"
                     />
