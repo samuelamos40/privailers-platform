@@ -46,7 +46,8 @@ const Sidebar = ({ isOpen, onClose }: { isOpen?: boolean, onClose?: () => void }
                     <button 
                         onClick={onClose}
                         className="mobile-close-btn"
-                        style={{ display: 'none', background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '0.5rem' }}
+                        style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '0.5rem', color: '#64748b' }}
+                        aria-label="Close menu"
                     >
                         ✕
                     </button>
@@ -64,6 +65,9 @@ const Sidebar = ({ isOpen, onClose }: { isOpen?: boolean, onClose?: () => void }
                                     onClick={async (e) => {
                                         if (isLogout) {
                                             e.preventDefault();
+                                            if (typeof window !== 'undefined') {
+                                                sessionStorage.setItem('privailers_logging_out', 'true');
+                                            }
                                             await signOut();
                                             window.location.href = '/';
                                         }

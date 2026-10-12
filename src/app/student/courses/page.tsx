@@ -56,29 +56,60 @@ export default function StudentCoursesPage() {
 
     useEffect(() => {
         if (user) {
+            // Instant load from sessionStorage cache if available
+            try {
+                const cached = sessionStorage.getItem(`privailers_courses_${user.id}`);
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (parsed.enrollments) setEnrollments(parsed.enrollments);
+                    if (parsed.allCohorts) setAllCohorts(parsed.allCohorts);
+                    setLoading(false);
+                }
+            } catch (err) {
+                console.error("Cache read error:", err);
+            }
+
             fetchEnrollments();
         }
     }, [user]);
 
     const fetchEnrollments = async () => {
-        setLoading(true);
-        // Fetch My Enrollments
-        const { data: eData } = await supabase
-            .from('enrollments')
-            .select(`*, course:courses(*), cohort:cohorts(*)`)
-            .eq('user_id', user?.id)
-            .order('last_accessed', { ascending: false });
-        
-        setEnrollments((eData as any[]) || []);
+        try {
+            // Fetch both in parallel for maximum speed
+            const [enrollResult, cohortsResult] = await Promise.all([
+                supabase
+                    .from('enrollments')
+                    .select(`*, course:courses(*), cohort:cohorts(*)`)
+                    .eq('user_id', user?.id)
+                    .order('last_accessed', { ascending: false }),
+                supabase
+                    .from('cohorts')
+                    .select(`*, course:courses(id, title, thumbnail_url, price)`)
+                    .eq('status', 'open')
+            ]);
 
-        // Fetch All Open Cohorts
-        const { data: cData } = await supabase
-            .from('cohorts')
-            .select(`*, course:courses(id, title, thumbnail_url, price)`)
-            .eq('status', 'open');
-        
-        setAllCohorts(cData || []);
-        setLoading(false);
+            const freshEnrollments = (enrollResult.data as any[]) || [];
+            const freshCohorts = cohortsResult.data || [];
+
+            setEnrollments(freshEnrollments);
+            setAllCohorts(freshCohorts);
+
+            // Save to cache
+            try {
+                if (user?.id) {
+                    sessionStorage.setItem(`privailers_courses_${user.id}`, JSON.stringify({
+                        enrollments: freshEnrollments,
+                        allCohorts: freshCohorts
+                    }));
+                }
+            } catch (err) {
+                console.error("Cache save error:", err);
+            }
+        } catch (err) {
+            console.error("Error fetching courses data:", err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const filteredEnrollments = enrollments.filter(enrollment => {
@@ -171,8 +202,11 @@ export default function StudentCoursesPage() {
                             const itemId = enrollment.course?.id || enrollment.cohort?.id || enrollment.id;
                             const itemTitle = enrollment.course?.title || enrollment.cohort?.name || "Assigned Batch";
                             const style = getCourseStyle(itemId, itemTitle);
+                            const targetPath = enrollment.course_id 
+                                ? `/student/courses/${enrollment.course_id}${enrollment.cohort_id ? `?cohortId=${enrollment.cohort_id}` : ''}`
+                                : (enrollment.cohort_id ? `/student/courses/${enrollment.cohort_id}` : '/student/live-classes');
                             return (
-                                <Link href={enrollment.course_id ? `/student/courses/${enrollment.course_id}${enrollment.cohort_id ? `?cohortId=${enrollment.cohort_id}` : ''}` : (enrollment.cohort_id ? `/student/courses/${enrollment.cohort?.course_id}?cohortId=${enrollment.cohort_id}` : `/student/live-classes`)} key={enrollment.id} style={{ textDecoration: 'none' }}>
+                                <Link href={targetPath} key={enrollment.id} style={{ textDecoration: 'none' }}>
                                     <LightCard
                                         style={{ height: '100%', padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', cursor: 'pointer' }}
                                     >

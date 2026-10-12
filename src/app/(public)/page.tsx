@@ -8,30 +8,25 @@ import Card from "@/components/ui/Card";
 import CourseIcon from "@/components/ui/CourseIcon";
 import { BarChart3, BrainCircuit, GraduationCap, ArrowRight, Database, Globe2, Calculator, BookOpen } from "lucide-react";
 
-let homeCoursesCache: any[] | null = null;
-
 export default function Home() {
-    const [featuredCourses, setFeaturedCourses] = useState<any[]>(() => {
-        if (homeCoursesCache) return homeCoursesCache;
-        if (typeof window !== "undefined") {
-            try {
-                const cached = sessionStorage.getItem("privailers_home_courses");
-                if (cached) return JSON.parse(cached);
-            } catch (e) {}
-        }
-        return [];
-    });
-    const [loading, setLoading] = useState(() => {
-        if (homeCoursesCache && homeCoursesCache.length > 0) return false;
-        if (typeof window !== "undefined") {
-            try {
-                if (sessionStorage.getItem("privailers_home_courses")) return false;
-            } catch (e) {}
-        }
-        return true;
-    });
+    const [featuredCourses, setFeaturedCourses] = useState<any[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
+        if (typeof window !== "undefined") {
+            try { sessionStorage.removeItem("privailers_logging_out"); } catch (e) {}
+            try {
+                const cached = sessionStorage.getItem("privailers_home_courses");
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (parsed && Array.isArray(parsed) && parsed.length > 0) {
+                        setFeaturedCourses(parsed);
+                        setLoading(false);
+                    }
+                }
+            } catch (e) {}
+        }
+
         let isMounted = true;
         const fetchCourses = async () => {
             try {
@@ -41,7 +36,6 @@ export default function Home() {
                     .limit(3);
                 if (data && isMounted) {
                     setFeaturedCourses(data);
-                    homeCoursesCache = data;
                     try {
                         sessionStorage.setItem("privailers_home_courses", JSON.stringify(data));
                     } catch (e) {}

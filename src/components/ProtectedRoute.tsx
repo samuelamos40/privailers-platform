@@ -16,6 +16,10 @@ export default function ProtectedRoute({
 
     useEffect(() => {
         if (!loading) {
+            // If user explicitly initiated logout, don't flash login page
+            if (typeof window !== 'undefined' && sessionStorage.getItem('privailers_logging_out') === 'true') {
+                return;
+            }
             if (!user) {
                 // Not authenticated, redirect to login
                 if (requireRole === 'admin') {

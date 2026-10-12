@@ -58,7 +58,7 @@ export default function StudentLayout({
     return (
         <ProtectedRoute requireRole="student">
             <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
-                <div className="mobile-topbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1.5rem', backgroundColor: 'white', borderBottom: '1px solid #e2e8f0' }}>
+                <div className="mobile-topbar" style={{ alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1.5rem', backgroundColor: 'white', borderBottom: '1px solid #e2e8f0' }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <img src="/images/logo.png" alt="Logo" style={{ height: '35px', width: 'auto' }} />
                     </div>

@@ -48,6 +48,15 @@ a {
   cursor: pointer;
 }
 
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  box-shadow: none !important;
+}
+
+
 .btn-primary {
   background-color: var(--primary-blue);
   color: var(--white);
@@ -198,8 +207,9 @@ a {
   }
 }
 
-.mobile-menu-btn {
-  display: none;
+.mobile-menu-btn,
+.mobile-close-btn {
+  display: none !important;
 }
 
 @media (max-width: 900px) {
@@ -216,7 +226,7 @@ a {
   }
 
   .mobile-topbar {
-    display: flex;
+    display: flex !important;
   }
 
   .course-player-grid {
@@ -232,7 +242,8 @@ a {
     display: none !important;
   }
   
-  .mobile-menu-btn {
+  .mobile-menu-btn,
+  .mobile-close-btn {
     display: block !important;
   }
 }

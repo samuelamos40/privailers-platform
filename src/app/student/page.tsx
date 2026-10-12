@@ -28,6 +28,7 @@ const LightCard = ({ children, style, className }: { children: React.ReactNode, 
 type EnrollmentWithCourse = Enrollment & {
     course: Course;
     cohort?: any;
+    cohort_id?: string;
 };
 
 export default function StudentDashboard() {
@@ -42,6 +43,22 @@ export default function StudentDashboard() {
 
     useEffect(() => {
         if (user) {
+            // Instant load from sessionStorage cache if available
+            try {
+                const cached = sessionStorage.getItem(`privailers_dashboard_${user.id}`);
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (parsed.enrollments) setEnrollments(parsed.enrollments);
+                    if (parsed.availableCourses) setAvailableCourses(parsed.availableCourses);
+                    if (parsed.upcomingCohorts) setUpcomingCohorts(parsed.upcomingCohorts);
+                    if (parsed.announcements) setAnnouncements(parsed.announcements);
+                    if (parsed.myClasses) setMyClasses(parsed.myClasses);
+                    setLoading(false);
+                }
+            } catch (err) {
+                console.error("Cache read error:", err);
+            }
+
             fetchData();
 
             // Realtime subscription for class status updates
@@ -63,93 +80,113 @@ export default function StudentDashboard() {
     }, [user]);
 
     const fetchData = async () => {
-        const [enrollResponse, coursesResponse, liveResponse, announcementResponse] = await Promise.all([
-            supabase
-                .from('enrollments')
-                .select(`
-                    id, user_id, course_id, cohort_id, status, progress, last_accessed,
-                    course:courses ( id, title, description, tier, price ),
-                    cohort:cohorts ( id, name, price, start_date )
-                `)
-                .eq('user_id', user?.id)
-                .order('last_accessed', { ascending: false }),
+        try {
+            const [enrollResponse, coursesResponse, liveResponse, announcementResponse] = await Promise.all([
+                supabase
+                    .from('enrollments')
+                    .select(`
+                        id, user_id, course_id, cohort_id, status, progress, last_accessed,
+                        course:courses ( id, title, description, tier, price ),
+                        cohort:cohorts ( id, name, price, start_date )
+                    `)
+                    .eq('user_id', user?.id)
+                    .order('last_accessed', { ascending: false }),
 
-            supabase
-                .from('courses')
-                .select('id, title, description, tier, price, duration, created_at'),
+                supabase
+                    .from('courses')
+                    .select('id, title, description, tier, price, duration, created_at'),
 
-            supabase
-                .from('live_classes')
-                .select(`
-                    id, title, scheduled_at, status,
-                    course:courses!inner(id, title, description, instructor:users(full_name))
-                `)
-                .neq('course_id', null)
-                .in('status', ['scheduled', 'live']),
+                supabase
+                    .from('live_classes')
+                    .select(`
+                        id, title, scheduled_at, status,
+                        course:courses!inner(id, title, description, instructor:users(full_name))
+                    `)
+                    .neq('course_id', null)
+                    .in('status', ['scheduled', 'live']),
 
-            supabase
-                .from('cohort_announcements')
-                .select(`*, instructor:users(full_name)`)
-                .order('created_at', { ascending: false })
-                .limit(5)
-        ]);
+                supabase
+                    .from('cohort_announcements')
+                    .select(`*, instructor:users(full_name)`)
+                    .order('created_at', { ascending: false })
+                    .limit(5)
+            ]);
 
-        const userEnrollments = (enrollResponse.data as any[]) || [];
-        setEnrollments(userEnrollments);
+            const userEnrollments = (enrollResponse.data as any[]) || [];
+            setEnrollments(userEnrollments);
 
-        // Fetch Classes for enrolled cohorts
-        const myBatchIds = userEnrollments.map(e => e.cohort_id).filter(Boolean);
-        const enrolledCourseIdsArray = Array.from(new Set(userEnrollments.map(e => e.course_id)));
-        
-        let allMyClasses: any[] = [];
-        
-        if (myBatchIds.length > 0) {
-            const { data: classData } = await supabase
-                .from('cohort_classes')
-                .select('*, cohort:cohorts(name)')
-                .in('cohort_id', myBatchIds);
+            // Fetch Classes for enrolled cohorts and global live classes in parallel
+            const myBatchIds = userEnrollments.map(e => e.cohort_id).filter(Boolean);
+            const enrolledCourseIdsArray = Array.from(new Set(userEnrollments.map(e => e.course_id)));
             
-            if (classData) allMyClasses = [...allMyClasses, ...classData];
-        }
+            let orQueryParts = ['and(course_id.is.null,cohort_id.is.null)'];
+            if (myBatchIds.length > 0) orQueryParts.push(`cohort_id.in.(${myBatchIds.join(',')})`);
+            if (enrolledCourseIdsArray.length > 0) orQueryParts.push(`course_id.in.(${enrolledCourseIdsArray.join(',')})`);
 
-        // Fetch Global/Course/Cohort live_classes
-        let orQueryParts = ['and(course_id.is.null,cohort_id.is.null)'];
-        if (myBatchIds.length > 0) orQueryParts.push(`cohort_id.in.(${myBatchIds.join(',')})`);
-        if (enrolledCourseIdsArray.length > 0) orQueryParts.push(`course_id.in.(${enrolledCourseIdsArray.join(',')})`);
+            const [cohortClassesRes, globalClassesRes] = await Promise.all([
+                myBatchIds.length > 0
+                    ? supabase.from('cohort_classes').select('*, cohort:cohorts(name)').in('cohort_id', myBatchIds)
+                    : Promise.resolve({ data: [] }),
+                supabase.from('live_classes').select('*, course:courses(title), cohort:cohorts(name)').or(orQueryParts.join(','))
+            ]);
 
-        const { data: globalClasses } = await supabase
-            .from('live_classes')
-            .select('*, course:courses(title), cohort:cohorts(name)')
-            .or(orQueryParts.join(','));
-
-        if (globalClasses) {
-            const normalizedGlobal = globalClasses.map(c => ({
-                ...c,
-                title: c.course_id ? `[Course] ${c.title}` : c.cohort_id ? `[Cohort] ${c.title}` : `[General] ${c.title}`,
-                cohort: c.cohort || { name: c.course?.title || 'Platform Event' },
-                isGlobalLiveClass: true
-            }));
-            allMyClasses = [...allMyClasses, ...normalizedGlobal];
-        }
-
-        // Filter and sort the combined classes
-        setMyClasses(allMyClasses
-            .filter(c => ['scheduled', 'ongoing', 'live'].includes(c.status) || (c.status === 'completed' && c.recording_url))
-            .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())
-            .slice(0, 5)
-        );
-
-        const allCourses = coursesResponse.data || [];
-        if (allCourses.length > 0) {
-            const enrolledCourseIds = new Set(userEnrollments.map(e => e.course_id));
-            setAvailableCourses(allCourses.filter(c => !enrolledCourseIds.has(c.id)));
-            const activeCohorts = liveResponse.data || [];
-            if (activeCohorts.length > 0) {
-                setUpcomingCohorts(activeCohorts.filter((c: any) => !enrolledCourseIds.has(c.course?.id)));
+            let allMyClasses: any[] = [];
+            if (cohortClassesRes.data) {
+                allMyClasses = [...allMyClasses, ...cohortClassesRes.data];
             }
+
+            if (globalClassesRes.data) {
+                const normalizedGlobal = globalClassesRes.data.map((c: any) => ({
+                    ...c,
+                    title: c.course_id ? `[Course] ${c.title}` : c.cohort_id ? `[Cohort] ${c.title}` : `[General] ${c.title}`,
+                    cohort: c.cohort || { name: c.course?.title || 'Platform Event' },
+                    isGlobalLiveClass: true
+                }));
+                allMyClasses = [...allMyClasses, ...normalizedGlobal];
+            }
+
+            // Filter and sort the combined classes
+            const finalClasses = allMyClasses
+                .filter(c => ['scheduled', 'ongoing', 'live'].includes(c.status) || (c.status === 'completed' && c.recording_url))
+                .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())
+                .slice(0, 5);
+            setMyClasses(finalClasses);
+
+            const allCourses = coursesResponse.data || [];
+            let freshAvailableCourses: Course[] = [];
+            let freshUpcomingCohorts: any[] = [];
+            if (allCourses.length > 0) {
+                const enrolledCourseIds = new Set(userEnrollments.map(e => e.course_id));
+                freshAvailableCourses = allCourses.filter(c => !enrolledCourseIds.has(c.id));
+                setAvailableCourses(freshAvailableCourses);
+                const activeCohorts = liveResponse.data || [];
+                if (activeCohorts.length > 0) {
+                    freshUpcomingCohorts = activeCohorts.filter((c: any) => !enrolledCourseIds.has(c.course?.id));
+                    setUpcomingCohorts(freshUpcomingCohorts);
+                }
+            }
+            const freshAnnouncements = announcementResponse.data || [];
+            setAnnouncements(freshAnnouncements);
+
+            // Save to cache for instant rendering next time
+            try {
+                if (user?.id) {
+                    sessionStorage.setItem(`privailers_dashboard_${user.id}`, JSON.stringify({
+                        enrollments: userEnrollments,
+                        availableCourses: freshAvailableCourses,
+                        upcomingCohorts: freshUpcomingCohorts,
+                        announcements: freshAnnouncements,
+                        myClasses: finalClasses
+                    }));
+                }
+            } catch (err) {
+                console.error("Cache save error:", err);
+            }
+        } catch (err) {
+            console.error("Error fetching dashboard data:", err);
+        } finally {
+            setLoading(false);
         }
-        setAnnouncements(announcementResponse.data || []);
-        setLoading(false);
     };
 
     const handleJoinClass = async (classId: string, isGlobalLiveClass?: boolean) => {
@@ -426,7 +463,7 @@ export default function StudentDashboard() {
                             </p>
 
                             <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-                                <Link href={heroCourse.course_id ? `/student/courses/${heroCourse.course_id}` : `/student/live-classes`}>
+                                <Link href={heroCourse.course_id ? `/student/courses/${heroCourse.course_id}${heroCourse.cohort_id ? `?cohortId=${heroCourse.cohort_id}` : ''}` : (heroCourse.cohort_id ? `/student/courses/${heroCourse.cohort_id}` : `/student/live-classes`)}>
                                     <Button style={{
                                         padding: '1rem 2.5rem',
                                         borderRadius: '1rem',
@@ -525,9 +562,13 @@ export default function StudentDashboard() {
                 <div style={{ marginBottom: '5rem' }}>
                     <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#334155', marginBottom: '1.5rem' }}>Your Library</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
-                        {otherEnrollments.map(e => (
-                            <Link href={e.course?.id ? `/student/courses/${e.course.id}` : '#'} key={e.id} style={{ textDecoration: 'none' }}>
-                                <LightCard style={{
+                        {otherEnrollments.map(e => {
+                            const eTarget = e.course_id 
+                                ? `/student/courses/${e.course_id}${e.cohort_id ? `?cohortId=${e.cohort_id}` : ''}`
+                                : (e.cohort_id ? `/student/courses/${e.cohort_id}` : '/student/live-classes');
+                            return (
+                                <Link href={eTarget} key={e.id} style={{ textDecoration: 'none' }}>
+                                    <LightCard style={{
                                     height: '100%',
                                     padding: '0',
                                     overflow: 'hidden',
@@ -559,7 +600,8 @@ export default function StudentDashboard() {
                                     </div>
                                 </LightCard>
                             </Link>
-                        ))}
+                        );
+                    })}
                     </div>
                 </div>
             )}

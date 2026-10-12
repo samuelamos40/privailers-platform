@@ -150,7 +150,15 @@ export default function CheckoutClient() {
 
         if (data.success) {
             alert("Payment successful! Welcome to the classroom 🎓");
-            router.push(type === 'cohort' ? `/student/courses/${item.course_id || 'standalone'}` : `/student/courses/${item.id}`);
+            if (type === 'cohort') {
+                if (item.course_id) {
+                    router.push(`/student/courses/${item.course_id}?cohortId=${item.id}`);
+                } else {
+                    router.push('/student/courses');
+                }
+            } else {
+                router.push(`/student/courses/${item.id}`);
+            }
         } else {
             alert("Payment verification failed: " + data.error);
         }

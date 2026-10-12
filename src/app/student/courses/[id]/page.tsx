@@ -65,48 +65,109 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
     const fetchData = async () => {
         setLoading(true);
 
-        // 1. Fetch Course Details
-        const { data: courseData } = await supabase
-            .from('courses')
-            .select('*')
-            .eq('id', courseId)
-            .single();
+        let actualCourseId = courseId;
+        let actualCourseData: any = null;
 
-        setCourse(courseData);
+        // 1. Try to fetch Course Details directly
+        if (courseId && courseId !== 'standalone' && courseId !== 'undefined') {
+            const { data: courseData } = await supabase
+                .from('courses')
+                .select('*')
+                .eq('id', courseId)
+                .maybeSingle();
+            
+            if (courseData) {
+                actualCourseData = courseData;
+            }
+        }
 
-        // 2. Fetch Modules
-        const { data: moduleData } = await supabase
-            .from('modules')
-            .select('*')
-            .eq('course_id', courseId)
-            .order('order', { ascending: true });
+        // If not found by courseId, check if courseId is actually a cohort ID or if targetCohortId is provided
+        const cohortLookupId = actualCourseData ? targetCohortId : (targetCohortId || courseId);
+        if (cohortLookupId && cohortLookupId !== 'standalone' && cohortLookupId !== 'undefined') {
+            const { data: tCohort } = await supabase
+                .from('cohorts')
+                .select('*, course:courses(*), instructor:users(full_name)')
+                .eq('id', cohortLookupId)
+                .maybeSingle();
 
-        setModules(moduleData || []);
+            if (tCohort) {
+                setTargetCohort(tCohort);
+                if (!actualCourseData) {
+                    if (tCohort.course) {
+                        actualCourseData = tCohort.course;
+                        actualCourseId = tCohort.course.id;
+                    } else {
+                        // The cohort is a live-only batch (no pre-recorded course video modules)
+                        actualCourseData = {
+                            id: tCohort.id,
+                            title: tCohort.name,
+                            description: `Live Mentored Batch for ${tCohort.name}. Attend live virtual classes, download materials, and complete assignments.`,
+                            tier: 'cohort',
+                            price: tCohort.price || 0,
+                            isCohortOnly: true
+                        };
+                    }
+                }
+            }
+        }
+
+        setCourse(actualCourseData);
+
+        // 2. Fetch Modules for the resolved course
+        let moduleData: any[] = [];
+        if (actualCourseId && actualCourseId !== 'standalone' && actualCourseId !== 'undefined') {
+            const { data: mData } = await supabase
+                .from('modules')
+                .select('*')
+                .eq('course_id', actualCourseId)
+                .order('order', { ascending: true });
+            moduleData = mData || [];
+        }
+        setModules(moduleData);
 
         // 3. Fetch Projects
-        const { data: projectData } = await supabase
-            .from('projects')
-            .select('*')
-            .eq('course_id', courseId);
+        let projectData: any[] = [];
+        if (actualCourseId && actualCourseId !== 'standalone' && actualCourseId !== 'undefined') {
+            const { data: pData } = await supabase
+                .from('projects')
+                .select('*')
+                .eq('course_id', actualCourseId);
+            projectData = pData || [];
+        }
+        setProjects(projectData);
 
-        setProjects(projectData || []);
-
-        // 3.5 Fetch My Submissions (for status)
-        const { data: submissionData } = await supabase
-            .from('project_submissions')
-            .select('*')
-            .eq('user_id', user!.id)
-            .in('project_id', (projectData || []).map((p: any) => p.id));
-
-        setSubmissions(submissionData || []);
+        // 3.5 Fetch Submissions
+        if (user && projectData.length > 0) {
+            const { data: submissionData } = await supabase
+                .from('project_submissions')
+                .select('*')
+                .eq('user_id', user.id)
+                .in('project_id', projectData.map((p: any) => p.id));
+            setSubmissions(submissionData || []);
+        } else {
+            setSubmissions([]);
+        }
 
         // 4. Fetch Enrollment & Access
-        const { data: enrollmentData } = await supabase
-            .from('enrollments')
-            .select('*')
-            .eq('user_id', user!.id)
-            .eq('course_id', courseId)
-            .single();
+        let enrollmentData = null;
+        if (user) {
+            // Check by course_id or cohort_id
+            let enrollQuery = supabase
+                .from('enrollments')
+                .select('*')
+                .eq('user_id', user.id);
+
+            if (actualCourseId && cohortLookupId) {
+                enrollQuery = enrollQuery.or(`course_id.eq.${actualCourseId},cohort_id.eq.${cohortLookupId}`);
+            } else if (actualCourseId) {
+                enrollQuery = enrollQuery.eq('course_id', actualCourseId);
+            } else if (cohortLookupId) {
+                enrollQuery = enrollQuery.eq('cohort_id', cohortLookupId);
+            }
+
+            const { data: eData } = await enrollQuery.maybeSingle();
+            enrollmentData = eData;
+        }
 
         setEnrollment(enrollmentData);
 
@@ -117,21 +178,25 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
                 .from('users')
                 .select('full_name, role')
                 .eq('id', user.id)
-                .single();
+                .maybeSingle();
             fetchedProfile = data;
             setUserProfile(data);
         }
 
         // 5. Fetch Module Progress
-        const { data: progressData } = await supabase
-            .from('module_progress')
-            .select('module_id')
-            .eq('user_id', user!.id)
-            .eq('completed', true)
-            .in('module_id', (moduleData || []).map((m: any) => m.id));
+        if (user && moduleData.length > 0) {
+            const { data: progressData } = await supabase
+                .from('module_progress')
+                .select('module_id')
+                .eq('user_id', user.id)
+                .eq('completed', true)
+                .in('module_id', moduleData.map((m: any) => m.id));
 
-        const completedSet = new Set((progressData || []).map((p: any) => p.module_id));
-        setCompletedModuleIds(completedSet);
+            const completedSet = new Set((progressData || []).map((p: any) => p.module_id));
+            setCompletedModuleIds(completedSet);
+        } else {
+            setCompletedModuleIds(new Set());
+        }
 
         // Determine Access (Admins bypass enrollment)
         const isAdmin = fetchedProfile?.role === 'admin' || (user as any)?.user_metadata?.role === 'admin';
@@ -139,40 +204,32 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
         setHasAccess(!!canAccess);
 
         // 6. Fetch Available Cohorts for this course
-        const { data: cohortData } = await supabase
-            .from('cohorts')
-            .select('*')
-            .eq('course_id', courseId)
-            .eq('status', 'open');
-        
-        setAvailableCohorts(cohortData || []);
+        if (actualCourseId && actualCourseId !== 'standalone' && actualCourseId !== 'undefined') {
+            const { data: cohortData } = await supabase
+                .from('cohorts')
+                .select('*')
+                .eq('course_id', actualCourseId)
+                .eq('status', 'open');
+            setAvailableCohorts(cohortData || []);
+        }
 
         // 7. If in a cohort, fetch classroom data
-        if (enrollmentData?.cohort_id) {
+        const activeCohortId = enrollmentData?.cohort_id || (targetCohort?.id);
+        if (activeCohortId) {
             const { data: cClasses } = await supabase
                 .from('cohort_classes')
                 .select('*')
-                .eq('cohort_id', enrollmentData.cohort_id)
+                .eq('cohort_id', activeCohortId)
                 .order('scheduled_at', { ascending: true });
             
             const { data: cAnn } = await supabase
                 .from('cohort_announcements')
                 .select('*')
-                .eq('cohort_id', enrollmentData.cohort_id)
+                .eq('cohort_id', activeCohortId)
                 .order('created_at', { ascending: false });
             
             setCohortClasses(cClasses || []);
             setCohortAnnouncements(cAnn || []);
-        }
-
-        // 8. Fetch Target Cohort (if linked via query param)
-        if (targetCohortId) {
-            const { data: tCohort } = await supabase
-                .from('cohorts')
-                .select('*')
-                .eq('id', targetCohortId)
-                .single();
-            setTargetCohort(tCohort);
         }
 
         setLoading(false);
@@ -444,30 +501,27 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
 
     const activeModule = modules[activeModuleIndex];
     const isModuleCompleted = activeModule && completedModuleIds.has(activeModule.id);
+    const allModulesDone = modules.length > 0 && completedModuleIds.size >= modules.length;
+    const allProjectsGraded = projects.length === 0 || projects.every(p => 
+        submissions.find(s => s.project_id === p.id && s.status === 'graded')
+    );
+    const isCourseCompleted = allModulesDone && allProjectsGraded;
 
     if (loading) return <div style={{ padding: '2rem' }}>Loading course player...</div>;
     
-    if (!course) {
+    if (!course && !targetCohort) {
         return (
-            <div style={{ padding: '3rem', maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
-                <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>🎓</div>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1e293b', marginBottom: '1rem' }}>
-                    {targetCohort ? targetCohort.name : 'Course Not Found'}
+            <div style={{ padding: '4rem 2rem', maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
+                <div style={{ fontSize: '3.5rem', marginBottom: '1.5rem' }}>🎓</div>
+                <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#1e293b', marginBottom: '0.75rem' }}>
+                    Course or Batch Not Found
                 </h2>
                 <p style={{ color: '#64748b', marginBottom: '2rem', lineHeight: 1.6 }}>
-                    {targetCohort 
-                        ? "This mentored batch is active, but its associated curriculum content is currently being updated. Please check back shortly or join the live sessions below."
-                        : "We couldn't find the course you're looking for. It might have been moved or renamed."}
+                    We couldn't find the curriculum or cohort batch you're looking for. It might have been moved or updated.
                 </p>
-                {targetCohort && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                         <Button onClick={() => router.push('/student/live-classes')} variant="primary">View Live Sessions</Button>
-                         <Link href="/student/courses" style={{ color: '#64748b', textDecoration: 'none', fontSize: '0.9rem' }}>Return to My Courses</Link>
-                    </div>
-                )}
-                {!targetCohort && (
-                    <Button onClick={() => router.push('/student/courses')} variant="primary">Back to Courses</Button>
-                )}
+                <Button onClick={() => router.push('/student/courses')} variant="primary">
+                    Return to My Courses
+                </Button>
             </div>
         );
     }
@@ -706,7 +760,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
                                     </div>
                                 )}
 
-                                <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
+                                <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                                     <Button
                                         variant="outline"
                                         disabled={activeModuleIndex === 0}
@@ -714,18 +768,151 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
                                     >
                                         ← Previous Lesson
                                     </Button>
-                                    <Button
-                                        variant="primary"
-                                        disabled={activeModuleIndex === modules.length - 1}
-                                        onClick={() => handleModuleClick(activeModuleIndex + 1)}
-                                    >
-                                        Next Lesson →
-                                    </Button>
+
+                                    {activeModuleIndex < modules.length - 1 ? (
+                                        <Button
+                                            variant="primary"
+                                            onClick={() => handleModuleClick(activeModuleIndex + 1)}
+                                        >
+                                            Next Lesson →
+                                        </Button>
+                                    ) : allModulesDone ? (
+                                        <Button
+                                            variant="primary"
+                                            style={{ backgroundColor: '#10b981', borderColor: '#10b981', color: 'white', fontWeight: 700 }}
+                                            onClick={() => {
+                                                if (allProjectsGraded) {
+                                                    setShowCertificate(true);
+                                                } else {
+                                                    alert("All lessons completed! Submit and get your assignments graded to view your certificate.");
+                                                }
+                                            }}
+                                        >
+                                            {allProjectsGraded ? '🏆 Course Completed • View Certificate' : '✓ All Lessons Completed'}
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            variant="primary"
+                                            onClick={handleMarkComplete}
+                                            disabled={isModuleCompleted}
+                                            style={isModuleCompleted ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
+                                        >
+                                            {isModuleCompleted ? '✓ Course Completed' : 'Complete Final Lesson ✓'}
+                                        </Button>
+                                    )}
                                 </div>
                             </>
                         ) : (
-                            <div style={{ textAlign: 'center', padding: '4rem' }}>
-                                <h3>No modules found in this course.</h3>
+                            <div>
+                                <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '1rem', border: '1px solid #e2e8f0', marginBottom: '2rem', boxShadow: '0 2px 4px rgba(0,0,0,0.03)' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                            <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#e0f2fe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>
+                                                👨‍🏫
+                                            </div>
+                                            <div>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                    <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                                                        {targetCohort?.name || course?.title}
+                                                    </h1>
+                                                    <span style={{ backgroundColor: '#e0f2fe', color: '#0369a1', fontSize: '0.75rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: '1rem', textTransform: 'uppercase' }}>
+                                                        Live Mentored Batch
+                                                    </span>
+                                                </div>
+                                                <p style={{ color: '#64748b', fontSize: '0.875rem', margin: '0.25rem 0 0 0' }}>
+                                                    Welcome to your live cohort classroom. Join live interactive sessions, complete assignments, and follow announcements below.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <Button 
+                                            variant="outline" 
+                                            size="sm"
+                                            onClick={() => router.push('/student/live-classes')}
+                                        >
+                                            📅 Live Schedule
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                {/* BATCH CLASSROOM COMPONENT */}
+                                <div className="classroom-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1.5rem' }}>
+                                    {/* Live Classes */}
+                                    <div style={{ backgroundColor: '#f0f9ff', padding: '1.5rem', borderRadius: '1rem', border: '1px solid #bae6fd' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#075985', margin: 0 }}>
+                                                📅 Scheduled Live Classes
+                                            </h3>
+                                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#0284c7', backgroundColor: '#e0f2fe', padding: '0.2rem 0.5rem', borderRadius: '0.5rem' }}>
+                                                {cohortClasses.length} Sessions
+                                            </span>
+                                        </div>
+
+                                        {cohortClasses.length > 0 ? (
+                                            cohortClasses.map(cls => (
+                                                <div key={cls.id} style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: 'white', borderRadius: '0.75rem', border: '1px solid #e0f2fe', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+                                                    <div style={{ fontWeight: 700, color: '#0369a1', fontSize: '0.95rem' }}>{cls.title}</div>
+                                                    <div style={{ fontSize: '0.8rem', color: '#0284c7', margin: '0.35rem 0 0.5rem 0' }}>
+                                                        🕒 {new Date(cls.scheduled_at).toLocaleString()}
+                                                    </div>
+                                                    {cls.use_internal_room !== false ? (
+                                                        <button 
+                                                            onClick={() => router.push(`/classroom/${cls.id}`)}
+                                                            style={{ display: 'inline-block', padding: '0.45rem 0.9rem', backgroundColor: '#003366', color: 'white', border: 'none', borderRadius: '0.4rem', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}
+                                                        >
+                                                            Join Live Room on Platform →
+                                                        </button>
+                                                    ) : cls.meeting_link && (
+                                                        <a 
+                                                            href={cls.meeting_link} 
+                                                            target="_blank" 
+                                                            rel="noopener noreferrer"
+                                                            style={{ display: 'inline-block', padding: '0.45rem 0.9rem', backgroundColor: '#0ea5e9', color: 'white', textDecoration: 'none', borderRadius: '0.4rem', fontSize: '0.8rem', fontWeight: 700 }}
+                                                        >
+                                                            Open External Class Link →
+                                                        </a>
+                                                    )}
+                                                    {cls.assignment_details && (
+                                                        <div style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: '#64748b', borderTop: '1px dashed #e2e8f0', paddingTop: '0.5rem' }}>
+                                                            <strong>Assignment:</strong> {cls.assignment_details}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '0.75rem', textAlign: 'center', color: '#64748b', border: '1px dashed #cbd5e1' }}>
+                                                <p style={{ margin: '0 0 0.5rem 0', fontWeight: 600 }}>No live classes currently scheduled.</p>
+                                                <p style={{ fontSize: '0.8rem', margin: 0 }}>Your instructor will post the upcoming session schedule soon.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Bulletin Board */}
+                                    <div style={{ backgroundColor: '#fdf2f8', padding: '1.5rem', borderRadius: '1rem', border: '1px solid #fbcfe8' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#9d174d', margin: 0 }}>
+                                                📢 Batch Bulletin Board
+                                            </h3>
+                                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#be185d', backgroundColor: '#fce7f3', padding: '0.2rem 0.5rem', borderRadius: '0.5rem' }}>
+                                                {cohortAnnouncements.length} Updates
+                                            </span>
+                                        </div>
+
+                                        {cohortAnnouncements.length > 0 ? (
+                                            cohortAnnouncements.map(ann => (
+                                                <div key={ann.id} style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: 'white', borderRadius: '0.75rem', border: '1px solid #fce7f3' }}>
+                                                    <div style={{ fontWeight: 700, color: '#831843', fontSize: '0.95rem' }}>{ann.title}</div>
+                                                    <p style={{ fontSize: '0.85rem', color: '#475569', margin: '0.35rem 0 0.5rem 0', lineHeight: 1.5 }}>{ann.content}</p>
+                                                    <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{new Date(ann.created_at).toLocaleDateString()}</div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '0.75rem', textAlign: 'center', color: '#64748b', border: '1px dashed #fbcfe8' }}>
+                                                <p style={{ margin: '0 0 0.5rem 0', fontWeight: 600 }}>No announcements yet.</p>
+                                                <p style={{ fontSize: '0.8rem', margin: 0 }}>Instructor announcements will appear here.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -826,8 +1013,14 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
             {/* RIGHT: Sidebar */}
             <div style={{ backgroundColor: 'white', borderLeft: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0' }}>
-                    <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#1e293b' }}>Course Content</h3>
-                    <p style={{ fontSize: '0.875rem', color: '#64748b' }}>{modules.length} Lessons • {projects.length} Assignments</p>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#1e293b' }}>
+                        {modules.length > 0 ? 'Course Content' : 'Cohort Overview'}
+                    </h3>
+                    <p style={{ fontSize: '0.875rem', color: '#64748b' }}>
+                        {modules.length > 0 
+                            ? `${modules.length} Lessons • ${projects.length} Assignments`
+                            : `Live Batch • ${cohortClasses.length} Live Sessions`}
+                    </p>
                 </div>
 
                 {/* Certificate Button (Only shows if 100% complete and all projects graded) */}
@@ -866,6 +1059,43 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
                 })()}
 
                 <div style={{ flex: 1, overflowY: 'auto' }}>
+                    {modules.length === 0 && (
+                        <div style={{ padding: '1.5rem' }}>
+                            <div style={{ backgroundColor: '#f8fafc', padding: '1.25rem', borderRadius: '0.75rem', border: '1px solid #e2e8f0', marginBottom: '1.25rem' }}>
+                                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
+                                    Cohort Details
+                                </div>
+                                <div style={{ fontSize: '0.85rem', color: '#334155', marginBottom: '0.5rem' }}>
+                                    📅 <strong>Start Date:</strong> {targetCohort?.start_date ? new Date(targetCohort.start_date).toLocaleDateString() : 'Active'}
+                                </div>
+                                <div style={{ fontSize: '0.85rem', color: '#334155', marginBottom: '0.5rem' }}>
+                                    👨‍🏫 <strong>Instructor:</strong> {targetCohort?.instructor?.full_name || 'Privailers Faculty'}
+                                </div>
+                                <div style={{ fontSize: '0.85rem', color: '#334155' }}>
+                                    👥 <strong>Format:</strong> Live Interactive Sessions
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    style={{ width: '100%', justifyContent: 'center' }}
+                                    onClick={() => router.push('/student/live-classes')}
+                                >
+                                    📅 Live Class Schedule
+                                </Button>
+                                <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    style={{ width: '100%', justifyContent: 'center' }}
+                                    onClick={() => router.push('/student/resources')}
+                                >
+                                    📁 Learning Resources
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                     {modules.map((mod, index) => (
                         <div
                             key={mod.id}

@@ -9,35 +9,25 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CourseIcon from "@/components/ui/CourseIcon";
 
-// In-memory module cache for instant zero-latency loads across client navigations
-let memoryCoursesCache: any[] | null = null;
-
 export default function CoursesPage() {
-    const [courses, setCourses] = useState<any[]>(() => {
-        if (memoryCoursesCache) return memoryCoursesCache;
-        if (typeof window !== "undefined") {
-            try {
-                const cached = sessionStorage.getItem("privailers_courses_cache");
-                if (cached) return JSON.parse(cached);
-            } catch (e) {}
-        }
-        return [];
-    });
-
-    const [loading, setLoading] = useState<boolean>(() => {
-        if (memoryCoursesCache && memoryCoursesCache.length > 0) return false;
-        if (typeof window !== "undefined") {
-            try {
-                const cached = sessionStorage.getItem("privailers_courses_cache");
-                if (cached) return false;
-            } catch (e) {}
-        }
-        return true;
-    });
-
+    const [courses, setCourses] = useState<any[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
     const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
+        if (typeof window !== "undefined") {
+            try {
+                const cached = sessionStorage.getItem("privailers_courses_cache");
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (parsed && Array.isArray(parsed) && parsed.length > 0) {
+                        setCourses(parsed);
+                        setLoading(false);
+                    }
+                }
+            } catch (e) {}
+        }
+
         let isMounted = true;
 
         const fetchCourses = async () => {
@@ -51,7 +41,6 @@ export default function CoursesPage() {
                 if (error) throw error;
                 if (data && isMounted) {
                     setCourses(data);
-                    memoryCoursesCache = data;
                     try {
                         sessionStorage.setItem("privailers_courses_cache", JSON.stringify(data));
                     } catch (e) {}
