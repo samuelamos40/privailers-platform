@@ -89,20 +89,43 @@ export default function ContactPage() {
             </div>
 
             {/* FAQs */}
-            <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '2rem', textAlign: 'center', color: 'var(--primary-blue)' }}>Common Questions</h2>
+            <div style={{ maxWidth: '850px', margin: '0 auto' }}>
+                <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+                    <h2 style={{ fontSize: '2.25rem', fontWeight: 700, color: 'var(--primary-blue)', marginBottom: '0.5rem' }}>
+                        Frequently Asked Questions
+                    </h2>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>
+                        Everything you need to know about our data consulting services, bootcamps, and platform.
+                    </p>
+                </div>
                 <Accordion items={[
                     {
-                        title: "How quickly can I expect a response?",
-                        content: "We typically respond to all inquiries within 24 business hours."
+                        title: "What services does Privailers Data Consult provide for businesses?",
+                        content: "We provide end-to-end quantitative and data solutions: applied mathematical modeling, stochastic simulations, Monte Carlo analysis, automated ETL/ELT data pipelines, analytics-ready web platforms with custom data extraction, executive Business Intelligence dashboards (Power BI & Tableau), and tailored corporate training."
                     },
                     {
-                        title: "Where are you located?",
-                        content: "We operate remotely with global access, serving clients and students worldwide through our online platform."
+                        title: "Can I buy self-paced courses and enroll in individual training?",
+                        content: "Yes! Through our integrated EdTech marketplace, individuals can purchase self-paced video courses with lifetime access and practical project work. We also conduct intensive live cohort bootcamps and 1-on-1 individual training paths with resume audits and direct job placement support."
                     },
                     {
-                        title: "Do you offer consultations?",
-                        content: "Yes! We offer a free 30-minute introductory consultation for businesses to discuss their data needs."
+                        title: "What mathematical modeling and simulation capabilities do you offer?",
+                        content: "Our quantitative team formulates real-world challenges using deterministic and stochastic mathematical models, Monte Carlo simulations, numerical optimization, risk modeling, and operations research algorithms to help organizations make high-stakes decisions with mathematical precision."
+                    },
+                    {
+                        title: "Can you build custom data pipelines and web data extraction systems for our company?",
+                        content: "Yes. We engineer automated pipelines and data extraction tools that systematically collect, clean, validate, and synchronize data from APIs, internal databases, custom web platforms, and spreadsheets into unified data warehouses for reliable, real-time reporting."
+                    },
+                    {
+                        title: "Do you offer corporate training tailored to specific team workflows?",
+                        content: "Yes. We conduct bespoke corporate training in Microsoft Excel, SQL, and Power BI tailored directly to your company's operational reporting needs. We offer flexible scheduling, live interactive sessions, and post-training competency assessments."
+                    },
+                    {
+                        title: "Where are you located and how do you work with clients?",
+                        content: "We operate remotely with global reach, serving clients and students across Nigeria, Africa, and internationally. We also have active expansion plans for a physical Privailers Innovation Hub in Ado-Ekiti to further anchor hands-on tech and quantitative talent development."
+                    },
+                    {
+                        title: "How do payments and enrollments work on the platform?",
+                        content: "All course purchases and bootcamp registrations are processed securely through Paystack. You can pay with debit/credit cards, bank transfers, or USSD. Once payment is confirmed, your course access or cohort seat is unlocked instantly on your student dashboard."
                     }
                 ]} />
             </div>

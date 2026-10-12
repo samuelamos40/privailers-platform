@@ -95,8 +95,8 @@ const Footer = () => {
                                 Privailers Data Consult
                             </h3>
                         </div>
-                        <p style={{ opacity: 0.9, fontWeight: 500, lineHeight: 1.7, marginBottom: '2rem', maxWidth: '320px', color: '#cbd5e1' }}>
-                            Empowering Insights. Driving Growth.
+                        <p style={{ opacity: 0.9, fontWeight: 500, lineHeight: 1.7, marginBottom: '2rem', maxWidth: '340px', color: '#cbd5e1' }}>
+                            A premier EdTech academy for self-paced courses and live bootcamps, automated enterprise data pipelines, and applied mathematical modeling.
                         </p>
                         <div style={{ display: 'flex', gap: '1.25rem' }}>
                             {[
@@ -125,8 +125,8 @@ const Footer = () => {
                         <h4 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem', borderBottom: '2px solid var(--accent-teal)', display: 'inline-block', paddingBottom: '0.25rem' }}>Quick Links</h4>
                         <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <li><Link href="/about" style={{ opacity: 0.8, transition: 'opacity 0.2s' }} onMouseOver={(e) => e.currentTarget.style.opacity = '1'}>About Us</Link></li>
-                            <li><Link href="/services" style={{ opacity: 0.8 }} onMouseOver={(e) => e.currentTarget.style.opacity = '1'}>Consultancy Services</Link></li>
-                            <li><Link href="/courses" style={{ opacity: 0.8 }} onMouseOver={(e) => e.currentTarget.style.opacity = '1'}>Training Courses</Link></li>
+                            <li><Link href="/services" style={{ opacity: 0.8 }} onMouseOver={(e) => e.currentTarget.style.opacity = '1'}>Consulting & Modeling</Link></li>
+                            <li><Link href="/courses" style={{ opacity: 0.8 }} onMouseOver={(e) => e.currentTarget.style.opacity = '1'}>Courses & Bootcamps</Link></li>
                             <li><Link href="/contact" style={{ opacity: 0.8 }} onMouseOver={(e) => e.currentTarget.style.opacity = '1'}>Contact</Link></li>
                             <li><Link href="/admin-login" style={{ opacity: 0.8 }} onMouseOver={(e) => e.currentTarget.style.opacity = '1'}>Admin Access</Link></li>
                         </ul>

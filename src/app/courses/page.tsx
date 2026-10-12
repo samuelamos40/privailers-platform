@@ -7,30 +7,64 @@ import Button from "@/components/ui/Button";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { useAuth } from "@/contexts/AuthContext";
 import CourseIcon from "@/components/ui/CourseIcon";
 
+// In-memory module cache for instant zero-latency loads across client navigations
+let memoryCoursesCache: any[] | null = null;
+
 export default function CoursesPage() {
-    const { user } = useAuth();
-    const [courses, setCourses] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [courses, setCourses] = useState<any[]>(() => {
+        if (memoryCoursesCache) return memoryCoursesCache;
+        if (typeof window !== "undefined") {
+            try {
+                const cached = sessionStorage.getItem("privailers_courses_cache");
+                if (cached) return JSON.parse(cached);
+            } catch (e) {}
+        }
+        return [];
+    });
+
+    const [loading, setLoading] = useState<boolean>(() => {
+        if (memoryCoursesCache && memoryCoursesCache.length > 0) return false;
+        if (typeof window !== "undefined") {
+            try {
+                const cached = sessionStorage.getItem("privailers_courses_cache");
+                if (cached) return false;
+            } catch (e) {}
+        }
+        return true;
+    });
+
     const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
+        let isMounted = true;
+
         const fetchCourses = async () => {
-            setLoading(true);
             try {
-                // Fetch All Courses in one go
-                const { data, error } = await supabase.from('courses').select('*');
+                // Optimized lightweight select (avoids heavy blobs or unused fields)
+                const { data, error } = await supabase
+                    .from('courses')
+                    .select('id, title, description, price, tier, published')
+                    .order('created_at', { ascending: false });
+
                 if (error) throw error;
-                setCourses(data || []);
+                if (data && isMounted) {
+                    setCourses(data);
+                    memoryCoursesCache = data;
+                    try {
+                        sessionStorage.setItem("privailers_courses_cache", JSON.stringify(data));
+                    } catch (e) {}
+                }
             } catch (err) {
                 console.error("Error fetching courses:", err);
             } finally {
-                setLoading(false);
+                if (isMounted) setLoading(false);
             }
         };
+
         fetchCourses();
+        return () => { isMounted = false; };
     }, []);
 
     const filteredCourses = courses.filter(course => 
@@ -43,6 +77,20 @@ export default function CoursesPage() {
             <Navbar />
             <main className="courses-main" style={{ flex: 1, padding: '4rem 0', backgroundColor: '#f8fafc' }}>
                 <style jsx>{`
+                    @keyframes pulse {
+                        0%, 100% { opacity: 1; }
+                        50% { opacity: 0.5; }
+                    }
+                    .skeleton-card {
+                        animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+                        background: #ffffff;
+                        border-radius: 1rem;
+                        border: 1px solid #e2e8f0;
+                        padding: 1.5rem;
+                        height: 380px;
+                        display: flex;
+                        flex-direction: column;
+                    }
                     @media (max-width: 768px) {
                         .courses-main {
                             padding: 2rem 0 !important;
@@ -88,11 +136,21 @@ export default function CoursesPage() {
                     </div>
 
                     {loading ? (
-                        <div style={{ textAlign: 'center', padding: '4rem', color: '#64748b' }}>Loading courses...</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="skeleton-card">
+                                    <div style={{ height: '180px', backgroundColor: '#e2e8f0', borderRadius: '0.75rem', marginBottom: '1.25rem' }} />
+                                    <div style={{ height: '24px', width: '40%', backgroundColor: '#e2e8f0', borderRadius: '4px', marginBottom: '0.75rem' }} />
+                                    <div style={{ height: '20px', width: '80%', backgroundColor: '#f1f5f9', borderRadius: '4px', marginBottom: '0.5rem' }} />
+                                    <div style={{ height: '16px', width: '90%', backgroundColor: '#f1f5f9', borderRadius: '4px', marginBottom: 'auto' }} />
+                                    <div style={{ height: '40px', backgroundColor: '#e2e8f0', borderRadius: '0.5rem', marginTop: '1rem' }} />
+                                </div>
+                            ))}
+                        </div>
                     ) : (
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
                             {filteredCourses.length > 0 ? filteredCourses.map(course => (
-                                <Card key={course.id} style={{ display: 'flex', flexDirection: 'column', transition: 'transform 0.2s' }}>
+                                <Card key={course.id} style={{ display: 'flex', flexDirection: 'column', transition: 'transform 0.2s', borderRadius: '1rem', overflow: 'hidden' }}>
                                     <div style={{
                                         height: '200px',
                                         background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)',
