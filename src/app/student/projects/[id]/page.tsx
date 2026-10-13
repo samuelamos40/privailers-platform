@@ -139,23 +139,23 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
         return url;
     };
 
-    if (loading) return <div style={{ padding: '3rem' }}>Loading project...</div>;
-    if (!project) return <div style={{ padding: '3rem' }}>Project not found.</div>;
+    if (loading) return <div style={{ padding: '2rem 1rem' }}>Loading project...</div>;
+    if (!project) return <div style={{ padding: '2rem 1rem' }}>Project not found.</div>;
 
     const isGraded = submission?.status === 'graded';
     const hasSubmitted = !!submission;
 
     return (
-        <div style={{ padding: '3rem', maxWidth: '800px', margin: '0 auto' }}>
-            <Link href={`/student/courses/${project.course.id}`} style={{ color: '#64748b', marginBottom: '1rem', display: 'inline-block', textDecoration: 'none' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto', width: '100%' }}>
+            <Link href={`/student/courses/${project.course.id}`} style={{ color: '#64748b', marginBottom: '1rem', display: 'inline-block', textDecoration: 'none', fontWeight: 500 }}>
                 ← Back to {project.course.title}
             </Link>
 
             <div style={{ marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#1e293b', marginBottom: '0.5rem' }}>
+                <h1 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 800, color: '#1e293b', marginBottom: '0.5rem', wordBreak: 'break-word' }}>
                     {project.title}
                 </h1>
-                <div style={{ display: 'flex', gap: '1rem', color: '#64748b', fontSize: '0.9rem' }}>
+                <div style={{ display: 'flex', gap: '1rem', color: '#64748b', fontSize: '0.9rem', flexWrap: 'wrap' }}>
                     <span>Course: {project.course.title}</span>
                     {project.due_date && <span style={{ color: '#ef4444' }}>Due: {new Date(project.due_date).toLocaleDateString()}</span>}
                 </div>
@@ -201,17 +201,17 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                 {/* Grading Result */}
                 {
                     isGraded && (
-                        <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '1rem', padding: '2rem' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'items-center', marginBottom: '1rem' }}>
+                        <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '1rem', padding: '1.5rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
                                 <h3 style={{ color: '#166534', fontSize: '1.25rem', margin: 0 }}>Graded Assignment</h3>
-                                <div style={{ fontSize: '2rem', fontWeight: 800, color: '#15803d' }}>
+                                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#15803d' }}>
                                     {submission.grade} <span style={{ fontSize: '1rem', color: '#86efac' }}>/ 100</span>
                                 </div>
                             </div>
                             {submission.feedback && (
                                 <div>
                                     <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#15803d', marginBottom: '0.5rem' }}>Instructor Feedback</h4>
-                                    <p style={{ color: '#14532d' }}>{submission.feedback}</p>
+                                    <p style={{ color: '#14532d', wordBreak: 'break-word' }}>{submission.feedback}</p>
                                 </div>
                             )}
                         </div>

@@ -246,13 +246,13 @@ export default function StudentDashboard() {
         : 0;
 
     if (loading) return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', padding: '3rem', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
-            <div style={{ height: '40px', width: '300px', backgroundColor: '#e2e8f0', borderRadius: '8px', animation: 'pulse 2s infinite' }}></div>
-            <div style={{ height: '350px', width: '100%', backgroundColor: '#ffffff', borderRadius: '2rem', border: '1px solid #e2e8f0' }}></div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem' }}>
-                <div style={{ height: '200px', backgroundColor: '#ffffff', borderRadius: '1.5rem', border: '1px solid #e2e8f0' }}></div>
-                <div style={{ height: '200px', backgroundColor: '#ffffff', borderRadius: '1.5rem', border: '1px solid #e2e8f0' }}></div>
-                <div style={{ height: '200px', backgroundColor: '#ffffff', borderRadius: '1.5rem', border: '1px solid #e2e8f0' }}></div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', padding: '1.5rem', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+            <div style={{ height: '40px', width: '240px', maxWidth: '100%', backgroundColor: '#e2e8f0', borderRadius: '8px', animation: 'pulse 2s infinite' }}></div>
+            <div style={{ height: '280px', width: '100%', backgroundColor: '#ffffff', borderRadius: '1.5rem', border: '1px solid #e2e8f0' }}></div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1.5rem' }}>
+                <div style={{ height: '180px', backgroundColor: '#ffffff', borderRadius: '1.5rem', border: '1px solid #e2e8f0' }}></div>
+                <div style={{ height: '180px', backgroundColor: '#ffffff', borderRadius: '1.5rem', border: '1px solid #e2e8f0' }}></div>
+                <div style={{ height: '180px', backgroundColor: '#ffffff', borderRadius: '1.5rem', border: '1px solid #e2e8f0' }}></div>
             </div>
             <style jsx>{`
                 @keyframes pulse {
@@ -293,23 +293,16 @@ export default function StudentDashboard() {
             minHeight: '100vh',
             backgroundColor: '#f8fafc',
             color: '#0f172a',
-            padding: '3rem',
+            width: '100%',
+            boxSizing: 'border-box'
         }}>
             <style jsx>{`
-                @media (max-width: 768px) {
+                .dashboard-container {
+                    padding: 2.5rem;
+                }
+                @media (max-width: 1023px) {
                     .dashboard-container {
-                        padding: 1.5rem !important;
-                    }
-                    .dashboard-header {
-                        flex-direction: column !important;
-                        align-items: flex-start !important;
-                        gap: 1.5rem !important;
-                        margin-bottom: 2rem !important;
-                    }
-                    .stats-pill {
-                        width: 100% !important;
-                        justify-content: space-between !important;
-                        padding: 1rem 1.5rem !important;
+                        padding: 1.5rem 1.25rem !important;
                     }
                     .hero-grid {
                         grid-template-columns: 1fr !important;
@@ -318,20 +311,51 @@ export default function StudentDashboard() {
                         padding: 2rem !important;
                     }
                     .hero-image {
-                        height: 200px !important;
+                        height: 220px !important;
+                    }
+                    .cohort-card-grid {
+                        grid-template-columns: 1fr !important;
+                    }
+                }
+                @media (max-width: 767px) {
+                    .dashboard-container {
+                        padding: 1rem 0.75rem !important;
+                    }
+                    .dashboard-header {
+                        flex-direction: column !important;
+                        align-items: flex-start !important;
+                        gap: 1.25rem !important;
+                        margin-bottom: 2rem !important;
+                    }
+                    .stats-pill {
+                        width: 100% !important;
+                        justify-content: space-around !important;
+                        padding: 0.75rem 1rem !important;
+                        border-radius: 1rem !important;
+                    }
+                    .hero-content {
+                        padding: 1.5rem 1rem !important;
+                    }
+                    .hero-action-row {
+                        flex-direction: column !important;
+                        align-items: stretch !important;
+                        gap: 1.25rem !important;
+                    }
+                    .hero-action-row button,
+                    .hero-action-row a {
+                        width: 100% !important;
+                        justify-content: center !important;
                     }
                     .batch-alert {
                         flex-direction: column !important;
                         text-align: center !important;
-                    }
-                    .batch-alert div {
-                        font-size: 1.5rem !important;
+                        padding: 1.25rem !important;
                     }
                     .courses-grid {
                         grid-template-columns: 1fr !important;
                     }
                     h1 {
-                        font-size: 1.8rem !important;
+                        font-size: 1.6rem !important;
                     }
                 }
             `}</style>
@@ -469,7 +493,7 @@ export default function StudentDashboard() {
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#ef4444' }}><path d="m22 8-6 4 6 4V8Z"></path><rect x="2" y="6" width="14" height="12" rx="2" ry="2"></rect></svg>
                         Your Scheduled Live Sessions & Classes
                     </h2>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '2rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1.5rem' }}>
                         {myClasses.map(cls => {
                             const startTime = new Date(cls.scheduled_at).getTime();
                             const now = new Date().getTime();
@@ -585,7 +609,7 @@ export default function StudentDashboard() {
                                 {heroCourse.course?.description || 'Exclusive instructor-led live learning sessions.'}
                             </p>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                            <div className="hero-action-row" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
                                 <Link href={heroCourse.course_id ? `/student/courses/${heroCourse.course_id}${heroCourse.cohort_id ? `?cohortId=${heroCourse.cohort_id}` : ''}` : (heroCourse.cohort_id ? `/student/courses/${heroCourse.cohort_id}` : `/student/live-classes`)}>
                                     <Button style={{
                                         padding: '1rem 2.5rem',
@@ -738,21 +762,21 @@ export default function StudentDashboard() {
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                         {upcomingCohorts.map(cohort => (
-                            <div key={cohort.id} style={{ 
-                                display: 'grid', gridTemplateColumns: '1fr auto', gap: '2rem', alignItems: 'center',
-                                backgroundColor: 'white', borderRadius: '1.5rem', padding: '2rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)'
+                            <div key={cohort.id} className="cohort-card-grid" style={{ 
+                                display: 'grid', gridTemplateColumns: '1fr auto', gap: '1.5rem', alignItems: 'center',
+                                backgroundColor: 'white', borderRadius: '1.5rem', padding: '1.75rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)'
                             }}>
                                 <div>
-                                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1rem' }}>
+                                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap' }}>
                                         <span style={{ padding: '0.35rem 1rem', borderRadius: '99px', backgroundColor: '#FEF3C7', color: '#B45309', fontSize: '0.75rem', fontWeight: 800 }}>LIVE COHORT</span>
                                         <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>
                                             Starts: {new Date(cohort.scheduled_at).toLocaleDateString()}
                                         </span>
                                     </div>
-                                    <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>
+                                    <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>
                                         {cohort.course?.title}
                                     </h3>
-                                    <p style={{ color: '#475569', fontSize: '1rem', marginBottom: '1rem', lineHeight: 1.5 }}>
+                                    <p style={{ color: '#475569', fontSize: '0.95rem', marginBottom: '1rem', lineHeight: 1.5 }}>
                                         {cohort.course?.description}
                                     </p>
                                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', fontSize: '0.9rem', color: '#334155', fontWeight: 500 }}>
@@ -761,8 +785,8 @@ export default function StudentDashboard() {
                                     </div>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
-                                    <Link href={`/student/courses/${cohort.course?.id}`}>
-                                        <Button variant="primary" size="lg" style={{ boxShadow: '0 4px 6px -1px rgba(37, 99, 235, 0.2)' }}>
+                                    <Link href={`/student/courses/${cohort.course?.id}`} style={{ display: 'inline-block', width: '100%' }}>
+                                        <Button variant="primary" size="lg" style={{ boxShadow: '0 4px 6px -1px rgba(37, 99, 235, 0.2)', width: '100%', justifyContent: 'center' }}>
                                             Join Cohort →
                                         </Button>
                                     </Link>
@@ -777,7 +801,7 @@ export default function StudentDashboard() {
             {availableCourses.length > 0 && (
                 <section>
                     <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#334155', marginBottom: '1.5rem' }}>Your Learning Journey</h2>
-                    <div className="courses-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2.5rem' }}>
+                    <div className="courses-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1.5rem' }}>
                         {availableCourses.map(course => (
                             <LightCard key={course.id} style={{ padding: '0', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                                 <div style={{ height: '160px', backgroundColor: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', borderBottom: '1px solid #f1f5f9' }}>

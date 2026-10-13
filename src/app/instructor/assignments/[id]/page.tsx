@@ -87,21 +87,21 @@ export default function AdminGradingPage({ params }: { params: Promise<{ id: str
         }
     };
 
-    if (loading) return <div style={{ padding: '2rem' }}>Loading...</div>;
-    if (!assignment) return <div style={{ padding: '2rem' }}>Assignment not found.</div>;
+    if (loading) return <div>Loading...</div>;
+    if (!assignment) return <div>Assignment not found.</div>;
 
     return (
-        <div style={{ padding: '2rem', display: 'grid', gridTemplateColumns: '1fr 400px', gap: '2rem' }}>
+        <div className="portal-split-layout wide" style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '2rem' }}>
             {/* LEFT: Submission List */}
             <div>
                 <div style={{ marginBottom: '1rem' }}>
-                    <Link href="/admin/assignments" style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>← Back to Assignments</Link>
+                    <Link href="/instructor/assignments" style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>← Back to Assignments</Link>
                 </div>
-                <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem' }}>{assignment.title}</h1>
+                <h1 style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 800, marginBottom: '0.5rem', wordBreak: 'break-word' }}>{assignment.title}</h1>
                 <p style={{ color: '#64748b', marginBottom: '2rem' }}>{submissions.length} Submissions</p>
 
                 <div style={{ display: 'grid', gap: '1rem' }}>
-                    {submissions.length === 0 && <p>No student has submitted yet.</p>}
+                    {submissions.length === 0 && <Card style={{ color: '#64748b', textAlign: 'center', padding: '3rem' }}>No student has submitted yet.</Card>}
                     {submissions.map((sub) => (
                         <Card
                             key={sub.id}
@@ -112,12 +112,12 @@ export default function AdminGradingPage({ params }: { params: Promise<{ id: str
                             }}
                             onClick={() => handleSelectSubmission(sub)}
                         >
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
                                 <div>
-                                    <div style={{ fontWeight: 600 }}>{sub.profile.full_name || sub.profile.email}</div>
+                                    <div style={{ fontWeight: 600, wordBreak: 'break-word' }}>{sub.profile.full_name || sub.profile.email}</div>
                                     <div style={{ fontSize: '0.875rem', color: '#64748b' }}>Submitted: {new Date(sub.submitted_at).toLocaleDateString()}</div>
                                 </div>
-                                <div style={{ textAlign: 'right' }}>
+                                <div>
                                     {sub.status === 'graded' ? (
                                         <span style={{ color: '#059669', fontWeight: 700 }}>{sub.grade}/100</span>
                                     ) : (
@@ -131,46 +131,48 @@ export default function AdminGradingPage({ params }: { params: Promise<{ id: str
             </div>
 
             {/* RIGHT: Grading Panel */}
-            <div style={{ borderLeft: '1px solid #e2e8f0', paddingLeft: '2rem' }}>
-                {selectedSubmission ? (
-                    <div>
-                        <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem' }}>Grading</h2>
+            <div>
+                <Card style={{ position: 'sticky', top: '2rem', height: 'fit-content' }}>
+                    {selectedSubmission ? (
+                        <div>
+                            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem' }}>Grading</h2>
 
-                        <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem' }}>
-                            <div style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '0.5rem' }}>Submission File</div>
-                            <a href={selectedSubmission.file_url} target="_blank" rel="noopener noreferrer">
-                                <Button variant="outline" size="sm" style={{ width: '100%' }}>Download File</Button>
-                            </a>
-                        </div>
-
-                        <form onSubmit={handleSaveGrade}>
-                            <Input
-                                label="Grade (0-100)"
-                                type="number"
-                                min="0" max="100"
-                                value={grade}
-                                onChange={e => setGrade(e.target.value)}
-                                required
-                            />
-
-                            <div style={{ marginBottom: '1rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Feedback</label>
-                                <textarea
-                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', minHeight: '120px' }}
-                                    value={feedback}
-                                    onChange={e => setFeedback(e.target.value)}
-                                    placeholder="Great job! Next time try to..."
-                                />
+                            <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem' }}>
+                                <div style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '0.5rem' }}>Submission File</div>
+                                <a href={selectedSubmission.file_url} target="_blank" rel="noopener noreferrer">
+                                    <Button variant="outline" size="sm" style={{ width: '100%' }}>Download File</Button>
+                                </a>
                             </div>
 
-                            <Button type="submit" variant="primary" style={{ width: '100%' }}>Save Grade</Button>
-                        </form>
-                    </div>
-                ) : (
-                    <div style={{ color: '#94a3b8', textAlign: 'center', marginTop: '4rem' }}>
-                        Select a submission on the left to grade it.
-                    </div>
-                )}
+                            <form onSubmit={handleSaveGrade} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <Input
+                                    label="Grade (0-100)"
+                                    type="number"
+                                    min="0" max="100"
+                                    value={grade}
+                                    onChange={e => setGrade(e.target.value)}
+                                    required
+                                />
+
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem', color: '#475569' }}>Feedback</label>
+                                    <textarea
+                                        style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', minHeight: '120px' }}
+                                        value={feedback}
+                                        onChange={e => setFeedback(e.target.value)}
+                                        placeholder="Great job! Next time try to..."
+                                    />
+                                </div>
+
+                                <Button type="submit" variant="primary" style={{ width: '100%' }}>Save Grade</Button>
+                            </form>
+                        </div>
+                    ) : (
+                        <div style={{ color: '#94a3b8', textAlign: 'center', padding: '2rem 1rem' }}>
+                            Select a submission on the left to grade it.
+                        </div>
+                    )}
+                </Card>
             </div>
         </div>
     );

@@ -112,9 +112,12 @@ export default function AdminCohortManagementPage() {
     };
 
     return (
-        <div style={{ padding: '2rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#1e293b' }}>Global Batch/Cohort Management</h1>
+        <div>
+            <div className="portal-header">
+                <div>
+                    <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 700, color: '#1e293b', margin: 0 }}>Global Batch/Cohort Management</h1>
+                    <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '0.25rem 0 0 0' }}>Manage cohort schedules, instructors, and enrollments</p>
+                </div>
                 <Button variant="primary" onClick={() => {
                     setFormData({ id: '', name: '', course_id: '', instructor_id: '', start_date: '', end_date: '', capacity: 50, status: 'open' });
                     setIsFormOpen(true);
@@ -123,22 +126,22 @@ export default function AdminCohortManagementPage() {
                 </Button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: isFormOpen ? '1fr 400px' : '1fr', gap: '2rem' }}>
+            <div className={`portal-split-layout ${isFormOpen ? 'open' : ''}`} style={{ display: 'grid', gridTemplateColumns: isFormOpen ? '1fr 380px' : '1fr', gap: '2rem' }}>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {loading ? <p>Loading cohorts...</p> : cohorts.length === 0 ? <Card>No cohorts found.</Card> : (
                         cohorts.map(c => (
                             <Card key={c.id}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                    <div>
-                                        <div style={{ fontWeight: 700, fontSize: '1.2rem', marginBottom: '0.25rem' }}>{c.name}</div>
-                                        <div style={{ fontSize: '0.9rem', color: '#0369a1', marginBottom: '0.25rem' }}>Course: {c.course?.title}</div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
+                                    <div style={{ minWidth: '200px', flex: '1 1 200px' }}>
+                                        <div style={{ fontWeight: 700, fontSize: '1.2rem', marginBottom: '0.25rem', wordBreak: 'break-word' }}>{c.name}</div>
+                                        <div style={{ fontSize: '0.9rem', color: '#0369a1', marginBottom: '0.25rem' }}>Course: {c.course?.title || 'Standalone Batch'}</div>
                                         <div style={{ fontSize: '0.9rem', color: '#059669', marginBottom: '0.5rem' }}>Instructor: {c.instructor?.full_name || 'Unassigned'}</div>
                                         <div style={{ fontSize: '0.85rem', color: '#64748b' }}>
                                             Timeline: {c.start_date} to {c.end_date}
                                         </div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                                         <Button size="sm" variant="outline" onClick={() => handleEdit(c)}>Edit</Button>
                                         <Button size="sm" variant="ghost" style={{ color: '#ef4444' }} onClick={() => handleDelete(c.id)}>Delete</Button>
                                         <span style={{ 
@@ -174,7 +177,7 @@ export default function AdminCohortManagementPage() {
                                 </select>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '1rem' }}>
                                 <Input label="Start Date" type="date" value={formData.start_date} onChange={e => setFormData({...formData, start_date: e.target.value})} required />
                                 <Input label="End Date" type="date" value={formData.end_date} onChange={e => setFormData({...formData, end_date: e.target.value})} required />
                             </div>

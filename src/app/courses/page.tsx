@@ -94,7 +94,7 @@ export default function CoursesPage() {
                 `}</style>
                 <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1rem' }}>
                     <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-                        <h1 className="page-title" style={{ fontSize: '3rem', fontWeight: 800, color: '#1e293b', marginBottom: '1rem', letterSpacing: '-0.02em' }}>
+                        <h1 className="page-title" style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--primary-blue)', marginBottom: '1rem', letterSpacing: '-0.02em' }}>
                             Course Catalog
                         </h1>
                         <p className="page-subtitle" style={{ color: '#64748b', fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto 2rem' }}>
@@ -118,14 +118,14 @@ export default function CoursesPage() {
                                     outline: 'none',
                                     transition: 'border-color 0.2s'
                                 }}
-                                onFocus={(e) => e.target.style.borderColor = '#38bdf8'}
+                                onFocus={(e) => e.target.style.borderColor = 'var(--accent-teal)'}
                                 onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
                             />
                         </div>
                     </div>
 
                     {loading ? (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '2rem' }}>
                             {[1, 2, 3].map(i => (
                                 <div key={i} className="skeleton-card">
                                     <div style={{ height: '180px', backgroundColor: '#e2e8f0', borderRadius: '0.75rem', marginBottom: '1.25rem' }} />
@@ -137,7 +137,7 @@ export default function CoursesPage() {
                             ))}
                         </div>
                     ) : (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '2rem' }}>
                             {filteredCourses.length > 0 ? filteredCourses.map(course => (
                                 <Card key={course.id} style={{ display: 'flex', flexDirection: 'column', transition: 'transform 0.2s', borderRadius: '1rem', overflow: 'hidden' }}>
                                     <div style={{

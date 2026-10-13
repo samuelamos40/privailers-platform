@@ -22,16 +22,36 @@ const Sidebar = ({ isOpen, onClose }: { isOpen?: boolean, onClose?: () => void }
 
     return (
         <aside className={`sidebar-nav ${isOpen ? 'open' : ''}`}>
-            <div style={{ marginBottom: '3rem', padding: '0 0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Link href="/student" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
-                    <img src="/images/logo.png" alt={platformName} suppressHydrationWarning style={{ height: '36px', width: 'auto' }} />
-                    <span suppressHydrationWarning style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>{platformName}</span>
+            <div style={{ marginBottom: '2.5rem', padding: '0 0.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem', width: '100%' }}>
+                <Link 
+                    href="/student" 
+                    onClick={() => { if (onClose) onClose(); }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none', minWidth: 0, flex: 1, overflow: 'hidden' }}
+                >
+                    <img src="/images/logo.png" alt={platformName} suppressHydrationWarning style={{ height: '36px', width: 'auto', flexShrink: 0 }} />
+                    <span suppressHydrationWarning style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{platformName}</span>
                 </Link>
                 {onClose && (
                     <button 
                         onClick={onClose}
                         className="mobile-close-btn"
-                        style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '0.5rem', color: '#64748b' }}
+                        style={{
+                            background: '#f1f5f9',
+                            border: 'none',
+                            fontSize: '1.25rem',
+                            cursor: 'pointer',
+                            padding: 0,
+                            color: '#475569',
+                            width: '36px',
+                            height: '36px',
+                            minWidth: '36px',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            zIndex: 10
+                        }}
                         aria-label="Close menu"
                     >
                         ✕
@@ -55,13 +75,15 @@ const Sidebar = ({ isOpen, onClose }: { isOpen?: boolean, onClose?: () => void }
                                             }
                                             await signOut();
                                             window.location.href = '/';
+                                        } else {
+                                            if (onClose) onClose();
                                         }
                                     }}
                                     style={{
                                         display: 'flex',
                                         alignItems: 'center',
                                         gap: '1rem',
-                                        padding: '1rem 1.25rem',
+                                        padding: '0.875rem 1.25rem',
                                         borderRadius: '0.75rem',
                                         color: isLogout ? '#ef4444' : '#475569',
                                         textDecoration: 'none',
@@ -77,8 +99,8 @@ const Sidebar = ({ isOpen, onClose }: { isOpen?: boolean, onClose?: () => void }
                                         e.currentTarget.style.color = isLogout ? '#ef4444' : '#475569';
                                     }}
                                 >
-                                    <span style={{ fontSize: '1.25rem' }}>{link.icon}</span>
-                                    <span>{link.label}</span>
+                                    <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>{link.icon}</span>
+                                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{link.label}</span>
                                 </Link>
                             </li>
                         );

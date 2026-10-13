@@ -660,8 +660,8 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
                                     )}
                                 </div>
 
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                                    <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#1e293b', margin: 0 }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
+                                    <h1 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: 700, color: '#1e293b', margin: 0, wordBreak: 'break-word', flex: '1 1 260px' }}>
                                         {activeModule.title}
                                     </h1>
                                     <Button
@@ -690,7 +690,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
                                         <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#166534', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                             📹 Course Live Sessions & Office Hours
                                         </h2>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1rem' }}>
                                             {courseLiveClasses.map(cls => {
                                                 const startTime = new Date(cls.scheduled_at).getTime();
                                                 const now = new Date().getTime();
@@ -808,7 +808,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
                                             <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0369a1' }}>🚀 Upgrade to Mentored Batch</h3>
                                             <p style={{ color: '#0284c7' }}>Get live help, assignments, and peer motivation by joining a batch.</p>
                                         </div>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: '1.5rem' }}>
                                             {availableCohorts.map(batch => (
                                                 <div key={batch.id} style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '1rem', border: '1px solid #bae6fd', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
                                                     <div style={{ fontWeight: 800, color: '#1e3a8a', fontSize: '1rem' }}>{batch.name}</div>
@@ -925,7 +925,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
                                                     {cls.use_internal_room !== false ? (
                                                         <button 
                                                             onClick={() => router.push(`/classroom/${cls.id}`)}
-                                                            style={{ display: 'inline-block', padding: '0.45rem 0.9rem', backgroundColor: '#003366', color: 'white', border: 'none', borderRadius: '0.4rem', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}
+                                                            style={{ display: 'inline-block', padding: '0.45rem 0.9rem', backgroundColor: 'var(--primary-blue)', color: 'white', border: 'none', borderRadius: '0.4rem', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}
                                                         >
                                                             Join Live Room on Platform →
                                                         </button>

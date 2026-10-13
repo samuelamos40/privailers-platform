@@ -118,7 +118,7 @@ export default function CreateCoursePage() {
                         />
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '1rem' }}>
                         <div style={{ marginBottom: '1rem' }}>
                             <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem', color: '#475569' }}>
                                 Tier
@@ -217,7 +217,7 @@ export default function CreateCoursePage() {
                                     onChange={(e) => setProjectData({ ...projectData, due_date: e.target.value })}
                                 />
 
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '1rem' }}>
                                     <Input 
                                         label="Guide / Brief URL (Optional)"
                                         type="url"

@@ -28,14 +28,17 @@ export default function AdminCoursesPage() {
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#1e293b' }}>Course Management</h1>
+            <div className="portal-header">
+                <div>
+                    <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 700, color: '#1e293b', margin: 0 }}>Course Management</h1>
+                    <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '0.25rem 0 0 0' }}>Manage video modules, curricula, and courses</p>
+                </div>
                 <Link href="/admin/courses/create">
                     <Button variant="primary">Create New Course</Button>
                 </Link>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1.5rem' }}>
                 {courses.map(course => (
                     <Card key={course.id} padding="lg">
                         <div style={{ marginBottom: '1rem' }}>

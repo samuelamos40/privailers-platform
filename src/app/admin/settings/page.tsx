@@ -15,7 +15,7 @@ const InputGroup = ({ label, description, children }: any) => (
 );
 
 const SettingsCard = ({ title, children }: any) => (
-    <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '1rem', border: '1px solid #e2e8f0', height: '100%' }}>
+    <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '1rem', border: '1px solid #e2e8f0', height: '100%' }}>
         <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0f172a', marginBottom: '1.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid #f1f5f9' }}>
             {title}
         </h2>
@@ -105,14 +105,14 @@ export default function AdminSettingsPage() {
 
     // Components extracted above to prevent re-render focus loss
 
-    if (loading) return <div style={{ padding: '2rem' }}>Loading configuration...</div>;
+    if (loading) return <div style={{ padding: '2rem 1rem' }}>Loading configuration...</div>;
 
     return (
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+            <div className="portal-header" style={{ marginBottom: '2.5rem' }}>
                 <div>
-                    <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#1e293b' }}>Platform Settings</h1>
-                    <p style={{ color: '#64748b' }}>Control global configurations for the student portal.</p>
+                    <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.25rem)', fontWeight: 800, color: '#1e293b', margin: 0 }}>Platform Settings</h1>
+                    <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '0.25rem 0 0 0' }}>Control global configurations for the student portal.</p>
                 </div>
                 <Button onClick={handleSave} disabled={saving} size="lg">
                     {saving ? 'Saving...' : 'Save Changes'}
@@ -130,7 +130,7 @@ export default function AdminSettingsPage() {
                 </div>
             )}
 
-            <form onSubmit={handleSave} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', gap: '2rem' }}>
+            <form onSubmit={handleSave} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: '2rem' }}>
 
                 {/* 1. General & Branding */}
                 <SettingsCard title="🔹 General & Branding">
@@ -147,7 +147,7 @@ export default function AdminSettingsPage() {
 
                 {/* 2. Communication */}
                 <SettingsCard title="📞 Contact & Socials">
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '1rem' }}>
                         <InputGroup label="WhatsApp Number">
                             <input type="text" value={settings.whatsapp_number} onChange={e => setSettings({ ...settings, whatsapp_number: e.target.value })}
                                 style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1' }} />

@@ -98,9 +98,9 @@ export default function VirtualClassroomPage() {
     };
 
     if (loading) return (
-        <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0f172a', color: 'white' }}>
+        <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#061e48', color: 'white' }}>
             <div style={{ textAlign: 'center' }}>
-                <div style={{ width: '40px', height: '40px', border: '4px solid #334155', borderTop: '4px solid #6366f1', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }}></div>
+                <div style={{ width: '40px', height: '40px', border: '4px solid rgba(255,255,255,0.2)', borderTop: '4px solid var(--accent-teal)', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }}></div>
                 <p>Initializing Secure Classroom...</p>
             </div>
             <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
@@ -111,25 +111,25 @@ export default function VirtualClassroomPage() {
     const roomName = `Privailers_${classData.cohort.name.replace(/\s+/g, '_')}_${classData.title.replace(/\s+/g, '_')}_${id}`;
 
     return (
-        <div style={{ height: '100vh', backgroundColor: '#0f172a', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ height: '100vh', backgroundColor: '#061e48', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             {/* Classroom Header */}
-            <header style={{ padding: '1rem 2rem', backgroundColor: '#1e293b', borderBottom: '1px solid #334155', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 10 }}>
+            <header style={{ padding: '0.75rem 1.25rem', backgroundColor: '#0a2e6b', borderBottom: '1px solid rgba(0, 168, 156, 0.25)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', zIndex: 10 }}>
                 <div>
-                    <h1 style={{ color: 'white', fontSize: '1.25rem', fontWeight: 800, margin: 0 }}>{classData.title}</h1>
-                    <p style={{ color: '#94a3b8', fontSize: '0.8rem', margin: 0 }}>Cohort: {classData.cohort.name} • Instructor: {classData.cohort.instructor?.full_name}</p>
+                    <h1 style={{ color: 'white', fontSize: '1.15rem', fontWeight: 800, margin: 0 }}>{classData.title}</h1>
+                    <p style={{ color: '#cbd5e1', fontSize: '0.8rem', margin: 0 }}>Cohort: {classData.cohort.name} • Instructor: {classData.cohort.instructor?.full_name}</p>
                 </div>
-                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     {user?.id === classData.cohort?.instructor_id && (
                         <button 
                             onClick={handleEndSession}
-                            style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', backgroundColor: '#1e293b', color: '#ef4444', border: '1px solid #ef4444', fontWeight: 700, cursor: 'pointer' }}
+                            style={{ padding: '0.4rem 0.85rem', borderRadius: '0.5rem', backgroundColor: '#061e48', color: '#ef4444', border: '1px solid #ef4444', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem', whiteSpace: 'nowrap' }}
                         >
                             End Session for Everyone
                         </button>
                     )}
                     <button 
                         onClick={() => router.back()}
-                        style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', backgroundColor: '#ef4444', color: 'white', border: 'none', fontWeight: 700, cursor: 'pointer' }}
+                        style={{ padding: '0.4rem 0.85rem', borderRadius: '0.5rem', backgroundColor: '#ef4444', color: 'white', border: 'none', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem', whiteSpace: 'nowrap' }}
                     >
                         Leave Classroom
                     </button>
@@ -148,7 +148,7 @@ export default function VirtualClassroomPage() {
             {/* Branding Watermark */}
             <div style={{ position: 'absolute', bottom: '2rem', right: '2rem', pointerEvents: 'none', opacity: 0.5 }}>
                 <div style={{ fontSize: '1.5rem', fontWeight: 900, color: 'white', letterSpacing: '-1px' }}>
-                    Privailers<span style={{ color: '#6366f1' }}>Portal</span>
+                    Privailers<span style={{ color: 'var(--accent-teal)' }}>Portal</span>
                 </div>
             </div>
         </div>

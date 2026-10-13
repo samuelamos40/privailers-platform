@@ -61,11 +61,11 @@ export default function AdminNewsletterPage() {
     };
 
     return (
-        <div className="main-content admin">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div>
+            <div className="portal-header">
                 <div>
-                    <h1 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--primary-blue)' }}>Newsletter Subscribers</h1>
-                    <p style={{ color: 'var(--text-muted)' }}>Manage your audience and export your list.</p>
+                    <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 700, color: 'var(--primary-blue)', margin: 0 }}>Newsletter Subscribers</h1>
+                    <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>Manage your audience and export your list.</p>
                 </div>
                 <Button variant="outline" onClick={exportToCSV} disabled={subscribers.length === 0}>
                     📥 Export to CSV

@@ -438,12 +438,12 @@ export default function CourseEditorPage({ params }: { params: Promise<{ id: str
                 </Link>
 
                 {/* Course Title Header / Editor */}
-                <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
+                <div className="portal-header" style={{ marginTop: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, flexWrap: 'wrap' }}>
                         {!isEditingCourse ? (
                             <>
-                                <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#1e293b', margin: 0, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                    {course?.title}
+                                <h1 style={{ fontSize: 'clamp(1.4rem, 3.5vw, 2.25rem)', fontWeight: 700, color: '#1e293b', margin: 0, display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                                    <span>{course?.title}</span>
                                     <span style={{ 
                                         fontSize: '0.8rem', 
                                         padding: '0.25rem 0.6rem', 
@@ -510,13 +510,13 @@ export default function CourseEditorPage({ params }: { params: Promise<{ id: str
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 450px', gap: '2rem' }}>
+            <div className="portal-split-layout wide" style={{ display: 'grid', gridTemplateColumns: '1fr 450px', gap: '2rem' }}>
                 {/* LEFT: Content List (Modules & Projects) */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
                     {/* MODULES SECTION */}
                     <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
                             <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Modules ({modules.length})</h2>
                             <Button variant="primary" onClick={openAddModule}>+ Add Module</Button>
                         </div>
@@ -528,13 +528,13 @@ export default function CourseEditorPage({ params }: { params: Promise<{ id: str
                                         <button onClick={() => handleReorder(index, 'up')} disabled={index === 0} style={{ border: 'none', background: 'none', cursor: index === 0 ? 'default' : 'pointer', opacity: index === 0 ? 0.3 : 1 }}>▲</button>
                                         <button onClick={() => handleReorder(index, 'down')} disabled={index === modules.length - 1} style={{ border: 'none', background: 'none', cursor: index === modules.length - 1 ? 'default' : 'pointer', opacity: index === modules.length - 1 ? 0.3 : 1 }}>▼</button>
                                     </div>
-                                    <div style={{ flex: 1 }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                            <div>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                            <div style={{ minWidth: '180px', flex: '1 1 180px' }}>
                                                 <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Module {index + 1}</div>
-                                                <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>{mod.title}</div>
+                                                <div style={{ fontWeight: 600, fontSize: '1.1rem', wordBreak: 'break-word' }}>{mod.title}</div>
                                             </div>
-                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                                                 <Button variant="outline" size="sm" onClick={() => startEditModule(mod)}>Edit</Button>
                                                 <Button variant="outline" size="sm" onClick={() => handleDeleteModule(mod.id)} style={{ borderColor: '#ef4444', color: '#ef4444' }}>Delete</Button>
                                             </div>
@@ -550,7 +550,7 @@ export default function CourseEditorPage({ params }: { params: Promise<{ id: str
 
                     {/* PROJECTS SECTION */}
                     <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderTop: '1px solid #e2e8f0', paddingTop: '2rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderTop: '1px solid #e2e8f0', paddingTop: '2rem', flexWrap: 'wrap', gap: '0.75rem' }}>
                             <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Class Projects ({projects.length})</h2>
                             <Button variant="outline" onClick={openAddProject}>+ Add Project</Button>
                         </div>
@@ -558,17 +558,17 @@ export default function CourseEditorPage({ params }: { params: Promise<{ id: str
                             {projects.length === 0 && <p style={{ color: 'var(--text-muted)' }}>No projects assigned yet.</p>}
                             {projects.map((proj, index) => (
                                 <Card key={proj.id}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                        <div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
+                                        <div style={{ minWidth: '180px', flex: '1 1 180px' }}>
                                             <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#3b82f6', marginBottom: '0.25rem', textTransform: 'uppercase' }}>Assignment</div>
-                                            <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>{proj.title}</div>
+                                            <div style={{ fontWeight: 600, fontSize: '1.1rem', wordBreak: 'break-word' }}>{proj.title}</div>
                                             {proj.due_date && (
                                                 <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.25rem' }}>
                                                     Due: {new Date(proj.due_date).toLocaleDateString()}
                                                 </div>
                                             )}
                                         </div>
-                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                                             <Button variant="outline" size="sm" onClick={() => openGrading(proj.id)}>🔎 Submissions</Button>
                                             <Button variant="outline" size="sm" onClick={() => startEditProject(proj)}>Edit</Button>
                                             <Button variant="outline" size="sm" onClick={() => handleDeleteProject(proj.id)} style={{ borderColor: '#ef4444', color: '#ef4444' }}>Delete</Button>

@@ -54,33 +54,33 @@ export default function Home() {
         <div>
             {/* Hero Section */}
             <section style={{
-                padding: '10rem 0 8rem',
-                background: 'radial-gradient(circle at top right, #1e293b, #0f172a)',
+                padding: 'clamp(5rem, 10vw, 9rem) 1rem clamp(3.5rem, 7vw, 7rem)',
+                background: 'radial-gradient(circle at top right, #0a2e6b 0%, #061e48 60%, #020b1c 100%)',
                 color: 'white',
                 position: 'relative',
                 overflow: 'hidden'
             }}>
                 {/* Decorative Elements */}
-                <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: '40%', height: '40%', background: 'var(--accent-teal)', filter: 'blur(150px)', opacity: 0.1, borderRadius: '50%' }} />
-                <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: '30%', height: '30%', background: 'var(--primary-blue)', filter: 'blur(120px)', opacity: 0.2, borderRadius: '50%' }} />
+                <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: '40%', height: '40%', background: 'var(--accent-teal)', filter: 'blur(150px)', opacity: 0.18, borderRadius: '50%' }} />
+                <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: '30%', height: '30%', background: 'var(--secondary-blue)', filter: 'blur(120px)', opacity: 0.25, borderRadius: '50%' }} />
 
                 <div className="container" style={{ position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
-                    <h1 style={{ fontSize: 'clamp(2.5rem, 8vw, 4.5rem)', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.1, letterSpacing: '-0.03em', maxWidth: '900px', margin: '0 auto 1.5rem' }}>
+                    <h1 style={{ fontSize: 'clamp(2.2rem, 7vw, 4.5rem)', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.15, letterSpacing: '-0.03em', maxWidth: '900px', margin: '0 auto 1.5rem', wordBreak: 'break-word' }}>
                         Empowering <span style={{ color: 'var(--accent-teal)' }}>Insights.</span><br />
                         <span style={{ opacity: 0.7 }}>Driving Growth.</span>
                     </h1>
-                    <p style={{ fontSize: '1.25rem', color: '#94a3b8', maxWidth: '750px', margin: '0 auto 3.5rem', lineHeight: 1.7, fontWeight: 400 }}>
+                    <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.25rem)', color: '#94a3b8', maxWidth: '750px', margin: '0 auto 3.5rem', lineHeight: 1.7, fontWeight: 400 }}>
                         Privailers Data Consult bridges the gap between high-demand tech skills and enterprise intelligence. We provide a comprehensive EdTech academy with self-paced courses and live bootcamps, automated data pipelines, analytics-ready web platforms, and applied mathematical modeling & simulations.
                     </p>
                     <div style={{ display: 'flex', gap: '1.25rem', justifyContent: 'center', flexWrap: 'wrap' }}>
                         <Link href="/courses">
-                            <Button variant="accent" size="lg" style={{ minWidth: '200px', height: '60px', fontSize: '1.1rem', boxShadow: '0 10px 15px -3px rgba(0, 184, 212, 0.2)' }}>
+                            <Button variant="accent" size="lg" style={{ minWidth: '180px', height: '56px', fontSize: '1.05rem', boxShadow: '0 10px 15px -3px rgba(0, 168, 156, 0.3)' }}>
                                 Start Learning
                             </Button>
                         </Link>
                         <Link href="/services">
                             <Button variant="outline" size="lg" style={{
-                                minWidth: '200px', height: '60px', fontSize: '1.1rem',
+                                minWidth: '180px', height: '56px', fontSize: '1.05rem',
                                 color: 'white', borderColor: 'rgba(255,255,255,0.2)', backgroundColor: 'rgba(255,255,255,0.02)'
                             }}>
                                 Hire Our Team
@@ -112,11 +112,11 @@ export default function Home() {
             </section>
 
             {/* Featured Courses Section */}
-            <section style={{ padding: '6rem 0', backgroundColor: '#f8fafc' }}>
+            <section style={{ padding: 'clamp(3rem, 6vw, 6rem) 0', backgroundColor: '#f8fafc' }}>
                 <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1rem' }}>
-                    <div style={{ textAlign: 'center', marginBottom: '4rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
                         <div style={{ textAlign: 'left' }}>
-                            <h2 style={{ fontSize: '2.5rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.5rem' }}>Featured Courses</h2>
+                            <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 700, color: '#1e293b', marginBottom: '0.5rem' }}>Featured Courses</h2>
                             <p style={{ color: '#64748b', maxWidth: '600px' }}>Start your journey with our top-rated programs.</p>
                         </div>
                         <Link href="/courses">
@@ -125,7 +125,7 @@ export default function Home() {
                     </div>
 
                     {loading ? (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '2rem' }}>
                             {[1, 2, 3].map(i => (
                                 <div key={i} style={{
                                     background: 'white',
@@ -146,7 +146,7 @@ export default function Home() {
                             ))}
                         </div>
                     ) : (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '2rem' }}>
                             {featuredCourses.map(course => (
                                 <Card key={course.id} style={{ display: 'flex', flexDirection: 'column', transition: 'transform 0.2s' }}>
                                     <div style={{
@@ -194,14 +194,14 @@ export default function Home() {
             </section>
 
             {/* Services Preview */}
-            <section style={{ padding: '6rem 0', backgroundColor: 'white' }}>
+            <section style={{ padding: 'clamp(3rem, 6vw, 6rem) 0', backgroundColor: 'white' }}>
                 <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1rem' }}>
-                    <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-                        <h2 style={{ fontSize: '2.5rem', fontWeight: 700, color: '#1e293b', marginBottom: '1rem' }}>What We Do</h2>
+                    <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+                        <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 700, color: '#1e293b', marginBottom: '1rem' }}>What We Do</h2>
                         <p style={{ color: '#64748b', maxWidth: '600px', margin: '0 auto' }}>Calculate your next move with precision. Our services are tailored for impact.</p>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '2rem' }}>
                         {[
                             {
                                 title: "EdTech Academy & Course Marketplace",
@@ -324,14 +324,14 @@ export default function Home() {
             </section>
 
             {/* Testimonials Section */}
-            <section style={{ padding: '6rem 0', backgroundColor: 'white', borderTop: '1px solid #f1f5f9' }}>
+            <section style={{ padding: 'clamp(3rem, 6vw, 6rem) 0', backgroundColor: 'white', borderTop: '1px solid #f1f5f9' }}>
                 <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1rem' }}>
-                    <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-                        <h2 style={{ fontSize: '2.5rem', fontWeight: 700, color: '#1e293b', marginBottom: '1rem' }}>Success Stories</h2>
+                    <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+                        <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 700, color: '#1e293b', marginBottom: '1rem' }}>Success Stories</h2>
                         <p style={{ color: '#64748b', maxWidth: '600px', margin: '0 auto' }}>Hear from the individuals and businesses we've helped grow.</p>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '2rem' }}>
                         {[
                             {
                                 quote: "Joining the Privailers Data Analytics Bootcamp was a game-changer for me. The classes were practical, beginner-friendly, and highly impactful. I gained hands-on experience with tools like Excel and I now feel confident analyzing data and drawing meaningful insights. I highly recommend it to anyone looking to build real data skills.",
@@ -350,17 +350,17 @@ export default function Home() {
                             }
                         ].map((testimonial, i) => (
                             <div key={i} style={{
-                                padding: '2rem',
+                                padding: '1.75rem',
                                 backgroundColor: '#f8fafc',
                                 borderRadius: '1rem',
                                 border: '1px solid #e2e8f0'
                             }}>
-                                <div style={{ color: '#38bdf8', fontSize: '2rem', marginBottom: '1rem', lineHeight: 1 }}>❝</div>
+                                <div style={{ color: 'var(--accent-teal)', fontSize: '2rem', marginBottom: '1rem', lineHeight: 1 }}>❝</div>
                                 <p style={{ color: '#475569', fontStyle: 'italic', marginBottom: '1.5rem', lineHeight: 1.6 }}>
                                     "{testimonial.quote}"
                                 </p>
                                 <div>
-                                    <div style={{ fontWeight: 700, color: '#0f172a' }}>{testimonial.author}</div>
+                                    <div style={{ fontWeight: 700, color: 'var(--primary-blue)' }}>{testimonial.author}</div>
                                     <div style={{ fontSize: '0.875rem', color: '#64748b' }}>{testimonial.role}</div>
                                 </div>
                             </div>
@@ -370,22 +370,22 @@ export default function Home() {
             </section>
 
             {/* CTA Section */}
-            <section style={{ padding: '6rem 0', backgroundColor: 'white' }}>
+            <section style={{ padding: 'clamp(3rem, 6vw, 6rem) 0', backgroundColor: 'white' }}>
                 <div className="container" style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 1rem' }}>
                     <div style={{
-                        backgroundColor: '#1e293b',
+                        background: 'linear-gradient(135deg, #061e48 0%, #0a2e6b 100%)',
                         borderRadius: '2rem',
-                        padding: '4rem 2rem',
+                        padding: 'clamp(2.5rem, 6vw, 4rem) 1.5rem',
                         textAlign: 'center',
                         color: 'white',
-                        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)'
+                        boxShadow: '0 20px 25px -5px rgba(6, 30, 72, 0.25), 0 8px 10px -6px rgba(6, 30, 72, 0.15)'
                     }}>
-                        <h2 style={{ fontSize: '2.5rem', fontWeight: 700, marginBottom: '1.5rem' }}>Ready to Transform Your Career?</h2>
-                        <p style={{ color: '#94a3b8', fontSize: '1.1rem', marginBottom: '2.5rem', maxWidth: '600px', margin: '0 auto 2.5rem' }}>
+                        <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 700, marginBottom: '1.5rem', wordBreak: 'break-word' }}>Ready to Transform Your Career?</h2>
+                        <p style={{ color: '#cbd5e1', fontSize: '1.1rem', marginBottom: '2.5rem', maxWidth: '600px', margin: '0 auto 2.5rem' }}>
                             Join hundreds of students who have landed jobs at top tech companies after training with us.
                         </p>
                         <Link href="/register">
-                            <Button variant="primary" size="lg" style={{ backgroundColor: '#38bdf8', color: '#0f172a', fontWeight: 700 }}>
+                            <Button variant="accent" size="lg" style={{ fontWeight: 700, padding: '1rem 2.5rem', fontSize: '1.05rem', boxShadow: '0 10px 15px -3px rgba(0, 168, 156, 0.3)' }}>
                                 Create Free Student Account
                             </Button>
                         </Link>

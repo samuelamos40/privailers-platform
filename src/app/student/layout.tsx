@@ -38,13 +38,16 @@ export default function StudentLayout({
     return (
         <ProtectedRoute requireRole="student">
             <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
-                <div className="mobile-topbar" style={{ alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1.5rem', backgroundColor: 'white', borderBottom: '1px solid #e2e8f0' }}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <img src="/images/logo.png" alt="Logo" style={{ height: '35px', width: 'auto' }} />
+                <div className="mobile-topbar">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <img src="/images/logo.png" alt="Logo" style={{ height: '32px', width: 'auto' }} />
+                        <span suppressHydrationWarning style={{ fontWeight: 800, fontSize: '1.1rem', color: '#0f172a' }}>{platformName}</span>
                     </div>
                     <button 
                          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                         style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '0.5rem' }}
+                         className="mobile-menu-btn"
+                         style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '0.5rem', color: '#1e293b' }}
+                         aria-label="Open menu"
                     >
                         ☰
                     </button>
@@ -52,7 +55,7 @@ export default function StudentLayout({
                 {/* Backdrop for mobile */}
                 {isMobileMenuOpen && (
                     <div 
-                         style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.4)', zIndex: 45, backdropFilter: 'blur(2px)' }} 
+                         style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.5)', zIndex: 55, backdropFilter: 'blur(3px)' }} 
                          onClick={() => setIsMobileMenuOpen(false)} 
                     />
                 )}

@@ -28,13 +28,37 @@ const InstructorSidebar = ({ isOpen, onClose }: { isOpen?: boolean, onClose?: ()
 
     return (
         <aside className={`sidebar-nav admin ${isOpen ? 'open' : ''}`}>
-            <div style={{ marginBottom: '3rem', fontSize: '1.25rem', fontWeight: 700, color: '#94a3b8', display: 'flex', justifyContent: 'space-between' }}>
-                <span suppressHydrationWarning>{platformName} Instructor</span>
+            <div style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem', width: '100%' }}>
+                <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+                    <div suppressHydrationWarning style={{ fontSize: '1.15rem', fontWeight: 800, color: '#f8fafc', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {platformName}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        Instructor Portal
+                    </div>
+                </div>
                 {onClose && (
                     <button 
                         onClick={onClose}
-                        style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '1.25rem', cursor: 'pointer' }}
                         className="mobile-close-btn"
+                        style={{
+                            background: 'rgba(255, 255, 255, 0.1)',
+                            border: 'none',
+                            color: '#ffffff',
+                            fontSize: '1.25rem',
+                            cursor: 'pointer',
+                            padding: 0,
+                            width: '36px',
+                            height: '36px',
+                            minWidth: '36px',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            zIndex: 10
+                        }}
+                        aria-label="Close menu"
                     >
                         ✕
                     </button>
@@ -45,18 +69,27 @@ const InstructorSidebar = ({ isOpen, onClose }: { isOpen?: boolean, onClose?: ()
                     {links.map(link => {
                         const isLogout = link.label === 'Logout';
                         return (
-                            <li key={link.href} style={{ marginBottom: '1rem' }}>
+                            <li key={link.href} style={{ marginBottom: '0.5rem' }}>
                                 <Link
                                     href={link.href}
-                                    onClick={isLogout ? handleLogout : undefined}
+                                    onClick={(e) => {
+                                        if (isLogout) {
+                                            handleLogout(e);
+                                        } else {
+                                            if (onClose) onClose();
+                                        }
+                                    }}
                                     style={{
                                         display: 'block',
                                         padding: '0.75rem 1rem',
                                         borderRadius: '0.5rem',
-                                        color: isLogout ? '#ef4444' : 'rgba(255,255,255,0.7)',
+                                        color: isLogout ? '#ef4444' : 'rgba(255,255,255,0.75)',
                                         textDecoration: 'none',
                                         transition: 'background 0.2s, color 0.2s',
-                                        fontWeight: isLogout ? 600 : 400
+                                        fontWeight: isLogout ? 600 : 400,
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap'
                                     }}
                                 >
                                     {link.label}

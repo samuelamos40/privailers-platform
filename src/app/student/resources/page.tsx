@@ -31,18 +31,18 @@ export default function ResourcesPage() {
         }
     };
 
-    if (loading) return <div style={{ padding: '2rem' }}>Loading resources...</div>;
+    if (loading) return <div style={{ padding: '2rem 1rem' }}>Loading resources...</div>;
 
     return (
-        <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '2rem', color: 'var(--primary-blue)' }}>Learning Resources</h1>
+        <div style={{ width: '100%' }}>
+            <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 800, marginBottom: '1.5rem', color: 'var(--primary-blue)' }}>Learning Resources</h1>
 
             {resources.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '4rem', color: '#94a3b8' }}>
+                <div style={{ textAlign: 'center', padding: '4rem 1rem', color: '#94a3b8' }}>
                     No resources added yet. Check back later!
                 </div>
             ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1.5rem' }}>
                     {resources.map((res, idx) => {
                         const style = getCategoryStyle(res.category);
                         return (

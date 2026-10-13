@@ -144,12 +144,12 @@ export default function AdminAssignmentsPage() {
         return (
             <div style={{ display: 'grid', gap: '1rem' }}>
                 {inboxItems.map(sub => (
-                    <Card key={sub.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
+                    <Card key={sub.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                        <div style={{ minWidth: '220px', flex: '1 1 220px' }}>
                             <div style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.25rem' }}>
                                 {sub.project?.course?.title} • {sub.project?.title}
                             </div>
-                            <div style={{ fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.25rem' }}>
+                            <div style={{ fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.25rem', wordBreak: 'break-word' }}>
                                 {sub.user?.email || 'Unknown User'}
                             </div>
                             <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
@@ -168,12 +168,12 @@ export default function AdminAssignmentsPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {submissions.length === 0 && <p style={{ color: '#64748b' }}>No submissions found.</p>}
                 {submissions.map(sub => (
-                    <div key={sub.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '0.5rem' }}>
-                        <div>
-                            <div style={{ fontWeight: 600 }}>{sub.user?.email || 'Unknown User'}</div>
+                    <div key={sub.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', padding: '1rem', backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '0.5rem' }}>
+                        <div style={{ minWidth: '200px', flex: '1 1 200px' }}>
+                            <div style={{ fontWeight: 600, wordBreak: 'break-word' }}>{sub.user?.email || 'Unknown User'}</div>
                             <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{sub.project?.title}</div>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                             <span style={{
                                 padding: '0.25rem 0.5rem', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600,
                                 backgroundColor: sub.status === 'graded' ? '#dcfce7' : '#fff7ed',
@@ -224,41 +224,43 @@ export default function AdminAssignmentsPage() {
         }
 
         return (
-            <Card>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
-                    <thead>
-                        <tr style={{ borderBottom: '2px solid #e2e8f0', textAlign: 'left' }}>
-                            <th style={{ padding: '1rem', color: '#64748b' }}>Student</th>
-                            <th style={{ padding: '1rem', color: '#64748b' }}>Completed</th>
-                            <th style={{ padding: '1rem', color: '#64748b' }}>Avg. Score</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {sortedUsers.map((u: any) => (
-                            <tr key={u.user} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                <td style={{ padding: '1rem', fontWeight: 600 }}>{u.user}</td>
-                                <td style={{ padding: '1rem' }}>{u.gradedCount} Assignments</td>
-                                <td style={{ padding: '1rem', color: '#059669', fontWeight: 700 }}>
-                                    {u.gradedCount > 0 ? (u.totalPoints / u.gradedCount).toFixed(1) : '-'}%
-                                </td>
+            <Card padding="none">
+                <div className="table-container">
+                    <table className="table-responsive" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                        <thead>
+                            <tr style={{ borderBottom: '2px solid #e2e8f0', textAlign: 'left', backgroundColor: '#f8fafc' }}>
+                                <th style={{ padding: '1rem', color: '#64748b' }}>Student</th>
+                                <th style={{ padding: '1rem', color: '#64748b' }}>Completed</th>
+                                <th style={{ padding: '1rem', color: '#64748b' }}>Avg. Score</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {sortedUsers.map((u: any) => (
+                                <tr key={u.user} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                    <td style={{ padding: '1rem', fontWeight: 600 }}>{u.user}</td>
+                                    <td style={{ padding: '1rem' }}>{u.gradedCount} Assignments</td>
+                                    <td style={{ padding: '1rem', color: '#059669', fontWeight: 700 }}>
+                                        {u.gradedCount > 0 ? (u.totalPoints / u.gradedCount).toFixed(1) : '-'}%
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </Card>
         );
     };
 
-    if (loading) return <div style={{ padding: '2rem' }}>Loading Assignments...</div>;
+    if (loading) return <div style={{ padding: '2rem 1rem' }}>Loading Assignments...</div>;
 
     return (
-        <div style={{ padding: '2rem' }}>
+        <div>
             <div style={{ marginBottom: '2rem' }}>
                 <Link href="/admin" style={{ color: '#64748b', fontSize: '0.875rem' }}>← Back to Dashboard</Link>
-                <h1 style={{ fontSize: '2rem', fontWeight: 800, marginTop: '0.5rem', color: '#1e293b' }}>Assignments & Grading</h1>
+                <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.25rem)', fontWeight: 800, marginTop: '0.5rem', color: '#1e293b' }}>Assignments & Grading</h1>
             </div>
 
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', borderBottom: '1px solid #e2e8f0', overflowX: 'auto', whiteSpace: 'nowrap' }}>
                 {[
                     { id: 'inbox', label: '📥 Inbox (Pending)' },
                     { id: 'all', label: '🗂 All Submissions' },

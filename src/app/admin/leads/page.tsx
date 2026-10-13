@@ -90,8 +90,11 @@ export default function LeadCRMPage() {
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#1e293b' }}>Lead Management</h1>
+            <div className="portal-header">
+                <div>
+                    <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 700, color: '#1e293b', margin: 0 }}>Lead Management</h1>
+                    <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '0.25rem 0 0 0' }}>Inquiries from prospective clients and students</p>
+                </div>
                 <Button variant="primary" onClick={exportToCSV}>Export CSV</Button>
             </div>
 

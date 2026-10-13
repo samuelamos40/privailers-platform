@@ -107,12 +107,12 @@ export default function ServicesPage() {
                     gap: '0.5rem',
                     padding: '0.4rem 1.25rem',
                     borderRadius: '999px',
-                    backgroundColor: 'rgba(0, 180, 216, 0.08)',
+                    backgroundColor: 'var(--accent-teal-subtle)',
                     color: 'var(--accent-teal-dark)',
                     fontSize: '0.875rem',
                     fontWeight: 700,
                     marginBottom: '1rem',
-                    border: '1px solid rgba(0, 180, 216, 0.2)'
+                    border: '1px solid var(--accent-teal-glow)'
                 }}>
                     EdTech Ecosystem • Enterprise Data Engineering • Applied Mathematics
                 </div>
@@ -125,7 +125,7 @@ export default function ServicesPage() {
             </div>
 
             {/* Services Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2.5rem', marginBottom: '6rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '2.5rem', marginBottom: '6rem' }}>
                 {services.map((service, index) => (
                     <Card key={index} padding="lg" style={{
                         display: 'flex',
@@ -263,12 +263,12 @@ export default function ServicesPage() {
             <div style={{
                 backgroundColor: 'var(--primary-blue)',
                 borderRadius: '1.5rem',
-                padding: '4rem 2rem',
+                padding: 'clamp(2.5rem, 5vw, 4rem) 1.5rem',
                 textAlign: 'center',
                 color: 'white',
                 boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
             }}>
-                <h2 style={{ fontSize: '2.25rem', fontWeight: 800, marginBottom: '1rem' }}>
+                <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.25rem)', fontWeight: 800, marginBottom: '1rem', wordBreak: 'break-word' }}>
                     Ready to Transform Your Business or Accelerate Your Career?
                 </h2>
                 <p style={{ color: '#94a3b8', fontSize: '1.1rem', maxWidth: '700px', margin: '0 auto 2.5rem', lineHeight: 1.6 }}>

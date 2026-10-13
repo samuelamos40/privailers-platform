@@ -13,7 +13,7 @@ export default function CMSPage() {
                 <form>
                     <div style={{ marginBottom: '1.5rem' }}>
                         <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, fontSize: '0.875rem', color: '#475569' }}>Content Type</label>
-                        <div style={{ display: 'flex', gap: '1rem' }}>
+                        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                             <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <input type="radio" name="type" defaultChecked /> Article
                             </label>

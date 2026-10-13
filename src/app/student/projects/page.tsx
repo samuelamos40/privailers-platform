@@ -9,15 +9,17 @@ const ProjectCard = ({ project }: { project: any }) => (
     <div style={{
         backgroundColor: 'white',
         borderRadius: '1rem',
-        padding: '1.5rem',
+        padding: '1.25rem',
         border: '1px solid #e2e8f0',
         marginBottom: '1rem',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '1rem',
         boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
     }}>
-        <div>
+        <div style={{ flex: '1 1 260px', minWidth: 0 }}>
             <div style={{
                 fontSize: '0.75rem',
                 fontWeight: 700,
@@ -28,14 +30,14 @@ const ProjectCard = ({ project }: { project: any }) => (
             }}>
                 {project.course?.title || 'General Course'}
             </div>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.5rem' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.5rem', wordBreak: 'break-word' }}>
                 {project.title}
             </h3>
-            <p style={{ color: '#64748b', fontSize: '0.9rem' }}>{project.description}</p>
+            <p style={{ color: '#64748b', fontSize: '0.9rem', wordBreak: 'break-word' }}>{project.description}</p>
         </div>
-        <div style={{ textAlign: 'right' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.5rem' }}>
             {project.due_date && (
-                <div style={{ fontSize: '0.875rem', color: '#ef4444', fontWeight: 600, marginBottom: '0.5rem' }}>
+                <div style={{ fontSize: '0.85rem', color: '#ef4444', fontWeight: 600 }}>
                     Due: {new Date(project.due_date).toLocaleDateString()}
                 </div>
             )}
@@ -49,7 +51,7 @@ const ProjectCard = ({ project }: { project: any }) => (
                     border: 'none',
                     cursor: 'pointer'
                 }}>
-                    View Details
+                    View Details →
                 </button>
             </Link>
         </div>
@@ -81,13 +83,13 @@ export default function StudentProjectsPage() {
         setLoading(false);
     };
 
-    if (loading) return <div style={{ padding: '3rem' }}>Loading assignments...</div>;
+    if (loading) return <div style={{ padding: '2rem 1rem' }}>Loading assignments...</div>;
 
     return (
-        <div style={{ padding: '3rem', maxWidth: '1000px', margin: '0 auto' }}>
-            <div style={{ marginBottom: '3rem' }}>
-                <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#1e293b' }}>Projects & Assignments</h1>
-                <p style={{ color: '#64748b', fontSize: '1.1rem' }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
+            <div style={{ marginBottom: '2rem' }}>
+                <h1 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 800, color: '#1e293b', marginBottom: '0.5rem' }}>Projects & Assignments</h1>
+                <p style={{ color: '#64748b', fontSize: '1rem' }}>
                     Practical work for your enrolled courses.
                 </p>
             </div>

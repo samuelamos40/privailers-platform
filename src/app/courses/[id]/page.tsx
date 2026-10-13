@@ -59,8 +59,8 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ id: st
     }, [courseId]);
 
 
-    if (loading) return <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#0f172a' }}><Navbar /><div style={{ padding: '8rem 2rem', textAlign: 'center', flex: 1, color: '#38bdf8', fontSize: '1.25rem', fontWeight: 600 }}>Loading premium course content...</div><Footer /></div>;
-    if (!course) return <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#0f172a' }}><Navbar /><div style={{ padding: '8rem 2rem', textAlign: 'center', flex: 1, color: '#cbd5e1', fontSize: '1.25rem' }}>Course not found. (ID mismatch or deleted)</div><Footer /></div>;
+    if (loading) return <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--primary-blue)' }}><Navbar /><div style={{ padding: '8rem 2rem', textAlign: 'center', flex: 1, color: 'var(--accent-teal)', fontSize: '1.25rem', fontWeight: 600 }}>Loading premium course content...</div><Footer /></div>;
+    if (!course) return <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--primary-blue)' }}><Navbar /><div style={{ padding: '8rem 2rem', textAlign: 'center', flex: 1, color: '#cbd5e1', fontSize: '1.25rem' }}>Course not found. (ID mismatch or deleted)</div><Footer /></div>;
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
@@ -68,41 +68,41 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ id: st
             
             {/* Header / Hero */}
             <header style={{ 
-                backgroundColor: '#1e293b', 
+                background: 'radial-gradient(circle at top right, #0a2e6b 0%, #061e48 100%)', 
                 color: 'white', 
-                padding: '6rem 1rem 4rem',
-                borderBottom: '4px solid #38bdf8'
+                padding: 'clamp(3rem, 6vw, 6rem) 1rem 3rem',
+                borderBottom: '4px solid var(--accent-teal)'
             }}>
                 <div className="container" style={{ maxWidth: '1000px', margin: '0 auto' }}>
                     <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '0.5rem' }}>
                         <span style={{
                             fontSize: '0.875rem', fontWeight: 600,
                             padding: '0.25rem 0.75rem', borderRadius: '4px',
-                            backgroundColor: course.tier === 'paid' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(34, 197, 94, 0.2)',
+                            backgroundColor: course.tier === 'paid' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(0, 168, 156, 0.2)',
                             color: course.tier === 'paid' ? '#fcd34d' : '#86efac'
                         }}>
                             {course.tier === 'paid' ? 'PREMIUM COURSE' : 'FREE COURSE'}
                         </span>
                     </div>
-                    <h1 style={{ fontSize: '3.5rem', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.1 }}>
+                    <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.15, wordBreak: 'break-word' }}>
                         {course.title}
                     </h1>
-                    <p style={{ fontSize: '1.25rem', color: '#cbd5e1', maxWidth: '800px', lineHeight: 1.6, marginBottom: '2.5rem' }}>
+                    <p style={{ fontSize: '1.15rem', color: '#cbd5e1', maxWidth: '800px', lineHeight: 1.6, marginBottom: '2.5rem' }}>
                         {course.description}
                     </p>
                     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
                         {user ? (
                             <Link href={course.tier === 'paid' ? `/checkout?type=course&id=${course.id}` : `/student/courses/${course.id}`}>
-                                <Button variant="primary" size="lg" style={{ backgroundColor: '#38bdf8', color: '#0f172a', fontWeight: 700, padding: '1rem 2.5rem', fontSize: '1.1rem' }}>
+                                <Button variant="accent" size="lg" style={{ fontWeight: 700, padding: '1rem 2.5rem', fontSize: '1.1rem', boxShadow: '0 10px 15px -3px rgba(0, 168, 156, 0.3)' }}>
                                     {course.tier === 'paid' ? `Enroll for ₦${course.price?.toLocaleString() || '0'}` : 'Enroll for Free'}
                                 </Button>
                             </Link>
                         ) : (
                             <Button 
                                 onClick={() => setIsLoginModalOpen(true)}
-                                variant="primary" 
+                                variant="accent" 
                                 size="lg" 
-                                style={{ backgroundColor: '#38bdf8', color: '#0f172a', fontWeight: 700, padding: '1rem 2.5rem', fontSize: '1.1rem' }}
+                                style={{ fontWeight: 700, padding: '1rem 2.5rem', fontSize: '1.1rem', boxShadow: '0 10px 15px -3px rgba(0, 168, 156, 0.3)' }}
                             >
                                 {course.tier === 'paid' ? `Enroll for ₦${course.price?.toLocaleString() || '0'}` : 'Enroll for Free'}
                             </Button>
@@ -112,8 +112,8 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ id: st
             </header>
 
             {/* Main Content */}
-            <main className="container" style={{ maxWidth: '1000px', margin: '0 auto', padding: '4rem 1rem', flex: 1 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem' }}>
+            <main className="container" style={{ maxWidth: '1000px', margin: '0 auto', padding: 'clamp(2rem, 4vw, 4rem) 1rem', flex: 1 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '2.5rem' }}>
                     
                     {/* Left Column: Curriculum */}
                     <div style={{ flex: 2 }}>

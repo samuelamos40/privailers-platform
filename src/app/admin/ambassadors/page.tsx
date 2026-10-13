@@ -104,12 +104,12 @@ export default function AdminAmbassadorsPage() {
     const activeCount = ambassadors.filter(a => a.is_active).length;
 
     return (
-        <div style={{ padding: '2rem' }}>
+        <div>
             {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+            <div className="portal-header">
                 <div>
-                    <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#1e293b' }}>Ambassadors 🤝</h1>
-                    <p style={{ color: '#64748b' }}>Manage influencers & affiliate partners</p>
+                    <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.25rem)', fontWeight: 800, color: '#1e293b', margin: 0 }}>Ambassadors 🤝</h1>
+                    <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '0.25rem 0 0 0' }}>Manage influencers & affiliate partners</p>
                 </div>
                 <Button variant="primary" onClick={() => {
                     setFormData({ id: '', full_name: '', email: '', phone: '', referral_code: '', commission_rate: 10, discount_value: 5, is_active: true });
@@ -120,27 +120,27 @@ export default function AdminAmbassadorsPage() {
             </div>
 
             {/* Summary Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-                <Card style={{ textAlign: 'center', padding: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+                <Card style={{ textAlign: 'center', padding: '1.25rem' }}>
                     <div style={{ fontSize: '2rem', fontWeight: 800, color: '#2563eb' }}>{ambassadors.length}</div>
                     <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Total Ambassadors</div>
                 </Card>
-                <Card style={{ textAlign: 'center', padding: '1.5rem' }}>
+                <Card style={{ textAlign: 'center', padding: '1.25rem' }}>
                     <div style={{ fontSize: '2rem', fontWeight: 800, color: '#059669' }}>{activeCount}</div>
                     <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Active</div>
                 </Card>
-                <Card style={{ textAlign: 'center', padding: '1.5rem' }}>
+                <Card style={{ textAlign: 'center', padding: '1.25rem' }}>
                     <div style={{ fontSize: '2rem', fontWeight: 800, color: '#7c3aed' }}>{totalReferrals}</div>
                     <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Total Referrals</div>
                 </Card>
-                <Card style={{ textAlign: 'center', padding: '1.5rem' }}>
+                <Card style={{ textAlign: 'center', padding: '1.25rem' }}>
                     <div style={{ fontSize: '2rem', fontWeight: 800, color: '#f59e0b' }}>₦{totalEarned.toLocaleString()}</div>
                     <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Total Commissions</div>
                 </Card>
             </div>
 
             {/* Ambassador Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '1.5rem' }}>
                 {loading ? <p>Loading ambassadors...</p> : ambassadors.length === 0 ? (
                     <Card style={{ gridColumn: '1/-1', textAlign: 'center', padding: '3rem', color: '#94a3b8' }}>
                         No ambassadors yet. Click "+ Add Ambassador" to create your first one.

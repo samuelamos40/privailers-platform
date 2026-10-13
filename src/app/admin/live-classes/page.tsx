@@ -138,8 +138,11 @@ export default function AdminLiveClassesPage() {
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#1e293b' }}>Manage Live Classes</h1>
+            <div className="portal-header">
+                <div>
+                    <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 700, color: '#1e293b', margin: 0 }}>Manage Live Classes</h1>
+                    <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '0.25rem 0 0 0' }}>Schedule and broadcast live interactive video sessions</p>
+                </div>
                 <Button variant="primary" onClick={() => {
                     setFormData({ id: '', title: '', description: '', scheduled_at: '', meeting_url: '', meeting_type: 'internal', status: 'scheduled', audienceType: 'general', course_id: '', cohort_id: '' });
                     setIsFormOpen(true);
@@ -148,7 +151,7 @@ export default function AdminLiveClassesPage() {
                 </Button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: isFormOpen ? '1fr 400px' : '1fr', gap: '2rem' }}>
+            <div className={`portal-split-layout ${isFormOpen ? 'open' : ''}`} style={{ display: 'grid', gridTemplateColumns: isFormOpen ? '1fr 380px' : '1fr', gap: '2rem' }}>
                 
                 {/* LIST OF CLASSES */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -160,8 +163,8 @@ export default function AdminLiveClassesPage() {
                         </Card>
                     ) : (classes.map(c => (
                         <Card key={c.id}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                                <div style={{ minWidth: '220px', flex: '1 1 220px' }}>
                                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.25rem' }}>
                                         <div style={{ fontWeight: 600, fontSize: '1.2rem', color: '#0f172a' }}>{c.title}</div>
                                         <span style={{ 

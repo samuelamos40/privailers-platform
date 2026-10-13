@@ -26,11 +26,11 @@ export default function AdminLiveRoom({ params }: { params: Promise<{ id: string
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#0f172a' }}>
-            <div style={{ padding: '1rem 2rem', backgroundColor: '#1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ padding: '0.75rem 1.25rem', backgroundColor: '#1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
                 <div>
-                    <h1 style={{ color: 'white', margin: 0, fontSize: '1.25rem' }}>🔴 {classData.title} <span style={{fontSize: '0.8rem', color: '#94a3b8'}}>(Admin Host View)</span></h1>
+                    <h1 style={{ color: 'white', margin: 0, fontSize: '1.15rem' }}>🔴 {classData.title} <span style={{fontSize: '0.8rem', color: '#94a3b8'}}>(Admin Host View)</span></h1>
                 </div>
-                <Link href="/admin/live-classes" style={{ color: '#ef4444', textDecoration: 'none', fontWeight: 600, padding: '0.5rem 1rem', border: '1px solid #ef4444', borderRadius: '0.5rem' }}>
+                <Link href="/admin/live-classes" style={{ color: '#ef4444', textDecoration: 'none', fontWeight: 600, padding: '0.4rem 0.85rem', border: '1px solid #ef4444', borderRadius: '0.5rem', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
                     Leave Studio
                 </Link>
             </div>

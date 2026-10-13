@@ -1,13 +1,13 @@
 import React from 'react';
 
 const colors = [
-  '#003366', // Navy Blue
-  '#0ea5e9', // Sky Blue
+  '#061e48', // Brand Midnight Navy Blue
+  '#00a89c', // Brand Vibrant Emerald Teal
+  '#004b87', // Brand Sapphire Blue
+  '#0a2e6b', // Deep Brand Blue
   '#10b981', // Emerald
   '#8b5cf6', // Violet
   '#f59e0b', // Amber
-  '#ef4444', // Red
-  '#00b8d4'  // Teal
 ];
 
 interface CourseIconProps {

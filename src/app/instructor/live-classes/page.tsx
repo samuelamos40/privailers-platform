@@ -113,8 +113,11 @@ export default function InstructorLiveClassesPage() {
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#1e293b' }}>Manage Live Classes</h1>
+            <div className="portal-header" style={{ marginBottom: '2rem' }}>
+                <div>
+                    <h1 style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 800, color: '#1e293b', margin: 0 }}>Manage Live Classes</h1>
+                    <p style={{ color: '#64748b', margin: '0.5rem 0 0 0', fontSize: '0.95rem' }}>Schedule and broadcast interactive live lessons for your enrolled students.</p>
+                </div>
                 <Button variant="primary" onClick={() => {
                     setFormData({ id: '', title: '', description: '', scheduled_at: '', meeting_url: '', meeting_type: 'internal', status: 'scheduled', course_id: '' });
                     setIsFormOpen(true);
@@ -123,7 +126,7 @@ export default function InstructorLiveClassesPage() {
                 </Button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: isFormOpen ? '1fr 400px' : '1fr', gap: '2rem' }}>
+            <div className="portal-split-layout wide" style={{ display: 'grid', gridTemplateColumns: isFormOpen ? '1fr 380px' : '1fr', gap: '2rem' }}>
                 
                 {/* LIST OF CLASSES */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -135,9 +138,9 @@ export default function InstructorLiveClassesPage() {
                         </Card>
                     ) : (classes.map(c => (
                         <Card key={c.id}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                <div>
-                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.25rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                                <div style={{ flex: '1 1 260px' }}>
+                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
                                         <div style={{ fontWeight: 600, fontSize: '1.2rem', color: '#0f172a' }}>{c.title}</div>
                                         <span style={{ 
                                             fontSize: '0.7rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', textTransform: 'uppercase',
@@ -152,7 +155,7 @@ export default function InstructorLiveClassesPage() {
                                     </div>
                                     <p style={{ fontSize: '0.95rem', color: '#475569', marginBottom: '1rem' }}>{c.description}</p>
                                     
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
                                         {c.meeting_url && c.meeting_url !== 'internal_platform_room' && c.meeting_url.startsWith('http') ? (
                                             <span style={{ fontSize: '0.85rem', color: '#2563eb', backgroundColor: '#eff6ff', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
                                                 🔗 Google Meet / Zoom
@@ -169,8 +172,8 @@ export default function InstructorLiveClassesPage() {
                                         )}
                                     </div>
                                 </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                                         <Button size="sm" variant="outline" onClick={() => handleEdit(c)}>Edit</Button>
                                         <Button size="sm" variant="outline" style={{ borderColor: '#f87171', color: '#ef4444' }} onClick={() => handleDelete(c.id)}>Delete</Button>
                                     </div>
@@ -180,7 +183,7 @@ export default function InstructorLiveClassesPage() {
                                         </Button>
                                     )}
                                     {c.status === 'live' && (
-                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                                             {c.meeting_url && c.meeting_url !== 'internal_platform_room' && c.meeting_url.startsWith('http') ? (
                                                 <a href={c.meeting_url} target="_blank" rel="noopener noreferrer">
                                                     <Button size="sm" variant="primary" style={{ backgroundColor: '#2563eb', borderColor: '#2563eb' }}>

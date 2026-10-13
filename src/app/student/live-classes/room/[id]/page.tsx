@@ -26,11 +26,11 @@ export default function StudentLiveRoom({ params }: { params: Promise<{ id: stri
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#0f172a' }}>
-            <div style={{ padding: '1rem 2rem', backgroundColor: '#1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ padding: '0.75rem 1.25rem', backgroundColor: '#1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
                 <div>
-                    <h1 style={{ color: 'white', margin: 0, fontSize: '1.25rem' }}>{classData.title}</h1>
+                    <h1 style={{ color: 'white', margin: 0, fontSize: '1.15rem' }}>{classData.title}</h1>
                 </div>
-                <Link href="/student/live-classes" style={{ color: '#f8fafc', textDecoration: 'none', fontWeight: 600, padding: '0.5rem 1rem', border: '1px solid #334155', borderRadius: '0.5rem' }}>
+                <Link href="/student/live-classes" style={{ color: '#f8fafc', textDecoration: 'none', fontWeight: 600, padding: '0.4rem 0.85rem', border: '1px solid #334155', borderRadius: '0.5rem', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
                     Leave Class
                 </Link>
             </div>

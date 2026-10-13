@@ -153,12 +153,12 @@ export default function InstructorAssignmentsPage() {
         return (
             <div style={{ display: 'grid', gap: '1rem' }}>
                 {inboxItems.map(sub => (
-                    <Card key={sub.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
+                    <Card key={sub.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                        <div style={{ flex: '1 1 240px' }}>
                             <div style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.25rem' }}>
                                 {sub.project?.course?.title} • {sub.project?.title}
                             </div>
-                            <div style={{ fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.25rem' }}>
+                            <div style={{ fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.25rem', wordBreak: 'break-word' }}>
                                 {sub.user?.email || 'Unknown User'}
                             </div>
                             <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
@@ -177,12 +177,12 @@ export default function InstructorAssignmentsPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {submissions.length === 0 && <p style={{ color: '#64748b' }}>No submissions found.</p>}
                 {submissions.map(sub => (
-                    <div key={sub.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '0.5rem' }}>
-                        <div>
-                            <div style={{ fontWeight: 600 }}>{sub.user?.email || 'Unknown User'}</div>
+                    <div key={sub.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '0.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+                        <div style={{ flex: '1 1 240px' }}>
+                            <div style={{ fontWeight: 600, wordBreak: 'break-word' }}>{sub.user?.email || 'Unknown User'}</div>
                             <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{sub.project?.title}</div>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                             <span style={{
                                 padding: '0.25rem 0.5rem', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600,
                                 backgroundColor: sub.status === 'graded' ? '#dcfce7' : '#fff7ed',
@@ -234,40 +234,45 @@ export default function InstructorAssignmentsPage() {
 
         return (
             <Card>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
-                    <thead>
-                        <tr style={{ borderBottom: '2px solid #e2e8f0', textAlign: 'left' }}>
-                            <th style={{ padding: '1rem', color: '#64748b' }}>Student</th>
-                            <th style={{ padding: '1rem', color: '#64748b' }}>Completed</th>
-                            <th style={{ padding: '1rem', color: '#64748b' }}>Avg. Score</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {sortedUsers.map((u: any) => (
-                            <tr key={u.user} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                <td style={{ padding: '1rem', fontWeight: 600 }}>{u.user}</td>
-                                <td style={{ padding: '1rem' }}>{u.gradedCount} Assignments</td>
-                                <td style={{ padding: '1rem', color: '#059669', fontWeight: 700 }}>
-                                    {u.gradedCount > 0 ? (u.totalPoints / u.gradedCount).toFixed(1) : '-'}%
-                                </td>
+                <div className="table-container">
+                    <table className="table-responsive" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                        <thead>
+                            <tr style={{ borderBottom: '2px solid #e2e8f0', textAlign: 'left' }}>
+                                <th style={{ padding: '1rem', color: '#64748b' }}>Student</th>
+                                <th style={{ padding: '1rem', color: '#64748b' }}>Completed</th>
+                                <th style={{ padding: '1rem', color: '#64748b' }}>Avg. Score</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {sortedUsers.map((u: any) => (
+                                <tr key={u.user} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                    <td style={{ padding: '1rem', fontWeight: 600 }}>{u.user}</td>
+                                    <td style={{ padding: '1rem' }}>{u.gradedCount} Assignments</td>
+                                    <td style={{ padding: '1rem', color: '#059669', fontWeight: 700 }}>
+                                        {u.gradedCount > 0 ? (u.totalPoints / u.gradedCount).toFixed(1) : '-'}%
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </Card>
         );
     };
 
-    if (loading) return <div style={{ padding: '2rem' }}>Loading Assignments...</div>;
+    if (loading) return <div>Loading Assignments...</div>;
 
     return (
-        <div style={{ padding: '2rem' }}>
-            <div style={{ marginBottom: '2rem' }}>
-                <Link href="/instructor" style={{ color: '#64748b', fontSize: '0.875rem' }}>← Back to Dashboard</Link>
-                <h1 style={{ fontSize: '2rem', fontWeight: 800, marginTop: '0.5rem', color: '#1e293b' }}>Assignments & Grading</h1>
+        <div>
+            <div className="portal-header" style={{ marginBottom: '1.5rem' }}>
+                <div>
+                    <Link href="/instructor" style={{ color: '#64748b', fontSize: '0.875rem' }}>← Back to Dashboard</Link>
+                    <h1 style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 800, marginTop: '0.5rem', color: '#1e293b' }}>Assignments & Grading</h1>
+                    <p style={{ color: '#64748b', margin: '0.25rem 0 0 0', fontSize: '0.95rem' }}>Review student projects and provide timely, structured grades.</p>
+                </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', borderBottom: '1px solid #e2e8f0', overflowX: 'auto', whiteSpace: 'nowrap', WebkitOverflowScrolling: 'touch' }}>
                 {[
                     { id: 'inbox', label: '📥 Inbox (Pending)' },
                     { id: 'all', label: '🗂 All Submissions' },
@@ -277,10 +282,11 @@ export default function InstructorAssignmentsPage() {
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id as any)}
                         style={{
-                            padding: '1rem', border: 'none', background: 'none', cursor: 'pointer',
+                            padding: '0.75rem 1rem', border: 'none', background: 'none', cursor: 'pointer',
                             borderBottom: activeTab === tab.id ? '2px solid #2563eb' : '2px solid transparent',
                             color: activeTab === tab.id ? '#2563eb' : '#64748b',
-                            fontWeight: activeTab === tab.id ? 600 : 500
+                            fontWeight: activeTab === tab.id ? 600 : 500,
+                            whiteSpace: 'nowrap'
                         }}
                     >
                         {tab.label}

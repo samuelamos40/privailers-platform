@@ -215,19 +215,43 @@ export default function StudentLiveClassesPage() {
     };
 
     return (
-        <div style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
+        <div className="live-classes-container" style={{ maxWidth: '1000px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+            <style jsx>{`
+                .live-classes-container {
+                    padding: 2.5rem;
+                }
+                @media (max-width: 1023px) {
+                    .live-classes-container {
+                        padding: 1.5rem 1.25rem !important;
+                    }
+                }
+                @media (max-width: 767px) {
+                    .live-classes-container {
+                        padding: 1rem 0.75rem !important;
+                    }
+                    .header-title {
+                        font-size: 1.8rem !important;
+                    }
+                    .cohort-banner {
+                        padding: 1.5rem 1rem !important;
+                    }
+                    .cohort-banner button {
+                        width: 100% !important;
+                    }
+                }
+            `}</style>
             
             <div style={{ marginBottom: '2.5rem' }}>
-                <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', margin: 0 }}>
+                <h1 className="header-title" style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', margin: 0 }}>
                     Live Classes & Webinars
                 </h1>
-                <p style={{ color: '#64748b', fontSize: '1.1rem', marginTop: '0.5rem' }}>
+                <p style={{ color: '#64748b', fontSize: '1.05rem', marginTop: '0.5rem' }}>
                     Join interactive sessions with your instructors and peers.
                 </p>
             </div>
 
             {targetCohort && (
-                <div style={{ 
+                <div className="cohort-banner" style={{ 
                     marginBottom: '3rem', padding: '2.5rem', backgroundColor: '#1e293b', color: 'white', borderRadius: '1.5rem',
                     textAlign: 'center', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
                 }}>
@@ -244,7 +268,7 @@ export default function StudentLiveClassesPage() {
                             size="lg" 
                             onClick={handleJoinCohort} 
                             disabled={isProcessing}
-                            style={{ padding: '1rem 3rem', minWidth: '200px' }}
+                            style={{ padding: '1rem 3rem', minWidth: 'min(100%, 200px)' }}
                         >
                             {isProcessing ? 'Processing...' : 'Complete Registration'}
                         </Button>
@@ -269,7 +293,7 @@ export default function StudentLiveClassesPage() {
                     <p style={{ color: '#64748b', marginTop: '0.5rem' }}>Check back later! When instructors schedule live sessions, they will appear here.</p>
                 </Card>
             ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1.5rem' }}>
                     {classes.map(c => {
                         const startTime = new Date(c.scheduled_at).getTime();
                         const now = new Date().getTime();

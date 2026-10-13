@@ -20,23 +20,23 @@ export default function AboutPage() {
                     gap: '0.5rem',
                     padding: '0.4rem 1.25rem',
                     borderRadius: '999px',
-                    backgroundColor: 'rgba(0, 180, 216, 0.08)',
+                    backgroundColor: 'var(--accent-teal-subtle)',
                     color: 'var(--accent-teal-dark)',
                     fontSize: '0.875rem',
                     fontWeight: 700,
                     marginBottom: '1rem',
-                    border: '1px solid rgba(0, 180, 216, 0.2)'
+                    border: '1px solid var(--accent-teal-glow)'
                 }}>
                     EdTech Learning Ecosystem • Enterprise Data Solutions • Mathematical Modeling
                 </div>
-                <h1 style={{ fontSize: '3rem', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--primary-blue)' }}>About Privailers Data Consult</h1>
-                <p style={{ fontSize: '1.25rem', lineHeight: 1.8, maxWidth: '980px', margin: '0 auto', color: 'var(--text-muted)' }}>
+                <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--primary-blue)', wordBreak: 'break-word' }}>About Privailers Data Consult</h1>
+                <p style={{ fontSize: 'clamp(1.05rem, 2vw, 1.25rem)', lineHeight: 1.8, maxWidth: '980px', margin: '0 auto', color: 'var(--text-muted)' }}>
                     Privailers Data Consult is a Nigerian-based EdTech and data analytics consultancy poised to bridge the critical skills gap in Africa&apos;s digital economy. We equip individuals with practical, career-defining skills through our self-paced course marketplace and live cohort bootcamps, while empowering businesses with automated data pipelines, analytics-ready web platforms, and advanced mathematical modeling & simulations.
                 </p>
             </div>
 
             {/* Key Pillars / Model */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', marginBottom: '6rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '2rem', marginBottom: '6rem' }}>
                 <div style={{ padding: '2rem', backgroundColor: '#f8fafc', borderRadius: '1rem', border: '1px solid #e2e8f0' }}>
                     <div style={{ fontSize: '1.75rem', marginBottom: '0.75rem' }}>⚡</div>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary-blue)', marginBottom: '0.75rem' }}>Dual-Impact Model</h3>
@@ -86,7 +86,7 @@ export default function AboutPage() {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '4rem', alignItems: 'center', marginBottom: '6rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '4rem', alignItems: 'center', marginBottom: '6rem' }}>
                 <div>
                     <h2 style={{ fontSize: '2.25rem', fontWeight: 700, marginBottom: '2rem', color: 'var(--primary-blue)' }}>Our Vision & Mission</h2>
                     <div style={{ marginBottom: '2rem' }}>

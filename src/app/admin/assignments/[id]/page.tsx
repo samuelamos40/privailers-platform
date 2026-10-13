@@ -87,17 +87,17 @@ export default function AdminGradingPage({ params }: { params: Promise<{ id: str
         }
     };
 
-    if (loading) return <div style={{ padding: '2rem' }}>Loading...</div>;
-    if (!assignment) return <div style={{ padding: '2rem' }}>Assignment not found.</div>;
+    if (loading) return <div style={{ padding: '2rem 1rem' }}>Loading...</div>;
+    if (!assignment) return <div style={{ padding: '2rem 1rem' }}>Assignment not found.</div>;
 
     return (
-        <div style={{ padding: '2rem', display: 'grid', gridTemplateColumns: '1fr 400px', gap: '2rem' }}>
+        <div className="portal-split-layout wide" style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: '2rem' }}>
             {/* LEFT: Submission List */}
             <div>
                 <div style={{ marginBottom: '1rem' }}>
                     <Link href="/admin/assignments" style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>← Back to Assignments</Link>
                 </div>
-                <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem' }}>{assignment.title}</h1>
+                <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.25rem)', fontWeight: 700, marginBottom: '0.5rem', wordBreak: 'break-word' }}>{assignment.title}</h1>
                 <p style={{ color: '#64748b', marginBottom: '2rem' }}>{submissions.length} Submissions</p>
 
                 <div style={{ display: 'grid', gap: '1rem' }}>

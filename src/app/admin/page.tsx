@@ -142,8 +142,11 @@ export default function AdminDashboard() {
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '2rem', fontWeight: 700, margin: 0, color: '#1e293b' }}>Administrator Dashboard</h1>
+            <div className="portal-header">
+                <div>
+                    <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 700, margin: 0, color: '#1e293b' }}>Administrator Dashboard</h1>
+                    <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '0.25rem 0 0 0' }}>Overview of platform analytics and operations</p>
+                </div>
                 <Button 
                     variant="outline" 
                     onClick={handleExportData}
@@ -157,7 +160,7 @@ export default function AdminDashboard() {
                 <div style={{ color: '#64748b', padding: '2rem 0' }}>Loading analytics...</div>
             ) : (
                 <>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
                         <Card padding="sm">
                             <h3 style={{ fontSize: '0.875rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Active Students</h3>
                             <p style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--primary-blue)' }}>{stats.students}</p>
@@ -174,7 +177,7 @@ export default function AdminDashboard() {
 
                     <div style={{ marginBottom: '3rem' }}>
                         <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem' }}>Management Tools</h2>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '1rem' }}>
                             <Card style={{ textAlign: 'center', cursor: 'pointer', border: '1px solid #e2e8f0', transition: 'all 0.2s' }}>
                                 <a href="/admin/resources" style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
                                     <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📚</div>

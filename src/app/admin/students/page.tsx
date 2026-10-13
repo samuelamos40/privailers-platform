@@ -67,31 +67,35 @@ export default function AdminStudentsPage() {
     );
 
     return (
-        <div style={{ padding: '2rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#1e293b' }}>Student Management</h1>
-                <div style={{ display: 'flex', gap: '1rem' }}>
+        <div>
+            <div className="portal-header">
+                <div>
+                    <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 700, color: '#1e293b', margin: 0 }}>Student Management</h1>
+                    <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '0.25rem 0 0 0' }}>Monitor student accounts, tiers, and cohort assignments</p>
+                </div>
+                <div style={{ display: 'flex', gap: '1rem', width: '100%', maxWidth: '320px' }}>
                     <Input 
                         placeholder="Search students..." 
                         value={searchTerm} 
                         onChange={e => setSearchTerm(e.target.value)}
-                        style={{ width: '300px', marginBottom: 0 }}
+                        style={{ width: '100%', marginBottom: 0 }}
                     />
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: isEditOpen ? '1fr 400px' : '1fr', gap: '2rem' }}>
+            <div className={`portal-split-layout ${isEditOpen ? 'open' : ''}`} style={{ display: 'grid', gridTemplateColumns: isEditOpen ? '1fr 380px' : '1fr', gap: '2rem' }}>
                 <Card padding="none">
-                    <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
-                        <thead style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                            <tr>
-                                <th style={{ padding: '1rem' }}>Student Details</th>
-                                <th style={{ padding: '1rem' }}>Tier / Access</th>
-                                <th style={{ padding: '1rem' }}>Current Cohorts</th>
-                                <th style={{ padding: '1rem' }}>Joined On</th>
-                                <th style={{ padding: '1rem' }}>Actions</th>
-                            </tr>
-                        </thead>
+                    <div className="table-container">
+                        <table className="table-responsive" style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
+                            <thead style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                                <tr>
+                                    <th style={{ padding: '1rem' }}>Student Details</th>
+                                    <th style={{ padding: '1rem' }}>Tier / Access</th>
+                                    <th style={{ padding: '1rem' }}>Current Cohorts</th>
+                                    <th style={{ padding: '1rem' }}>Joined On</th>
+                                    <th style={{ padding: '1rem' }}>Actions</th>
+                                </tr>
+                            </thead>
                         <tbody>
                             {filteredStudents.map(s => {
                                 const hasPaidEnrollment = s.enrollments?.length > 0;
@@ -144,6 +148,7 @@ export default function AdminStudentsPage() {
                             })}
                         </tbody>
                     </table>
+                    </div>
                 </Card>
 
                 {isEditOpen && (

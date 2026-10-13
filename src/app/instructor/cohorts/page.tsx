@@ -329,45 +329,45 @@ export default function CohortManagementPage() {
 
     if (isManaging && selectedCohort) {
         return (
-            <div className="manage-container" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+            <div className="manage-container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
                 <style jsx>{`
                     @media (max-width: 900px) {
                         .manage-container {
-                            padding: 1rem !important;
+                            padding: 0 !important;
                         }
                         .content-split {
                             grid-template-columns: 1fr !important;
-                            gap: 2rem !important;
-                        }
-                        .batch-header {
-                            flex-direction: column !important;
-                            align-items: flex-start !important;
-                            gap: 1rem !important;
+                            gap: 1.5rem !important;
                         }
                     }
                 `}</style>
-                <button onClick={() => setIsManaging(false)} style={{ marginBottom: '2rem', background: 'none', border: 'none', color: '#6366f1', fontWeight: 700, cursor: 'pointer' }}>← Back to Batches</button>
+                <button onClick={() => setIsManaging(false)} style={{ marginBottom: '1.5rem', background: 'none', border: 'none', color: '#6366f1', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>← Back to Batches</button>
                 
-                <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Manage: {selectedCohort.name}</h1>
-                <p style={{ color: '#64748b', marginBottom: '3rem' }}>Track classes, assignments, and announcements for this cohort.</p>
+                <div className="portal-header" style={{ marginBottom: '2rem' }}>
+                    <div>
+                        <h1 style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 800, marginBottom: '0.5rem', wordBreak: 'break-word' }}>Manage: {selectedCohort.name}</h1>
+                        <p style={{ color: '#64748b', margin: 0 }}>Track classes, assignments, and announcements for this cohort.</p>
+                    </div>
 
-                <div style={{ marginBottom: '2rem', display: 'flex', gap: '1rem' }}>
-                    <button 
-                        onClick={fetchBatchSummary}
-                        style={{ padding: '0.75rem 1.5rem', backgroundColor: '#0f172a', color: 'white', border: 'none', borderRadius: '0.6rem', fontWeight: 700, cursor: 'pointer' }}
-                    >
-                        📊 View Batch Attendance Report
-                    </button>
+                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                        <button 
+                            onClick={fetchBatchSummary}
+                            style={{ padding: '0.75rem 1.5rem', backgroundColor: '#0f172a', color: 'white', border: 'none', borderRadius: '0.6rem', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                        >
+                            📊 View Batch Attendance Report
+                        </button>
+                    </div>
                 </div>
 
                 {isSummaryOpen && (
-                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-                        <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '1.5rem', maxWidth: '800px', width: '95%', maxHeight: '90vh', overflowY: 'auto' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                                <h2 style={{ fontSize: '1.5rem' }}>Batch Attendance Summary</h2>
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
+                        <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '1.5rem', maxWidth: '800px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                <h2 style={{ fontSize: '1.5rem', margin: 0 }}>Batch Attendance Summary</h2>
                                 <button onClick={() => setIsSummaryOpen(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
                             </div>
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <div className="table-container">
+                                <table className="table-responsive" style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <thead>
                                     <tr style={{ borderBottom: '2px solid #f1f5f9', textAlign: 'left' }}>
                                         <th style={{ padding: '1rem' }}>Student Name</th>
@@ -399,12 +399,13 @@ export default function CohortManagementPage() {
                                     ))}
                                 </tbody>
                             </table>
+                            </div>
                             {batchSummary.length === 0 && <p style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>No students enrolled in this batch yet.</p>}
                         </div>
                     </div>
                 )}
 
-                <div className="content-split" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem' }}>
+                <div className="content-split portal-split-layout equal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))', gap: '2rem' }}>
                     
                     <div>
                         <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>📅 Classes & Assignments</h2>
@@ -530,24 +531,11 @@ export default function CohortManagementPage() {
     }
 
     return (
-        <div className="main-container" style={{ padding: '2rem' }}>
+        <div className="main-container">
             <style jsx>{`
                 @media (max-width: 900px) {
                     .main-container {
-                        padding: 1rem !important;
-                    }
-                    .main-header {
-                        flex-direction: column !important;
-                        align-items: stretch !important;
-                        gap: 1rem !important;
-                    }
-                    .batch-card-header {
-                        flex-direction: column !important;
-                        gap: 1.5rem !important;
-                    }
-                    .batch-actions {
-                        width: 100% !important;
-                        flex-direction: column !important;
+                        padding: 0 !important;
                     }
                     .split-layout {
                         grid-template-columns: 1fr !important;
@@ -561,8 +549,11 @@ export default function CohortManagementPage() {
                 <Link href="/instructor" style={{ color: '#64748b', textDecoration: 'none', fontSize: '0.875rem' }}>
                     ← Back to Dashboard
                 </Link>
-                <div className="main-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
-                    <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#1e293b' }}>Manage Batches (Cohorts)</h1>
+                <div className="portal-header" style={{ marginTop: '1rem' }}>
+                    <div>
+                        <h1 style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 800, color: '#1e293b', margin: 0 }}>Manage Batches (Cohorts)</h1>
+                        <p style={{ color: '#64748b', margin: '0.5rem 0 0 0', fontSize: '0.95rem' }}>Create, update, and manage student learning batches.</p>
+                    </div>
                     <Button variant="primary" onClick={() => {
                         setFormData({ id: '', name: '', course_id: '', start_date: '', end_date: '', capacity: 50, price: 0, batch_plan: '', status: 'open' });
                         setIsFormOpen(true);
@@ -572,7 +563,7 @@ export default function CohortManagementPage() {
                 </div>
             </div>
 
-            <div className="split-layout" style={{ display: 'grid', gridTemplateColumns: isFormOpen ? '1fr 400px' : '1fr', gap: '2rem' }}>
+            <div className="split-layout portal-split-layout wide" style={{ display: 'grid', gridTemplateColumns: isFormOpen ? '1fr 400px' : '1fr', gap: '2rem' }}>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {loading ? (
@@ -584,9 +575,9 @@ export default function CohortManagementPage() {
                     ) : (
                         cohorts.map(c => (
                             <Card key={c.id}>
-                                <div className="batch-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                    <div>
-                                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                <div className="batch-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                                    <div style={{ flex: '1 1 260px' }}>
+                                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
                                             <span style={{ fontWeight: 700, fontSize: '1.2rem' }}>{c.name}</span>
                                             <span style={{ 
                                                 fontSize: '0.7rem', fontWeight: 700, padding: '0.2rem 0.5rem', borderRadius: '1rem', textTransform: 'uppercase',
@@ -611,10 +602,10 @@ export default function CohortManagementPage() {
                                             </div>
                                         )}
                                     </div>
-                                    <div className="batch-actions" style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <div className="batch-actions" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                                         <button 
                                             onClick={() => handleManage(c)}
-                                            style={{ flex: 1, padding: '0.5rem', backgroundColor: '#0f172a', color: 'white', border: 'none', borderRadius: '0.5rem', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}
+                                            style={{ flex: 1, padding: '0.5rem 0.75rem', backgroundColor: '#0f172a', color: 'white', border: 'none', borderRadius: '0.5rem', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
                                         >
                                             Manage Classroom
                                         </button>
@@ -655,12 +646,12 @@ export default function CohortManagementPage() {
                                 </select>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '1rem' }}>
                                 <Input label="Start Date" type="date" value={formData.start_date} onChange={e => setFormData({...formData, start_date: e.target.value})} required />
                                 <Input label="End Date" type="date" value={formData.end_date} onChange={e => setFormData({...formData, end_date: e.target.value})} required />
                             </div>
 
-                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '1rem' }}>
                                 <Input label="Capacity" type="number" value={formData.capacity} onChange={e => setFormData({...formData, capacity: e.target.value === '' ? 0 : parseInt(e.target.value)})} required />
                                 <Input label="Batch Price (₦)" type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value === '' ? 0 : parseFloat(e.target.value)})} placeholder="Optional" />
                             </div>
@@ -688,8 +679,8 @@ export default function CohortManagementPage() {
                                 </select>
                             </div>
 
-                            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                                <Button variant="primary" type="submit" style={{ flex: 1, justifyContent: 'center' }}>Save Batch</Button>
+                            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+                                <Button variant="primary" type="submit" style={{ flex: 1, minWidth: '120px', justifyContent: 'center' }}>Save Batch</Button>
                                 <Button variant="outline" type="button" onClick={() => setIsFormOpen(false)}>Cancel</Button>
                             </div>
                         </form>

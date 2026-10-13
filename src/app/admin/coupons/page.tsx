@@ -99,9 +99,12 @@ export default function AdminCouponsPage() {
     };
 
     return (
-        <div style={{ padding: '2rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#1e293b' }}>Promo Coupons</h1>
+        <div>
+            <div className="portal-header">
+                <div>
+                    <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.25rem)', fontWeight: 700, color: '#1e293b', margin: 0 }}>Promo Coupons</h1>
+                    <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '0.25rem 0 0 0' }}>Manage discount codes and promotional pricing</p>
+                </div>
                 <Button variant="primary" onClick={() => {
                     setFormData({ id: '', code: '', discount_type: 'percentage', discount_value: 0, expires_at: '', max_uses: 100, course_id: '', is_active: true });
                     setIsFormOpen(true);
@@ -111,7 +114,7 @@ export default function AdminCouponsPage() {
             </div>
 
             <div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1.5rem' }}>
                     {loading ? <p>Loading coupons...</p> : coupons.map(c => (
                         <Card key={c.id} style={{ borderLeft: `6px solid ${c.is_active ? '#059669' : '#94a3b8'}` }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>

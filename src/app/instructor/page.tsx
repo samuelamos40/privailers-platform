@@ -140,8 +140,11 @@ export default function InstructorDashboard() {
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#1e293b' }}>Instructor Dashboard</h1>
+            <div className="portal-header">
+                <div>
+                    <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 700, color: '#1e293b', margin: 0 }}>Instructor Dashboard</h1>
+                    <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '0.25rem 0 0 0' }}>Manage courses, active cohorts, and student progress</p>
+                </div>
                 <Link href="/instructor/cohorts">
                     <Button variant="primary">+ Manage Batches/Cohorts</Button>
                 </Link>
@@ -151,7 +154,7 @@ export default function InstructorDashboard() {
                 <div style={{ color: '#64748b', padding: '2rem 0' }}>Loading your dashboard...</div>
             ) : (
                 <>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
                         <Card padding="sm">
                             <h3 style={{ fontSize: '0.875rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>My Courses</h3>
                             <p style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--primary-blue)' }}>{stats.myCoursesCount}</p>
@@ -223,9 +226,9 @@ export default function InstructorDashboard() {
 
                     <div style={{ marginTop: '3rem' }}>
                         <Card>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Active Student Roster</h2>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+                                <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Active Student Roster</h2>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
                                     <span style={{ fontSize: '0.875rem', color: '#64748b' }}>Filter by Batch:</span>
                                     <select 
                                         value={selectedCohortId} 

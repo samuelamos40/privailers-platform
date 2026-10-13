@@ -51,34 +51,34 @@ export default function AdminReferralsPage() {
     const totalRevenue = referrals.reduce((sum, r) => sum + parseFloat(r.amount_paid || 0), 0);
 
     return (
-        <div style={{ padding: '2rem' }}>
+        <div>
             <div style={{ marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#1e293b' }}>Referral Tracking 💰</h1>
-                <p style={{ color: '#64748b' }}>Track ambassador referrals and manage commission payouts</p>
+                <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.25rem)', fontWeight: 800, color: '#1e293b' }}>Referral Tracking 💰</h1>
+                <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Track ambassador referrals and manage commission payouts</p>
             </div>
 
             {/* Summary Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-                <Card style={{ textAlign: 'center', padding: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+                <Card style={{ textAlign: 'center', padding: '1.25rem' }}>
                     <div style={{ fontSize: '2rem', fontWeight: 800, color: '#7c3aed' }}>{referrals.length}</div>
                     <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Total Referrals</div>
                 </Card>
-                <Card style={{ textAlign: 'center', padding: '1.5rem' }}>
+                <Card style={{ textAlign: 'center', padding: '1.25rem' }}>
                     <div style={{ fontSize: '2rem', fontWeight: 800, color: '#059669' }}>₦{totalRevenue.toLocaleString()}</div>
                     <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Revenue from Referrals</div>
                 </Card>
-                <Card style={{ textAlign: 'center', padding: '1.5rem', border: totalCommissionOwed > 0 ? '2px solid #f59e0b' : undefined }}>
+                <Card style={{ textAlign: 'center', padding: '1.25rem', border: totalCommissionOwed > 0 ? '2px solid #f59e0b' : undefined }}>
                     <div style={{ fontSize: '2rem', fontWeight: 800, color: '#f59e0b' }}>₦{totalCommissionOwed.toLocaleString()}</div>
                     <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Commission Owed</div>
                 </Card>
-                <Card style={{ textAlign: 'center', padding: '1.5rem' }}>
+                <Card style={{ textAlign: 'center', padding: '1.25rem' }}>
                     <div style={{ fontSize: '2rem', fontWeight: 800, color: '#2563eb' }}>₦{totalPaidOut.toLocaleString()}</div>
                     <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Total Paid Out</div>
                 </Card>
             </div>
 
             {/* Filter Tabs */}
-            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', overflowX: 'auto', whiteSpace: 'nowrap' }}>
                 {(['all', 'unpaid', 'paid'] as const).map(f => (
                     <button key={f} onClick={() => setFilter(f)} style={{
                         padding: '0.5rem 1.25rem', borderRadius: '999px', border: 'none', cursor: 'pointer',
@@ -97,8 +97,9 @@ export default function AdminReferralsPage() {
                     {referrals.length === 0 ? 'No referrals yet. They will appear here when students register using ambassador codes.' : 'No referrals match the selected filter.'}
                 </Card>
             ) : (
-                <Card style={{ overflow: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                <Card padding="none">
+                    <div className="table-container">
+                        <table className="table-responsive" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
                         <thead>
                             <tr style={{ borderBottom: '2px solid #e2e8f0', textAlign: 'left' }}>
                                 <th style={{ padding: '0.75rem', color: '#64748b', fontWeight: 600 }}>Date</th>
@@ -151,6 +152,7 @@ export default function AdminReferralsPage() {
                             ))}
                         </tbody>
                     </table>
+                    </div>
                 </Card>
             )}
         </div>

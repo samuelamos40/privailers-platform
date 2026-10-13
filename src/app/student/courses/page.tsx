@@ -136,53 +136,97 @@ export default function StudentCoursesPage() {
     );
 
     return (
-        <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc', padding: '3rem' }}>
-            <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <div className="courses-page-container" style={{ minHeight: '100vh', backgroundColor: '#f8fafc', width: '100%', boxSizing: 'border-box' }}>
+            <style jsx>{`
+                .courses-page-container {
+                    padding: 2.5rem;
+                }
+                @media (max-width: 1023px) {
+                    .courses-page-container {
+                        padding: 1.5rem 1.25rem !important;
+                    }
+                }
+                @media (max-width: 767px) {
+                    .courses-page-container {
+                        padding: 1rem 0.75rem !important;
+                    }
+                    .page-header h1 {
+                        font-size: 1.8rem !important;
+                    }
+                    .search-filter-row {
+                        flex-direction: column !important;
+                        align-items: stretch !important;
+                    }
+                    .search-container {
+                        max-width: 100% !important;
+                        min-width: 100% !important;
+                    }
+                    .filter-buttons {
+                        width: 100% !important;
+                        justify-content: space-between !important;
+                    }
+                    .filter-buttons button {
+                        flex: 1 !important;
+                        padding: 0.5rem !important;
+                        text-align: center !important;
+                    }
+                }
+            `}</style>
+            <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
 
                 {/* Header Section */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', marginBottom: '3rem' }}>
+                <div className="page-header" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginBottom: '2.5rem' }}>
                     <div>
-                        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#1e293b', letterSpacing: '-0.03em' }}>My Courses</h1>
-                        <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Manage and track your learning progress.</p>
+                        <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: '#1e293b', letterSpacing: '-0.03em', margin: '0 0 0.25rem 0' }}>My Courses</h1>
+                        <p style={{ color: '#64748b', fontSize: '1.05rem', margin: 0 }}>Manage and track your learning progress.</p>
                     </div>
 
                     {/* Tabs */}
-                    <div style={{ display: 'flex', gap: '2rem', borderBottom: '1px solid #e2e8f0' }}>
+                    <div style={{ display: 'flex', gap: '1.5rem', borderBottom: '1px solid #e2e8f0', overflowX: 'auto' }}>
                         <button 
                             onClick={() => setActiveTab('my-courses')}
-                            style={{ padding: '1rem 0.5rem', background: 'none', border: 'none', borderBottom: activeTab === 'my-courses' ? '3px solid #3b82f6' : '3px solid transparent', color: activeTab === 'my-courses' ? '#3b82f6' : '#64748b', fontWeight: 700, fontSize: '1.1rem', cursor: 'pointer', transition: 'all 0.2s' }}
+                            style={{ padding: '0.875rem 0.5rem', background: 'none', border: 'none', borderBottom: activeTab === 'my-courses' ? '3px solid #3b82f6' : '3px solid transparent', color: activeTab === 'my-courses' ? '#3b82f6' : '#64748b', fontWeight: 700, fontSize: '1.05rem', cursor: 'pointer', transition: 'all 0.2s', whiteSpace: 'nowrap' }}
                         >
                             My Enrolled Courses
                         </button>
                         <button 
                             onClick={() => setActiveTab('live-batches')}
-                            style={{ padding: '1rem 0.5rem', background: 'none', border: 'none', borderBottom: activeTab === 'live-batches' ? '3px solid #3b82f6' : '3px solid transparent', color: activeTab === 'live-batches' ? '#3b82f6' : '#64748b', fontWeight: 700, fontSize: '1.1rem', cursor: 'pointer', transition: 'all 0.2s' }}
+                            style={{ padding: '0.875rem 0.5rem', background: 'none', border: 'none', borderBottom: activeTab === 'live-batches' ? '3px solid #3b82f6' : '3px solid transparent', color: activeTab === 'live-batches' ? '#3b82f6' : '#64748b', fontWeight: 700, fontSize: '1.05rem', cursor: 'pointer', transition: 'all 0.2s', whiteSpace: 'nowrap' }}
                         >
                             Live Batches
                         </button>
                     </div>
 
                     {activeTab === 'my-courses' && (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div className="search-filter-row" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between' }}>
                             {/* Search */}
-                            <div style={{ position: 'relative', flex: 1, minWidth: '300px', maxWidth: '500px' }}>
-                                <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', fontSize: '1.2rem', color: '#94a3b8' }}>🔍</span>
+                            <div className="search-container" style={{ position: 'relative', flex: 1, minWidth: 'min(100%, 260px)', maxWidth: '500px' }}>
+                                <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', fontSize: '1.1rem', color: '#94a3b8' }}>🔍</span>
                                 <input
                                     type="text"
                                     placeholder="Search your courses..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
+                                    style={{
+                                        width: '100%',
+                                        padding: '0.75rem 1rem 0.75rem 2.75rem',
+                                        borderRadius: '0.75rem',
+                                        border: '1px solid #cbd5e1',
+                                        fontSize: '0.95rem',
+                                        backgroundColor: 'white',
+                                        boxSizing: 'border-box'
+                                    }}
                                 />
                             </div>
 
                             {/* Filters */}
-                            <div style={{ display: 'flex', gap: '0.5rem', backgroundColor: '#e2e8f0', padding: '0.25rem', borderRadius: '0.75rem' }}>
+                            <div className="filter-buttons" style={{ display: 'flex', gap: '0.35rem', backgroundColor: '#e2e8f0', padding: '0.25rem', borderRadius: '0.75rem' }}>
                                 {(['all', 'active', 'completed'] as const).map((f) => (
                                     <button
                                         key={f}
                                         onClick={() => setFilter(f)}
                                         style={{
-                                            padding: '0.5rem 1.5rem', borderRadius: '0.5rem', border: 'none', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', textTransform: 'capitalize',
+                                            padding: '0.5rem 1.25rem', borderRadius: '0.5rem', border: 'none', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', textTransform: 'capitalize',
                                             backgroundColor: filter === f ? 'white' : 'transparent',
                                             color: filter === f ? '#0f172a' : '#64748b'
                                         }}
@@ -197,7 +241,7 @@ export default function StudentCoursesPage() {
 
                 {/* Main Content Grid */}
                 {activeTab === 'my-courses' ? (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '2rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1.5rem' }}>
                         {filteredEnrollments.map(enrollment => {
                             const itemId = enrollment.course?.id || enrollment.cohort?.id || enrollment.id;
                             const itemTitle = enrollment.course?.title || enrollment.cohort?.name || "Assigned Batch";
@@ -293,7 +337,7 @@ export default function StudentCoursesPage() {
                     </div>
                 ) : (
                     /* LIVE BATCHES EXPLORER TAB */
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '2rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1.5rem' }}>
                         {allCohorts.length > 0 ? (
                             allCohorts.map(cohort => {
                                 const style = getCourseStyle(cohort.id, cohort.name);
