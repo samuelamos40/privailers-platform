@@ -140,7 +140,7 @@ export default function VirtualClassroomPage() {
             <div style={{ flex: 1, position: 'relative' }}>
                 <iframe 
                     allow="camera; microphone; display-capture; fullscreen; clipboard-read; clipboard-write; speaker"
-                    src={`https://meet.jit.si/${roomName}#userInfo.displayName="${user.user_metadata?.full_name || 'Student'}"&config.startWithAudioMuted=true&config.prejoinPageEnabled=false`}
+                    src={`https://meet.ffrn.de/${roomName}#userInfo.displayName="${encodeURIComponent(user.user_metadata?.full_name || 'Student')}"&config.startWithAudioMuted=true&config.prejoinPageEnabled=false`}
                     style={{ width: '100%', height: '100%', border: 'none' }}
                 />
             </div>

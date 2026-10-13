@@ -19,6 +19,7 @@ export default function AdminLiveClassesPage() {
         description: '',
         scheduled_at: '',
         meeting_url: '',
+        meeting_type: 'internal',
         status: 'scheduled',
         audienceType: 'general',
         course_id: '',
@@ -57,11 +58,15 @@ export default function AdminLiveClassesPage() {
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         
+        const resolvedMeetingUrl = formData.meeting_type === 'external' && formData.meeting_url.trim()
+            ? formData.meeting_url.trim()
+            : 'internal_platform_room';
+
         const payload = {
             title: formData.title,
             description: formData.description,
             scheduled_at: new Date(formData.scheduled_at).toISOString(),
-            meeting_url: 'internal_platform_room', // Overriding the external link requirement
+            meeting_url: resolvedMeetingUrl,
             status: formData.status,
             course_id: formData.audienceType === 'course' && formData.course_id ? formData.course_id : null,
             cohort_id: formData.audienceType === 'cohort' && formData.cohort_id ? formData.cohort_id : null
@@ -74,7 +79,25 @@ export default function AdminLiveClassesPage() {
         } else {
             const { error } = await supabase.from('live_classes').insert([payload]);
             if (error) alert("Error creating: " + error.message);
-            else { alert("Created successfully!"); setIsFormOpen(false); fetchClasses(); }
+            else { 
+                // If it's a general session, broadcast an announcement to student dashboards
+                if (formData.audienceType === 'general') {
+                    try {
+                        const formattedDate = new Date(formData.scheduled_at).toLocaleString();
+                        await supabase.from('cohort_announcements').insert([{
+                            cohort_id: null,
+                            title: `📢 General Live Session: ${formData.title}`,
+                            content: `A new live platform session is scheduled for ${formattedDate}. Topic: ${formData.description || formData.title}. Open to all students!`,
+                            is_notified: true
+                        }]);
+                    } catch (annErr) {
+                        console.error("Could not post general announcement:", annErr);
+                    }
+                }
+                alert("Created successfully! Students have been notified."); 
+                setIsFormOpen(false); 
+                fetchClasses(); 
+            }
         }
     };
 
@@ -83,12 +106,15 @@ export default function AdminLiveClassesPage() {
         if (c.course_id) audienceType = 'course';
         else if (c.cohort_id) audienceType = 'cohort';
 
+        const isExt = c.meeting_url && c.meeting_url !== 'internal_platform_room' && c.meeting_url.startsWith('http');
+
         setFormData({
             id: c.id,
             title: c.title,
             description: c.description || '',
             scheduled_at: new Date(c.scheduled_at).toISOString().slice(0, 16), // datetime-local format
-            meeting_url: c.meeting_url,
+            meeting_url: isExt ? c.meeting_url : '',
+            meeting_type: isExt ? 'external' : 'internal',
             status: c.status,
             audienceType,
             course_id: c.course_id || '',
@@ -115,7 +141,7 @@ export default function AdminLiveClassesPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#1e293b' }}>Manage Live Classes</h1>
                 <Button variant="primary" onClick={() => {
-                    setFormData({ id: '', title: '', description: '', scheduled_at: '', meeting_url: '', status: 'scheduled', audienceType: 'general', course_id: '', cohort_id: '' });
+                    setFormData({ id: '', title: '', description: '', scheduled_at: '', meeting_url: '', meeting_type: 'internal', status: 'scheduled', audienceType: 'general', course_id: '', cohort_id: '' });
                     setIsFormOpen(true);
                 }}>
                     + Schedule New Class
@@ -151,10 +177,16 @@ export default function AdminLiveClassesPage() {
                                     </div>
                                     <p style={{ fontSize: '0.95rem', color: '#475569', marginBottom: '1rem' }}>{c.description}</p>
                                     
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                        <span style={{ fontSize: '0.85rem', color: '#059669', backgroundColor: '#d1fae5', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
-                                            📹 On-Platform Video
-                                        </span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                                        {c.meeting_url && c.meeting_url !== 'internal_platform_room' && c.meeting_url.startsWith('http') ? (
+                                            <span style={{ fontSize: '0.85rem', color: '#2563eb', backgroundColor: '#eff6ff', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                                                🔗 Google Meet / Zoom
+                                            </span>
+                                        ) : (
+                                            <span style={{ fontSize: '0.85rem', color: '#059669', backgroundColor: '#d1fae5', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                                                📹 On-Platform Studio (Unlimited)
+                                            </span>
+                                        )}
                                         {c.course_id && (
                                             <span style={{ fontSize: '0.85rem', color: '#8b5cf6', backgroundColor: '#f5f3ff', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
                                                 Course: {c.course?.title}
@@ -184,11 +216,19 @@ export default function AdminLiveClassesPage() {
                                     )}
                                     {c.status === 'live' && (
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                            <a href={`/admin/live-classes/room/${c.id}`}>
-                                                <Button size="sm" variant="primary" style={{ backgroundColor: '#ef4444', borderColor: '#ef4444' }}>
-                                                    Enter Studio 🎥
-                                                </Button>
-                                            </a>
+                                            {c.meeting_url && c.meeting_url !== 'internal_platform_room' && c.meeting_url.startsWith('http') ? (
+                                                <a href={c.meeting_url} target="_blank" rel="noopener noreferrer">
+                                                    <Button size="sm" variant="primary" style={{ backgroundColor: '#2563eb', borderColor: '#2563eb' }}>
+                                                        Open Meeting Link 🔗
+                                                    </Button>
+                                                </a>
+                                            ) : (
+                                                <a href={`/admin/live-classes/room/${c.id}`}>
+                                                    <Button size="sm" variant="primary" style={{ backgroundColor: '#ef4444', borderColor: '#ef4444' }}>
+                                                        Enter Studio 🎥
+                                                    </Button>
+                                                </a>
+                                            )}
                                             <Button size="sm" variant="outline" onClick={() => updateStatus(c.id, 'completed')}>
                                                 End Class
                                             </Button>
@@ -265,9 +305,32 @@ export default function AdminLiveClassesPage() {
 
                             <Input label="Date & Time" type="datetime-local" value={formData.scheduled_at} onChange={e => setFormData({...formData, scheduled_at: e.target.value})} required />
                             
-                            <div style={{ padding: '0.75rem', backgroundColor: '#f0fdf4', color: '#166534', borderRadius: '0.5rem', fontSize: '0.875rem', border: '1px solid #bbf7d0' }}>
-                                🔒 A secure on-platform video room will be automatically generated for this class!
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem', color: '#475569' }}>Meeting Type</label>
+                                <select 
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', backgroundColor: 'white' }}
+                                    value={formData.meeting_type}
+                                    onChange={e => setFormData({...formData, meeting_type: e.target.value})}
+                                >
+                                    <option value="internal">🎥 On-Platform Video Room (Unlimited, Built-in)</option>
+                                    <option value="external">🔗 External Meeting Link (Google Meet, Zoom, Teams)</option>
+                                </select>
                             </div>
+
+                            {formData.meeting_type === 'external' ? (
+                                <Input 
+                                    label="External Meeting URL" 
+                                    type="url" 
+                                    placeholder="https://meet.google.com/xxx-yyyy-zzz or Zoom link" 
+                                    value={formData.meeting_url} 
+                                    onChange={e => setFormData({...formData, meeting_url: e.target.value})} 
+                                    required 
+                                />
+                            ) : (
+                                <div style={{ padding: '0.75rem', backgroundColor: '#f0fdf4', color: '#166534', borderRadius: '0.5rem', fontSize: '0.875rem', border: '1px solid #bbf7d0' }}>
+                                    🔒 A secure, unlimited on-platform video classroom will be automatically generated for this session!
+                                </div>
+                            )}
                             
                             {formData.id && (
                                 <div>

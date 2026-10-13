@@ -29,7 +29,7 @@ export default function CreateCoursePage() {
                 title: formData.title,
                 description: formData.description,
                 tier: formData.tier,
-                duration: formData.duration,
+                duration: formData.duration?.trim() || 'Self-Paced',
                 price: parseFloat(formData.price) || 0
             }])
             .select()
@@ -107,11 +107,10 @@ export default function CreateCoursePage() {
                             </select>
                         </div>
                         <Input
-                            label="Duration"
-                            placeholder="e.g. 4 weeks"
+                            label="Estimated Duration (Optional)"
+                            placeholder="e.g. Self-Paced, 4 weeks, 10 hours"
                             value={formData.duration}
                             onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                            required
                         />
                     </div>
 

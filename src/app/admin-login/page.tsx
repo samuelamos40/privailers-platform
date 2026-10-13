@@ -85,11 +85,8 @@ export default function AdminLoginPage() {
                     </Button>
                 </form>
 
-                <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-                    Need admin access?{' '}
-                    <Link href="/admin-register" style={{ color: 'var(--primary-blue)', fontWeight: 600 }}>
-                        Register Here
-                    </Link>
+                <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.813rem', color: '#64748b' }}>
+                    Admin accounts are strictly provisioned by invitation. Contact platform administration if you need access.
                 </div>
             </Card>
         </div>

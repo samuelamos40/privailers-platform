@@ -31,16 +31,35 @@ export default function StudentLiveClassesPage() {
 
     useEffect(() => {
         if (user) {
+            // Instant load from sessionStorage cache
+            try {
+                const cached = sessionStorage.getItem('privailers_student_live_classes');
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        setClasses(parsed);
+                        setLoading(false);
+                    }
+                }
+            } catch (e) {}
+
             fetchClasses();
             if (targetCohortId) fetchTargetCohort();
 
             // Realtime subscription for class status updates
             const channel = supabase
-                .channel('live_classes_updates')
+                .channel('student_live_classes_updates')
                 .on('postgres_changes', { 
-                    event: 'UPDATE', 
+                    event: '*', 
                     schema: 'public', 
                     table: 'cohort_classes' 
+                }, () => {
+                    fetchClasses(); 
+                })
+                .on('postgres_changes', { 
+                    event: '*', 
+                    schema: 'public', 
+                    table: 'live_classes' 
                 }, () => {
                     fetchClasses(); 
                 })
@@ -63,33 +82,100 @@ export default function StudentLiveClassesPage() {
 
     const fetchClasses = async () => {
         setLoading(true);
-        // Fetch classes specifically for the cohorts the user is enrolled in
+
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            const res = await fetch('/api/student/live-classes', {
+                headers: session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {}
+            });
+            const data = await res.json();
+            if (data && Array.isArray(data.classes)) {
+                const finalClasses = data.classes
+                    .filter((c: any) => ['scheduled', 'ongoing', 'live'].includes(c.status) || (c.status === 'completed' && c.recording_url))
+                    .sort((a: any, b: any) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime());
+                setClasses(finalClasses);
+                try {
+                    sessionStorage.setItem('privailers_student_live_classes', JSON.stringify(finalClasses));
+                } catch (e) {}
+                setLoading(false);
+                return;
+            }
+        } catch (apiErr) {
+            console.error("Live classes API error, trying fallback:", apiErr);
+        }
+
+        // Fallback to direct client query
         const { data: enrollments } = await supabase
             .from('enrollments')
-            .select('cohort_id')
-            .eq('user_id', user?.id)
-            .not('cohort_id', 'is', null);
+            .select(`
+                course_id, cohort_id,
+                course:courses(id, title),
+                cohort:cohorts(id, name, course_id)
+            `)
+            .eq('user_id', user?.id);
             
-        const cohortIds = enrollments?.map(e => e.cohort_id) || [];
+        const userEnrollments = (enrollments as any[]) || [];
+        const cohortIds = userEnrollments.map(e => e.cohort_id).filter(Boolean);
+        const directCourseIds = userEnrollments.map(e => e.course_id).filter(Boolean);
+        const cohortCourseIds = userEnrollments.map(e => {
+            const c = Array.isArray(e.cohort) ? e.cohort[0] : e.cohort;
+            return c?.course_id;
+        }).filter(Boolean);
+        const uniqueCourseIds = Array.from(new Set([...directCourseIds, ...cohortCourseIds]));
 
-        if (cohortIds.length === 0) {
-            setClasses([]);
-            setLoading(false);
-            return;
+        let orLiveFilters = ['and(course_id.is.null,cohort_id.is.null)'];
+        if (cohortIds.length > 0) orLiveFilters.push(`cohort_id.in.(${cohortIds.join(',')})`);
+        if (uniqueCourseIds.length > 0) orLiveFilters.push(`course_id.in.(${uniqueCourseIds.join(',')})`);
+
+        const [cohortRes, liveRes] = await Promise.all([
+            cohortIds.length > 0
+                ? supabase
+                    .from('cohort_classes')
+                    .select('*, cohort:cohorts(name)')
+                    .in('cohort_id', cohortIds)
+                    .in('status', ['scheduled', 'ongoing', 'live', 'completed'])
+                    .order('scheduled_at', { ascending: true })
+                : Promise.resolve({ data: [] }),
+            supabase
+                .from('live_classes')
+                .select('*, course:courses(title), cohort:cohorts(name)')
+                .or(orLiveFilters.join(','))
+                .in('status', ['scheduled', 'ongoing', 'live', 'completed'])
+                .order('scheduled_at', { ascending: true })
+        ]);
+
+        let combined: any[] = [];
+
+        if (cohortRes.data) {
+            const mappedCohort = cohortRes.data.map(c => ({
+                ...c,
+                classType: 'cohort',
+                displayName: c.cohort?.name ? `Batch: ${c.cohort.name}` : 'Mentored Cohort'
+            }));
+            combined = [...combined, ...mappedCohort];
         }
 
-        const { data, error } = await supabase
-            .from('cohort_classes')
-            .select('*, cohort:cohorts(name)')
-            .in('cohort_id', cohortIds)
-            .in('status', ['scheduled', 'ongoing', 'completed'])
-            .order('scheduled_at', { ascending: true });
-
-        if (!error && data) {
-            setClasses(data.filter(c => 
-                ['scheduled', 'ongoing'].includes(c.status) || (c.status === 'completed' && c.recording_url)
-            ));
+        if (liveRes.data) {
+            const mappedLive = liveRes.data.map(c => ({
+                ...c,
+                classType: 'course_live',
+                displayName: c.course?.title 
+                    ? `Course: ${c.course.title}` 
+                    : c.cohort?.name 
+                        ? `Batch: ${c.cohort.name}` 
+                        : 'Platform Event'
+            }));
+            combined = [...combined, ...mappedLive];
         }
+
+        const finalClasses = combined
+            .filter(c => ['scheduled', 'ongoing', 'live'].includes(c.status) || (c.status === 'completed' && c.recording_url))
+            .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime());
+
+        setClasses(finalClasses);
+        try {
+            sessionStorage.setItem('privailers_student_live_classes', JSON.stringify(finalClasses));
+        } catch (e) {}
         setLoading(false);
     };
 
@@ -185,7 +271,12 @@ export default function StudentLiveClassesPage() {
             ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
                     {classes.map(c => {
-                        const isLive = c.status === 'ongoing';
+                        const startTime = new Date(c.scheduled_at).getTime();
+                        const now = new Date().getTime();
+                        const isLive = c.status === 'ongoing' || c.status === 'live' || (c.status !== 'completed' && now >= startTime && now <= startTime + (2 * 60 * 60 * 1000));
+                        const isExternal = c.meeting_url && c.meeting_url !== 'internal_platform_room' && c.meeting_url.startsWith('http');
+                        const targetRoomLink = c.classType === 'cohort' ? `/classroom/${c.id}` : `/student/live-classes/room/${c.id}`;
+
                         return (
                             <Card key={c.id} style={{ 
                                 display: 'flex', flexDirection: 'column', 
@@ -203,16 +294,21 @@ export default function StudentLiveClassesPage() {
                                         )}
                                     </div>
                                     
-                                    <div style={{ fontSize: '0.9rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <div style={{ fontSize: '0.9rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                                         <span>🗓️</span> 
                                         {new Date(c.scheduled_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })} WAT
                                     </div>
                                     
-                                    {c.cohort?.name && (
-                                        <div style={{ fontSize: '0.85rem', color: '#8b5cf6', marginTop: '0.5rem', fontWeight: 500 }}>
-                                            👥 Batch: {c.cohort.name}
-                                        </div>
-                                    )}
+                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                        <span style={{ fontSize: '0.8rem', color: '#2563eb', backgroundColor: '#eff6ff', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 600 }}>
+                                            {c.classType === 'cohort' ? `👥 ${c.displayName}` : `🎓 ${c.displayName}`}
+                                        </span>
+                                        {isExternal && (
+                                            <span style={{ fontSize: '0.8rem', color: '#059669', backgroundColor: '#ecfdf5', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 600 }}>
+                                                🔗 Google Meet / Zoom
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                                 
                                 <p style={{ fontSize: '0.95rem', color: '#475569', lineHeight: 1.5, flex: 1 }}>
@@ -221,18 +317,26 @@ export default function StudentLiveClassesPage() {
                                 
                                 <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #f1f5f9' }}>
                                     {isLive ? (
-                                        <a href={`/classroom/${c.id}`} style={{ textDecoration: 'none' }}>
-                                            <Button variant="primary" style={{ width: '100%', justifyContent: 'center', backgroundColor: '#ef4444', borderColor: '#ef4444', fontSize: '1rem', fontWeight: 600 }}>
-                                                ▶ Join Live Room
-                                            </Button>
-                                        </a>
+                                        isExternal ? (
+                                            <a href={c.meeting_url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                                                <Button variant="primary" style={{ width: '100%', justifyContent: 'center', backgroundColor: '#2563eb', borderColor: '#2563eb', fontSize: '1rem', fontWeight: 600 }}>
+                                                    ▶ Open Google Meet / Zoom
+                                                </Button>
+                                            </a>
+                                        ) : (
+                                            <a href={targetRoomLink} style={{ textDecoration: 'none' }}>
+                                                <Button variant="primary" style={{ width: '100%', justifyContent: 'center', backgroundColor: '#ef4444', borderColor: '#ef4444', fontSize: '1rem', fontWeight: 600 }}>
+                                                    ▶ Join Live Room
+                                                </Button>
+                                            </a>
+                                        )
                                     ) : c.recording_url ? (
                                         <a href={c.recording_url} target="_blank" style={{ textDecoration: 'none' }}>
                                             <Button style={{ width: '100%', backgroundColor: '#7c3aed', color: 'white', borderColor: '#7c3aed' }}>🎥 Watch Recording</Button>
                                         </a>
                                     ) : (
                                         <Button variant="outline" disabled style={{ width: '100%', justifyContent: 'center', backgroundColor: '#f8fafc', color: '#94a3b8' }}>
-                                            {c.status === 'completed' ? 'Session Ended' : 'Meeting starts later'}
+                                            {c.status === 'completed' ? 'Session Ended' : `Starts at ${new Date(c.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
                                         </Button>
                                     )}
                                 </div>

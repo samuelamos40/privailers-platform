@@ -5,27 +5,11 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 
+import { useAppSettings } from '@/hooks/useAppSettings';
+
 const Sidebar = ({ isOpen, onClose }: { isOpen?: boolean, onClose?: () => void }) => {
     const { signOut } = useAuth();
-    const [whatsappNumber, setWhatsappNumber] = useState('2348000000000');
-    const [platformName, setPlatformName] = useState('Privailers.');
-
-    useEffect(() => {
-        const fetchSettings = async () => {
-            const { data } = await supabase
-                .from('app_settings')
-                .select('key, value')
-                .in('key', ['whatsapp_number', 'platform_name']);
-
-            if (data) {
-                const wa = data.find(s => s.key === 'whatsapp_number');
-                const name = data.find(s => s.key === 'platform_name');
-                if (wa?.value) setWhatsappNumber(wa.value);
-                if (name?.value) setPlatformName(name.value);
-            }
-        };
-        fetchSettings();
-    }, []);
+    const { platformName, whatsappNumber } = useAppSettings();
 
     const links = [
         { href: '/student', label: 'Dashboard', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg> },
@@ -39,8 +23,9 @@ const Sidebar = ({ isOpen, onClose }: { isOpen?: boolean, onClose?: () => void }
     return (
         <aside className={`sidebar-nav ${isOpen ? 'open' : ''}`}>
             <div style={{ marginBottom: '3rem', padding: '0 0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Link href="/student" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-                    <img src="/images/logo.png" alt="Logo" style={{ height: '40px', width: 'auto' }} />
+                <Link href="/student" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
+                    <img src="/images/logo.png" alt={platformName} suppressHydrationWarning style={{ height: '36px', width: 'auto' }} />
+                    <span suppressHydrationWarning style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>{platformName}</span>
                 </Link>
                 {onClose && (
                     <button 

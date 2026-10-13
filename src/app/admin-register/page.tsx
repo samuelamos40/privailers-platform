@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
@@ -20,16 +19,13 @@ export default function AdminRegisterPage() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
-    const ADMIN_REGISTRATION_CODE = 'PRIVAILERS_ADMIN_2026'; // Change this to your secret code
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         setLoading(true);
 
-        // Validation
-        if (formData.adminCode !== ADMIN_REGISTRATION_CODE) {
-            setError('Invalid admin registration code');
+        if (!formData.adminCode.trim()) {
+            setError('Administrative authorization code is required.');
             setLoading(false);
             return;
         }
@@ -47,38 +43,50 @@ export default function AdminRegisterPage() {
         }
 
         try {
-            // 1. Create auth user in Supabase Auth
-            // Usage metadata for the Trigger
-            const { data: authData, error: authError } = await supabase.auth.signUp({
-                email: formData.email,
-                password: formData.password,
-                options: {
-                    data: {
-                        full_name: formData.fullName,
-                        role: 'admin'
-                    }
-                }
+            // Verify and create admin securely on the server
+            const res = await fetch('/api/admin/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    fullName: formData.fullName,
+                    email: formData.email,
+                    password: formData.password,
+                    adminCode: formData.adminCode
+                })
             });
 
-            if (authError) throw authError;
+            const data = await res.json();
 
-            // Success! The Trigger handles the DB records.
-            alert('Admin account created successfully! Please check your email to confirm, then log in.');
+            if (!res.ok) {
+                throw new Error(data.error || 'Admin registration failed.');
+            }
+
+            alert('Admin account created successfully! You can now log in.');
             router.push('/admin-login');
 
         } catch (err: any) {
-            setError(err.message || 'Registration failed. Please try again.');
+            setError(err.message || 'Registration failed. Please check your authorization code.');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc', padding: '2rem' }}>
-            <Card padding="lg" style={{ maxWidth: '500px', width: '100%' }}>
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0f172a', padding: '2rem' }}>
+            <Card padding="lg" style={{ maxWidth: '480px', width: '100%', border: '1px solid #334155', backgroundColor: '#1e293b' }}>
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <h1 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--primary-blue)', marginBottom: '0.5rem' }}>Create Admin Account</h1>
-                    <p style={{ color: 'var(--text-muted)' }}>Requires admin registration code</p>
+                    <div style={{ display: 'inline-flex', padding: '0.75rem', borderRadius: '50%', backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#60a5fa', marginBottom: '1rem' }}>
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#f8fafc', marginBottom: '0.5rem' }}>Admin Access Portal</h1>
+                    <p style={{ color: '#94a3b8', fontSize: '0.875rem' }}>Restricted access for platform administrators</p>
+                </div>
+
+                <div style={{ padding: '0.875rem 1rem', backgroundColor: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.25)', borderRadius: '0.5rem', marginBottom: '1.5rem', fontSize: '0.813rem', color: '#fef08a', display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                    <span style={{ fontSize: '1.1rem' }}>🔒</span>
+                    <div>
+                        <strong>Authorization Required:</strong> Registration is restricted to authorized personnel with a confidential security passphrase provided by platform leadership.
+                    </div>
                 </div>
 
                 <form onSubmit={handleSubmit}>
@@ -87,11 +95,11 @@ export default function AdminRegisterPage() {
                         type="text"
                         value={formData.fullName}
                         onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                        placeholder="Admin Name"
+                        placeholder="Admin Full Name"
                         required
                     />
                     <Input
-                        label="Email"
+                        label="Email Address"
                         type="email"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -99,15 +107,15 @@ export default function AdminRegisterPage() {
                         required
                     />
                     <Input
-                        label="Admin Registration Code"
+                        label="Admin Passphrase"
                         type="password"
                         value={formData.adminCode}
                         onChange={(e) => setFormData({ ...formData, adminCode: e.target.value })}
-                        placeholder="Enter admin code"
+                        placeholder="••••••••••••"
                         required
                     />
                     <Input
-                        label="Password"
+                        label="Create Password"
                         type="password"
                         value={formData.password}
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -124,7 +132,7 @@ export default function AdminRegisterPage() {
                     />
 
                     {error && (
-                        <div style={{ padding: '0.75rem', backgroundColor: '#fee2e2', color: '#991b1b', borderRadius: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
+                        <div style={{ padding: '0.75rem 1rem', backgroundColor: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#fca5a5', borderRadius: '0.5rem', marginBottom: '1.25rem', fontSize: '0.875rem' }}>
                             {error}
                         </div>
                     )}
@@ -134,21 +142,17 @@ export default function AdminRegisterPage() {
                         variant="primary"
                         size="lg"
                         disabled={loading}
-                        style={{ width: '100%', justifyContent: 'center', marginBottom: '1rem' }}
+                        style={{ width: '100%', justifyContent: 'center', marginBottom: '1.25rem' }}
                     >
-                        {loading ? 'Creating Account...' : 'Create Admin Account'}
+                        {loading ? 'Verifying & Provisioning...' : 'Provision Admin Account'}
                     </Button>
                 </form>
 
-                <div style={{ textAlign: 'center', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-                    Already have an account?{' '}
-                    <Link href="/admin-login" style={{ color: 'var(--primary-blue)', fontWeight: 600 }}>
-                        Sign In
+                <div style={{ textAlign: 'center', fontSize: '0.875rem', color: '#94a3b8' }}>
+                    Already an authorized admin?{' '}
+                    <Link href="/admin-login" style={{ color: '#60a5fa', fontWeight: 600 }}>
+                        Sign In Here
                     </Link>
-                </div>
-
-                <div style={{ marginTop: '1.5rem', padding: '1rem', backgroundColor: '#fef3c7', borderRadius: '0.5rem', fontSize: '0.75rem', color: '#92400e' }}>
-                    <strong>Admin Code:</strong> PRIVAILERS_ADMIN_2026
                 </div>
             </Card>
         </div>

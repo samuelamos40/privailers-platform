@@ -19,6 +19,16 @@ export default function CreateCoursePage() {
         price: '0'
     });
 
+    // Project State
+    const [addProject, setAddProject] = useState(false);
+    const [projectData, setProjectData] = useState({
+        title: '',
+        description: '',
+        due_date: '',
+        guide_url: '',
+        dataset_url: ''
+    });
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -31,7 +41,7 @@ export default function CreateCoursePage() {
                 title: formData.title,
                 description: formData.description,
                 tier: formData.tier,
-                duration: formData.duration,
+                duration: formData.duration?.trim() || 'Self-Paced',
                 price: parseFloat(formData.price) || 0,
                 instructor_id: session?.user?.id
             }])
@@ -41,14 +51,34 @@ export default function CreateCoursePage() {
         if (error) {
             alert('Error creating course: ' + error.message);
             setLoading(false);
-        } else {
-            // Redirect to the editor for this new course
-            router.push(`/instructor/courses/${data.id}`);
+            return;
         }
+
+        // Create Project if instructor enabled it
+        if (addProject && projectData.title.trim()) {
+            const { error: projError } = await supabase
+                .from('projects')
+                .insert([{
+                    course_id: data.id,
+                    title: projectData.title.trim(),
+                    description: projectData.description.trim() || 'Complete the course project according to instructions.',
+                    due_date: projectData.due_date ? new Date(projectData.due_date).toISOString() : null,
+                    guide_url: projectData.guide_url.trim() || null,
+                    dataset_url: projectData.dataset_url.trim() || null
+                }]);
+            
+            if (projError) {
+                console.error("Project creation error:", projError);
+                alert("Course created, but could not attach project: " + projError.message);
+            }
+        }
+
+        // Redirect to the editor for this new course
+        router.push(`/instructor/courses/${data.id}`);
     };
 
     return (
-        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '650px', margin: '0 auto', paddingBottom: '3rem' }}>
             <div style={{ marginBottom: '2rem' }}>
                 <Link href="/instructor/courses" style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
                     ← Back to Courses
@@ -110,11 +140,10 @@ export default function CreateCoursePage() {
                             </select>
                         </div>
                         <Input
-                            label="Duration"
-                            placeholder="e.g. 4 weeks"
+                            label="Estimated Duration (Optional)"
+                            placeholder="e.g. Self-Paced, 4 weeks, 10 hours"
                             value={formData.duration}
                             onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                            required
                         />
                     </div>
 
@@ -127,6 +156,86 @@ export default function CreateCoursePage() {
                             onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                         />
                     )}
+
+                    {/* PROJECT CREATION SECTION */}
+                    <div style={{ 
+                        marginTop: '1.5rem', 
+                        marginBottom: '1.5rem', 
+                        border: '1px solid #e2e8f0', 
+                        borderRadius: '0.75rem', 
+                        padding: '1.25rem',
+                        backgroundColor: addProject ? '#f8fafc' : '#ffffff',
+                        transition: 'background-color 0.2s'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', fontWeight: 600, color: '#1e293b' }}>
+                                <input 
+                                    type="checkbox" 
+                                    checked={addProject} 
+                                    onChange={(e) => setAddProject(e.target.checked)} 
+                                    style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                                />
+                                <span>Add Course Project / Assignment Now</span>
+                            </label>
+                            <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Optional</span>
+                        </div>
+
+                        {addProject && (
+                            <div style={{ marginTop: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem', borderTop: '1px solid #e2e8f0', paddingTop: '1.25rem' }}>
+                                <Input 
+                                    label="Project Title"
+                                    placeholder="e.g. End-to-End Sales Dashboard Capstone"
+                                    value={projectData.title}
+                                    onChange={(e) => setProjectData({ ...projectData, title: e.target.value })}
+                                    required={addProject}
+                                />
+
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem', color: '#475569' }}>
+                                        Project Instructions / Description
+                                    </label>
+                                    <textarea
+                                        style={{
+                                            width: '100%',
+                                            padding: '0.75rem',
+                                            borderRadius: '0.5rem',
+                                            border: '1px solid #cbd5e1',
+                                            minHeight: '80px',
+                                            fontFamily: 'inherit'
+                                        }}
+                                        placeholder="Detailed deliverables, expectations, and guidelines..."
+                                        value={projectData.description}
+                                        onChange={(e) => setProjectData({ ...projectData, description: e.target.value })}
+                                        required={addProject}
+                                    />
+                                </div>
+
+                                <Input 
+                                    label="Due Date (Optional)"
+                                    type="date"
+                                    value={projectData.due_date}
+                                    onChange={(e) => setProjectData({ ...projectData, due_date: e.target.value })}
+                                />
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <Input 
+                                        label="Guide / Brief URL (Optional)"
+                                        type="url"
+                                        placeholder="https://..."
+                                        value={projectData.guide_url}
+                                        onChange={(e) => setProjectData({ ...projectData, guide_url: e.target.value })}
+                                    />
+                                    <Input 
+                                        label="Dataset URL (Optional)"
+                                        type="url"
+                                        placeholder="https://..."
+                                        value={projectData.dataset_url}
+                                        onChange={(e) => setProjectData({ ...projectData, dataset_url: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
 
                     <div style={{ marginTop: '2rem' }}>
                         <Button type="submit" variant="primary" style={{ width: '100%', justifyContent: 'center' }} disabled={loading}>

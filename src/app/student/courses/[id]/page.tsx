@@ -31,6 +31,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
     const [enrollment, setEnrollment] = useState<any>(null);
     const [availableCohorts, setAvailableCohorts] = useState<any[]>([]);
     const [cohortClasses, setCohortClasses] = useState<any[]>([]);
+    const [courseLiveClasses, setCourseLiveClasses] = useState<any[]>([]);
     const [cohortAnnouncements, setCohortAnnouncements] = useState<any[]>([]);
     const [targetCohort, setTargetCohort] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -230,6 +231,17 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
             
             setCohortClasses(cClasses || []);
             setCohortAnnouncements(cAnn || []);
+        }
+
+        // 8. Fetch Course-Specific Live Classes (for self-paced & cohort students)
+        if (actualCourseId && actualCourseId !== 'standalone' && actualCourseId !== 'undefined') {
+            const { data: liveData } = await supabase
+                .from('live_classes')
+                .select('*')
+                .eq('course_id', actualCourseId)
+                .in('status', ['scheduled', 'ongoing', 'live', 'completed'])
+                .order('scheduled_at', { ascending: true });
+            setCourseLiveClasses(liveData || []);
         }
 
         setLoading(false);
@@ -671,6 +683,62 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
                                     moduleId={activeModule.id} 
                                     isAdmin={userProfile?.role === 'admin' || (user as any)?.user_metadata?.role === 'admin'} 
                                 />
+
+                                {/* COURSE LIVE SESSIONS / OFFICE HOURS (FOR ALL STUDENTS IN THIS COURSE) */}
+                                {courseLiveClasses.length > 0 && (
+                                    <div style={{ marginTop: '3rem', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '1rem', padding: '1.5rem' }}>
+                                        <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#166534', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                            📹 Course Live Sessions & Office Hours
+                                        </h2>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+                                            {courseLiveClasses.map(cls => {
+                                                const startTime = new Date(cls.scheduled_at).getTime();
+                                                const now = new Date().getTime();
+                                                const isLive = cls.status === 'live' || cls.status === 'ongoing' || (cls.status !== 'completed' && now >= startTime && now <= startTime + (2 * 60 * 60 * 1000));
+                                                const isExternal = cls.meeting_url && cls.meeting_url !== 'internal_platform_room' && cls.meeting_url.startsWith('http');
+                                                return (
+                                                    <div key={cls.id} style={{ backgroundColor: 'white', borderRadius: '0.75rem', padding: '1.25rem', border: isLive ? '2px solid #ef4444' : '1px solid #dcfce7', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                                                            <h4 style={{ fontWeight: 700, color: '#1e293b', margin: 0 }}>{cls.title}</h4>
+                                                            {isLive && (
+                                                                <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'white', backgroundColor: '#ef4444', padding: '0.1rem 0.4rem', borderRadius: '4px', animation: 'pulse 2s infinite' }}>LIVE</span>
+                                                            )}
+                                                        </div>
+                                                        <div style={{ fontSize: '0.8rem', color: '#15803d', marginBottom: '0.5rem' }}>
+                                                            🗓️ {new Date(cls.scheduled_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                                                        </div>
+                                                        {cls.description && <p style={{ fontSize: '0.85rem', color: '#475569', marginBottom: '1rem' }}>{cls.description}</p>}
+                                                        {isLive ? (
+                                                            isExternal ? (
+                                                                <a href={cls.meeting_url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                                                                    <Button size="sm" variant="primary" style={{ width: '100%', justifyContent: 'center', backgroundColor: '#2563eb' }}>
+                                                                        Join via Google Meet / Zoom →
+                                                                    </Button>
+                                                                </a>
+                                                            ) : (
+                                                                <a href={`/student/live-classes/room/${cls.id}`} style={{ textDecoration: 'none' }}>
+                                                                    <Button size="sm" variant="primary" style={{ width: '100%', justifyContent: 'center', backgroundColor: '#ef4444' }}>
+                                                                        Join Live Room →
+                                                                    </Button>
+                                                                </a>
+                                                            )
+                                                        ) : cls.recording_url ? (
+                                                            <a href={cls.recording_url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                                                                <Button size="sm" variant="outline" style={{ width: '100%', justifyContent: 'center', color: '#7c3aed', borderColor: '#7c3aed' }}>
+                                                                    🎥 Watch Recording
+                                                                </Button>
+                            </a>
+                                                        ) : (
+                                                            <Button size="sm" variant="outline" disabled style={{ width: '100%', justifyContent: 'center', opacity: 0.6 }}>
+                                                                Starts at {new Date(cls.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* BATCH CLASSROOM (ONLY FOR COHORT STUDENTS) */}
                                 {enrollment?.cohort_id && (

@@ -19,14 +19,27 @@ import type { User } from '@/lib/supabase';
 
     export function AuthProvider({ children }: { children: React.ReactNode }) {
         const [user, setUser] = useState<User | null>(null);
-        const [loading, setLoading] = useState(true);
+        const [loading, setLoading] = useState<boolean>(true);
 
         useEffect(() => {
+            // Instantly restore cached session on client mount
+            try {
+                const cached = sessionStorage.getItem('privailers_auth_user');
+                if (cached) {
+                    setUser(JSON.parse(cached));
+                    setLoading(false);
+                }
+            } catch (e) {}
+
             // Check active session
             supabase.auth.getSession().then(({ data: { session } }) => {
                 if (session?.user) {
                     fetchUserData(session.user.id);
                 } else {
+                    setUser(null);
+                    if (typeof window !== 'undefined') {
+                        sessionStorage.removeItem('privailers_auth_user');
+                    }
                     setLoading(false);
                 }
             });
@@ -37,6 +50,9 @@ import type { User } from '@/lib/supabase';
                     fetchUserData(session.user.id);
                 } else {
                     setUser(null);
+                    if (typeof window !== 'undefined') {
+                        sessionStorage.removeItem('privailers_auth_user');
+                    }
                     setLoading(false);
                 }
             });
@@ -54,9 +70,15 @@ import type { User } from '@/lib/supabase';
 
                 if (data && !error) {
                     setUser(data);
+                    if (typeof window !== 'undefined') {
+                        sessionStorage.setItem('privailers_auth_user', JSON.stringify(data));
+                    }
                 } else {
                     console.warn("User profile not found in public.users table.");
-                    setUser(null); // Explicitly null if not found
+                    setUser(null);
+                    if (typeof window !== 'undefined') {
+                        sessionStorage.removeItem('privailers_auth_user');
+                    }
                 }
             } catch (err) {
                 console.error("Error fetching user data:", err);
@@ -90,9 +112,16 @@ import type { User } from '@/lib/supabase';
         };
 
     const signOut = async () => {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
-        setUser(null);
+        try {
+            if (typeof window !== 'undefined') {
+                sessionStorage.clear();
+            }
+            await supabase.auth.signOut();
+        } catch (err) {
+            console.error("Error signing out:", err);
+        } finally {
+            setUser(null);
+        }
     };
 
     const isExpired = user?.access_expires_at ? new Date(user.access_expires_at) < new Date() : false;

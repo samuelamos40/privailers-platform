@@ -82,7 +82,23 @@ export default function AdminSettingsPage() {
             setMessage({ type: 'error', text: 'Failed to update settings: ' + error.message });
         } else {
             setMessage({ type: 'success', text: 'Settings saved successfully' });
-            // Optional: Trigger a re-fetch or context update if we had a global settings context
+            if (typeof window !== 'undefined') {
+                const updatedObj = {
+                    platformName: settings.platform_name || 'Privailers',
+                    whatsappNumber: settings.whatsapp_number,
+                    supportEmail: settings.support_email,
+                    instagramUrl: settings.instagram_url,
+                    twitterUrl: settings.twitter_url,
+                    facebookUrl: settings.facebook_url,
+                    linkedinUrl: settings.linkedin_url,
+                    maintenanceMode: settings.maintenance_mode === 'true',
+                    announcementText: settings.announcement_text,
+                    showAnnouncement: settings.show_announcement === 'true',
+                    bankDetails: settings.bank_details
+                };
+                localStorage.setItem('privailers_app_settings', JSON.stringify(updatedObj));
+                window.dispatchEvent(new Event('app_settings_updated'));
+            }
         }
         setSaving(false);
     };

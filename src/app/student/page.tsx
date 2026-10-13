@@ -40,6 +40,7 @@ export default function StudentDashboard() {
     const [upcomingCohorts, setUpcomingCohorts] = useState<any[]>([]);
     const [announcements, setAnnouncements] = useState<any[]>([]);
     const [myClasses, setMyClasses] = useState<any[]>([]);
+    const [generalLiveAlert, setGeneralLiveAlert] = useState<any>(null);
 
     useEffect(() => {
         if (user) {
@@ -53,6 +54,7 @@ export default function StudentDashboard() {
                     if (parsed.upcomingCohorts) setUpcomingCohorts(parsed.upcomingCohorts);
                     if (parsed.announcements) setAnnouncements(parsed.announcements);
                     if (parsed.myClasses) setMyClasses(parsed.myClasses);
+                    if (parsed.generalLiveAlert) setGeneralLiveAlert(parsed.generalLiveAlert);
                     setLoading(false);
                 }
             } catch (err) {
@@ -115,42 +117,68 @@ export default function StudentDashboard() {
             const userEnrollments = (enrollResponse.data as any[]) || [];
             setEnrollments(userEnrollments);
 
-            // Fetch Classes for enrolled cohorts and global live classes in parallel
-            const myBatchIds = userEnrollments.map(e => e.cohort_id).filter(Boolean);
-            const enrolledCourseIdsArray = Array.from(new Set(userEnrollments.map(e => e.course_id)));
-            
-            let orQueryParts = ['and(course_id.is.null,cohort_id.is.null)'];
-            if (myBatchIds.length > 0) orQueryParts.push(`cohort_id.in.(${myBatchIds.join(',')})`);
-            if (enrolledCourseIdsArray.length > 0) orQueryParts.push(`course_id.in.(${enrolledCourseIdsArray.join(',')})`);
+            let finalClasses: any[] = [];
+            let currentGeneralAlert: any = null;
 
-            const [cohortClassesRes, globalClassesRes] = await Promise.all([
-                myBatchIds.length > 0
-                    ? supabase.from('cohort_classes').select('*, cohort:cohorts(name)').in('cohort_id', myBatchIds)
-                    : Promise.resolve({ data: [] }),
-                supabase.from('live_classes').select('*, course:courses(title), cohort:cohorts(name)').or(orQueryParts.join(','))
-            ]);
-
-            let allMyClasses: any[] = [];
-            if (cohortClassesRes.data) {
-                allMyClasses = [...allMyClasses, ...cohortClassesRes.data];
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                const apiRes = await fetch('/api/student/live-classes', {
+                    headers: session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {}
+                });
+                const apiData = await apiRes.json();
+                if (apiData && Array.isArray(apiData.classes)) {
+                    finalClasses = apiData.classes
+                        .filter((c: any) => ['scheduled', 'ongoing', 'live'].includes(c.status) || (c.status === 'completed' && c.recording_url))
+                        .slice(0, 5);
+                    if (apiData.generalAlerts && apiData.generalAlerts.length > 0) {
+                        currentGeneralAlert = apiData.generalAlerts[0];
+                    }
+                }
+            } catch (err) {
+                console.error("Live classes API error, trying direct query:", err);
             }
 
-            if (globalClassesRes.data) {
-                const normalizedGlobal = globalClassesRes.data.map((c: any) => ({
-                    ...c,
-                    title: c.course_id ? `[Course] ${c.title}` : c.cohort_id ? `[Cohort] ${c.title}` : `[General] ${c.title}`,
-                    cohort: c.cohort || { name: c.course?.title || 'Platform Event' },
-                    isGlobalLiveClass: true
-                }));
-                allMyClasses = [...allMyClasses, ...normalizedGlobal];
+            // Fallback to direct query if API was unavailable
+            if (finalClasses.length === 0) {
+                const myBatchIds = userEnrollments.map(e => e.cohort_id).filter(Boolean);
+                const directCourseIds = userEnrollments.map(e => e.course_id).filter(Boolean);
+                const cohortCourseIds = userEnrollments.map(e => {
+                    const c = Array.isArray(e.cohort) ? e.cohort[0] : e.cohort;
+                    return c?.course_id;
+                }).filter(Boolean);
+                const enrolledCourseIdsArray = Array.from(new Set([...directCourseIds, ...cohortCourseIds]));
+                
+                let orQueryParts = ['and(course_id.is.null,cohort_id.is.null)'];
+                if (myBatchIds.length > 0) orQueryParts.push(`cohort_id.in.(${myBatchIds.join(',')})`);
+                if (enrolledCourseIdsArray.length > 0) orQueryParts.push(`course_id.in.(${enrolledCourseIdsArray.join(',')})`);
+
+                const [cohortClassesRes, globalClassesRes] = await Promise.all([
+                    myBatchIds.length > 0
+                        ? supabase.from('cohort_classes').select('*, cohort:cohorts(name)').in('cohort_id', myBatchIds)
+                        : Promise.resolve({ data: [] }),
+                    supabase.from('live_classes').select('*, course:courses(title), cohort:cohorts(name)').or(orQueryParts.join(','))
+                ]);
+
+                let allMyClasses: any[] = [];
+                if (cohortClassesRes.data) allMyClasses = [...allMyClasses, ...cohortClassesRes.data];
+                if (globalClassesRes.data) {
+                    const normalizedGlobal = globalClassesRes.data.map((c: any) => ({
+                        ...c,
+                        title: c.course_id ? `[Course] ${c.title}` : c.cohort_id ? `[Cohort] ${c.title}` : `[General] ${c.title}`,
+                        cohort: c.cohort || { name: c.course?.title || 'Platform Event' },
+                        isGlobalLiveClass: true
+                    }));
+                    allMyClasses = [...allMyClasses, ...normalizedGlobal];
+                }
+
+                finalClasses = allMyClasses
+                    .filter(c => ['scheduled', 'ongoing', 'live'].includes(c.status) || (c.status === 'completed' && c.recording_url))
+                    .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())
+                    .slice(0, 5);
             }
 
-            // Filter and sort the combined classes
-            const finalClasses = allMyClasses
-                .filter(c => ['scheduled', 'ongoing', 'live'].includes(c.status) || (c.status === 'completed' && c.recording_url))
-                .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())
-                .slice(0, 5);
             setMyClasses(finalClasses);
+            setGeneralLiveAlert(currentGeneralAlert);
 
             const allCourses = coursesResponse.data || [];
             let freshAvailableCourses: Course[] = [];
@@ -176,7 +204,8 @@ export default function StudentDashboard() {
                         availableCourses: freshAvailableCourses,
                         upcomingCohorts: freshUpcomingCohorts,
                         announcements: freshAnnouncements,
-                        myClasses: finalClasses
+                        myClasses: finalClasses,
+                        generalLiveAlert: currentGeneralAlert
                     }));
                 }
             } catch (err) {
@@ -189,9 +218,14 @@ export default function StudentDashboard() {
         }
     };
 
-    const handleJoinClass = async (classId: string, isGlobalLiveClass?: boolean) => {
+    const handleJoinClass = async (classId: string, isGlobalLiveClass?: boolean, meetingUrl?: string) => {
         if (!user) return;
         
+        if (meetingUrl && meetingUrl !== 'internal_platform_room' && meetingUrl.startsWith('http')) {
+            window.open(meetingUrl, '_blank', 'noopener,noreferrer');
+            return;
+        }
+
         if (isGlobalLiveClass) {
             router.push(`/student/live-classes/room/${classId}`);
         } else {
@@ -333,6 +367,83 @@ export default function StudentDashboard() {
                 </div>
             </header>
 
+            {/* GENERAL LIVE SESSION NOTIFICATION BANNER */}
+            {generalLiveAlert && (
+                <section className="general-live-alert" style={{
+                    marginBottom: '2.5rem',
+                    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                    border: '1px solid #3b82f6',
+                    borderRadius: '1.25rem',
+                    padding: '1.5rem 2rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '1.5rem',
+                    boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.25)',
+                    color: 'white'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                        <div style={{
+                            width: '48px',
+                            height: '48px',
+                            borderRadius: '50%',
+                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: '#ef4444',
+                            fontSize: '1.5rem',
+                            flexShrink: 0
+                        }}>
+                            📹
+                        </div>
+                        <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                                <span style={{
+                                    fontSize: '0.75rem',
+                                    fontWeight: 700,
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.05em',
+                                    padding: '0.2rem 0.6rem',
+                                    borderRadius: '999px',
+                                    backgroundColor: generalLiveAlert.status === 'live' || generalLiveAlert.status === 'ongoing' ? '#ef4444' : '#3b82f6',
+                                    color: 'white'
+                                }}>
+                                    {generalLiveAlert.status === 'live' || generalLiveAlert.status === 'ongoing' ? '🔴 Live Now' : '📢 Platform Live Session'}
+                                </span>
+                                <span style={{ fontSize: '0.813rem', color: '#94a3b8' }}>
+                                    {new Date(generalLiveAlert.scheduled_at).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                            </div>
+                            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: '#f8fafc' }}>
+                                {generalLiveAlert.title}
+                            </h3>
+                            {generalLiveAlert.description && (
+                                <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', color: '#cbd5e1', maxWidth: '600px' }}>
+                                    {generalLiveAlert.description}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.75rem' }}>
+                        <Button
+                            variant="primary"
+                            onClick={() => handleJoinClass(generalLiveAlert.id, true, generalLiveAlert.meeting_url)}
+                            style={{
+                                backgroundColor: '#3b82f6',
+                                border: 'none',
+                                fontWeight: 700,
+                                padding: '0.75rem 1.5rem',
+                                boxShadow: '0 4px 14px 0 rgba(59, 130, 246, 0.4)'
+                            }}
+                        >
+                            {generalLiveAlert.status === 'live' || generalLiveAlert.status === 'ongoing' ? 'Join Live Room Now →' : 'View Session Room →'}
+                        </Button>
+                    </div>
+                </section>
+            )}
+
             {/* BATCH ALERTS: Limited Slots */}
             {upcomingCohorts.length > 0 && (
                 <section className="batch-alert" style={{ marginBottom: '3rem', backgroundColor: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '1rem', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
@@ -356,7 +467,7 @@ export default function StudentDashboard() {
                 <section style={{ marginBottom: '4rem' }}>
                     <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#334155', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#ef4444' }}><path d="m22 8-6 4 6 4V8Z"></path><rect x="2" y="6" width="14" height="12" rx="2" ry="2"></rect></svg>
-                        Your Live Batch Sessions
+                        Your Scheduled Live Sessions & Classes
                     </h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '2rem' }}>
                         {myClasses.map(cls => {
@@ -364,6 +475,7 @@ export default function StudentDashboard() {
                             const now = new Date().getTime();
                             // Show as live if instructor marked it 'ongoing'/'live' OR if we are within 2 hours of the start time AND NOT completed
                             const isLive = cls.status === 'ongoing' || cls.status === 'live' || (cls.status !== 'completed' && now >= startTime && now <= startTime + (2 * 60 * 60 * 1000));
+                            const isExternal = cls.meeting_url && cls.meeting_url !== 'internal_platform_room' && cls.meeting_url.startsWith('http');
                             
                             return (
                                 <LightCard key={cls.id} style={{ 
@@ -374,7 +486,16 @@ export default function StudentDashboard() {
                                         <div>
                                             {isLive && <span style={{ fontSize: '0.65rem', fontWeight: 900, color: 'white', backgroundColor: '#ef4444', padding: '0.15rem 0.5rem', borderRadius: '4px', display: 'inline-block', marginBottom: '0.5rem', animation: 'pulse 2s infinite' }}>LIVE NOW</span>}
                                             <h3 style={{ fontWeight: 800, color: '#1e293b' }}>{cls.title}</h3>
-                                            <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Batch: {cls.cohort?.name}</p>
+                                            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.35rem', flexWrap: 'wrap' }}>
+                                                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#2563eb', backgroundColor: '#eff6ff', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                                                    {cls.isGlobalLiveClass ? (cls.course_id ? `🎓 Course: ${cls.course?.title || 'Course Live'}` : '🌐 Platform Session') : `👥 Batch: ${cls.cohort?.name}`}
+                                                </span>
+                                                {isExternal && (
+                                                    <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#059669', backgroundColor: '#ecfdf5', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                                                        🔗 Google Meet / Zoom
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                         <div style={{ textAlign: 'right' }}>
                                             <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#3b82f6' }}>
@@ -386,7 +507,9 @@ export default function StudentDashboard() {
                                         </div>
                                     </div>
                                     {isLive ? (
-                                        <Button onClick={() => handleJoinClass(cls.id, cls.isGlobalLiveClass)} style={{ width: '100%', backgroundColor: '#ef4444' }}>Join Live Room →</Button>
+                                        <Button onClick={() => handleJoinClass(cls.id, cls.isGlobalLiveClass, cls.meeting_url)} style={{ width: '100%', backgroundColor: isExternal ? '#2563eb' : '#ef4444' }}>
+                                            {isExternal ? '▶ Join via Google Meet / Zoom' : '▶ Join Live Room'}
+                                        </Button>
                                     ) : cls.recording_url ? (
                                         <a href={cls.recording_url} target="_blank" style={{ textDecoration: 'none' }}>
                                             <Button style={{ width: '100%', backgroundColor: '#7c3aed' }}>🎥 Watch Recording</Button>

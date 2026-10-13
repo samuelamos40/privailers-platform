@@ -2,36 +2,16 @@
 
 import Sidebar from "@/components/layout/Sidebar";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { useState } from "react";
+import { useAppSettings } from "@/hooks/useAppSettings";
 
 export default function StudentLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const [announcement, setAnnouncement] = useState<{ text: string, show: boolean } | null>(null);
-    const [maintenance, setMaintenance] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-    useEffect(() => {
-        const fetchSettings = async () => {
-            const { data } = await supabase
-                .from('app_settings')
-                .select('*')
-                .in('key', ['announcement_text', 'show_announcement', 'maintenance_mode']);
-
-            if (data) {
-                const text = data.find(s => s.key === 'announcement_text')?.value || '';
-                const show = data.find(s => s.key === 'show_announcement')?.value === 'true';
-                const maint = data.find(s => s.key === 'maintenance_mode')?.value === 'true';
-
-                if (show && text) setAnnouncement({ text, show });
-                if (maint) setMaintenance(true);
-            }
-        };
-        fetchSettings();
-    }, []);
+    const { platformName, announcementText, showAnnouncement, maintenanceMode: maintenance } = useAppSettings();
 
     if (maintenance) {
         return (
@@ -78,7 +58,7 @@ export default function StudentLayout({
                 )}
                 <Sidebar isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
                 <main className="main-content">
-                    {announcement && announcement.show && (
+                    {showAnnouncement && announcementText && (
                         <div style={{
                             backgroundColor: '#fff7ed',
                             borderBottom: '1px solid #fed7aa',
@@ -92,7 +72,7 @@ export default function StudentLayout({
                             justifyContent: 'center',
                             gap: '0.5rem'
                         }}>
-                            <span>📢</span> {announcement.text}
+                            <span>📢</span> {announcementText}
                         </div>
                     )}
                     {children}

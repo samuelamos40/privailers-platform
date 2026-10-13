@@ -48,6 +48,18 @@ export default function AdminDashboard() {
     };
 
     useEffect(() => {
+        // Instant load from cache
+        try {
+            const cached = sessionStorage.getItem('privailers_admin_dashboard_cache');
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (parsed.stats) setStats(parsed.stats);
+                if (parsed.recentActivity) setRecentActivity(parsed.recentActivity);
+                if (parsed.upcomingClasses) setUpcomingClasses(parsed.upcomingClasses);
+                setLoading(false);
+            }
+        } catch (e) {}
+
         const fetchDashboardData = async () => {
             // Get Student Count
             const { count: studentCount } = await supabase
@@ -76,11 +88,12 @@ export default function AdminDashboard() {
                 });
             }
 
-            setStats({
+            const freshStats = {
                 students: studentCount || 0,
                 courses: coursesCount || 0,
                 revenue: totalRevenue
-            });
+            };
+            setStats(freshStats);
 
             // Fetch Recent Activity (Top 5 Enrollments)
             const { data: recent, error: recentError } = await supabase
@@ -113,6 +126,15 @@ export default function AdminDashboard() {
 
             if (upcoming) setUpcomingClasses(upcoming);
             
+            // Save to cache
+            try {
+                sessionStorage.setItem('privailers_admin_dashboard_cache', JSON.stringify({
+                    stats: freshStats,
+                    recentActivity: recent || [],
+                    upcomingClasses: upcoming || []
+                }));
+            } catch (e) {}
+
             setLoading(false);
         };
         fetchDashboardData();

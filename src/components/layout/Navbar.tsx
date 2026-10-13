@@ -5,9 +5,11 @@ import Button from '@/components/ui/Button';
 import { useState } from 'react';
 
 import { useAuth } from '@/contexts/AuthContext';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 const Navbar = () => {
     const { user, signOut, isAdmin, isStudent } = useAuth();
+    const { platformName } = useAppSettings();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const dashboardLink = isAdmin ? '/admin' : isStudent ? '/student' : '/instructor';
@@ -49,7 +51,7 @@ const Navbar = () => {
                         display: 'flex',
                         alignItems: 'center'
                     }}>
-                        <img src="/images/logo.png" alt="Privailers Data Consult" style={{ height: '60px', width: 'auto' }} />
+                        <img src="/images/logo.png" alt={platformName} suppressHydrationWarning style={{ height: '60px', width: 'auto' }} />
                     </Link>
                 </div>
 
