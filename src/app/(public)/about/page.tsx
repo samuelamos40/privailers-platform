@@ -191,7 +191,8 @@ export default function AboutPage() {
                         name="Duru Grace Chigozie"
                         role="Data Analyst"
                         bio="Specializes in data storytelling and visualization, helping organizations make sense of complex datasets."
-                        imageUrl="/images/team/duru.jpg"
+                        imageUrl="/images/team/duru.jpg?v=2"
+                        imagePosition="center 18%"
                     />
                 </div>
             </div>
