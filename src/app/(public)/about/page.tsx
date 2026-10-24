@@ -14,21 +14,6 @@ export default function AboutPage() {
     return (
         <div className="container" style={{ padding: '4rem 1rem' }}>
             <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-                <div style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.4rem 1.25rem',
-                    borderRadius: '999px',
-                    backgroundColor: 'var(--accent-teal-subtle)',
-                    color: 'var(--accent-teal-dark)',
-                    fontSize: '0.875rem',
-                    fontWeight: 700,
-                    marginBottom: '1rem',
-                    border: '1px solid var(--accent-teal-glow)'
-                }}>
-                    EdTech Learning Ecosystem • Enterprise Data Solutions • Mathematical Modeling
-                </div>
                 <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--primary-blue)', wordBreak: 'break-word' }}>About Privailers Data Consult</h1>
                 <p style={{ fontSize: 'clamp(1.05rem, 2vw, 1.25rem)', lineHeight: 1.8, maxWidth: '980px', margin: '0 auto', color: 'var(--text-muted)' }}>
                     Privailers Data Consult is a Nigerian-based EdTech and data analytics consultancy poised to bridge the critical skills gap in Africa&apos;s digital economy. We equip individuals with practical, career-defining skills through our self-paced course marketplace and live cohort bootcamps, while empowering businesses with automated data pipelines, analytics-ready web platforms, and advanced mathematical modeling & simulations.
@@ -168,10 +153,28 @@ export default function AboutPage() {
                 </div>
             </div>
 
-            {/* Meet the Team */}
+                        {/* Meet the Team */}
             <div>
                 <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '3rem', textAlign: 'center', color: 'var(--primary-blue)' }}>Meet the Team</h2>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+                    <TeamMemberCard
+                        name="Caleb Kpesa Iyako"
+                        role="MD"
+                        bio="Managing Director steering strategic direction, quantitative growth, and educational innovation across the platform."
+                        imageUrl="/images/team/caleb-iyako.jpg"
+                    />
+                    <TeamMemberCard
+                        name="Catherine Chimezie"
+                        role="Administrative Officer"
+                        bio="Oversees daily operations, student outreach, program administration, and organizational workflow coordination."
+                        imageUrl="/images/team/catherine-chimezie.jpg"
+                    />
+                    <TeamMemberCard
+                        name="Adio Boluwatife Florence"
+                        role="Secretary"
+                        bio="Manages executive communications, documentation, scheduling, and administrative correspondence."
+                        imageUrl="/images/team/florence-adio.jpg"
+                    />
                     <TeamMemberCard
                         name="Aguoha Confidence Emeka"
                         role="Data Analyst"
@@ -182,7 +185,7 @@ export default function AboutPage() {
                         name="Muhammmad Yunusa Liman"
                         role="Data Analyst"
                         bio="Passionate about turning raw data into actionable insights for business growth and operational efficiency."
-                        imageUrl="/images/team/muhammad.jpg"
+                        imageUrl="/images/team/muhammad.jpg?v=2"
                     />
                     <TeamMemberCard
                         name="Duru Grace Chigozie"

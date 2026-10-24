@@ -101,21 +101,6 @@ export default function ServicesPage() {
         <div className="container" style={{ padding: '4rem 1rem' }}>
             {/* Header Section */}
             <div style={{ textAlign: 'center', marginBottom: '4.5rem' }}>
-                <div style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.4rem 1.25rem',
-                    borderRadius: '999px',
-                    backgroundColor: 'var(--accent-teal-subtle)',
-                    color: 'var(--accent-teal-dark)',
-                    fontSize: '0.875rem',
-                    fontWeight: 700,
-                    marginBottom: '1rem',
-                    border: '1px solid var(--accent-teal-glow)'
-                }}>
-                    EdTech Ecosystem • Enterprise Data Engineering • Applied Mathematics
-                </div>
                 <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 3.5rem)', fontWeight: 800, marginBottom: '1.5rem', color: 'var(--primary-blue)', letterSpacing: '-0.02em' }}>
                     What We Build, Solve & Deliver
                 </h1>

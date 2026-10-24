@@ -6,6 +6,7 @@ interface TeamMemberCardProps extends React.HTMLAttributes<HTMLDivElement> {
     role: string;
     bio: string;
     imageUrl?: string;
+    imagePosition?: string;
 }
 
 const TeamMemberCard: React.FC<TeamMemberCardProps> = ({
@@ -13,6 +14,7 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({
     role,
     bio,
     imageUrl,
+    imagePosition = 'center 20%',
     style,
     ...props
 }) => {
@@ -29,15 +31,25 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({
             {...props}
         >
             <div style={{
-                height: '240px',
+                height: '260px',
                 backgroundColor: '#e2e8f0',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#94a3b8'
+                color: '#94a3b8',
+                overflow: 'hidden'
             }}>
                 {imageUrl ? (
-                    <img src={imageUrl} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img
+                        src={imageUrl}
+                        alt={name}
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            objectPosition: imagePosition
+                        }}
+                    />
                 ) : (
                     <svg width="64" height="64" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
