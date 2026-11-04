@@ -65,8 +65,32 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": ["EducationalOrganization", "ProfessionalService"],
+    name: "Privailers Data Consult",
+    url: "https://privailers.com",
+    logo: "https://privailers.com/images/logo.png",
+    image: "https://privailers.com/images/opengraph-image.png",
+    description:
+      "Empowering individuals and businesses with in-demand data skills, self-paced courses, live cohort bootcamps, automated data pipelines, and quantitative mathematical modeling.",
+    email: "info@privailers.com",
+    telephone: "+2347078865107",
+    address: {
+      "@type": "PostalAddress",
+      addressCountry: "NG",
+    },
+    sameAs: ["https://privailers.com"],
+  };
+
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className={`${poppins.variable} ${roboto.variable} antialiased`}>
         <AuthProvider>
           {children}
