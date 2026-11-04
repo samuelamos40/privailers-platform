@@ -90,7 +90,7 @@ export async function POST(req: Request) {
                 }
 
                 if (studentEmail && process.env.RESEND_API_KEY) {
-                    const fromAddress = process.env.EMAIL_FROM || 'Privailers Academy <onboarding@resend.dev>';
+                    const fromAddress = process.env.EMAIL_FROM || 'Privailers Academy <info@privailers.com>';
                     const emailTemplate = getPaymentReceiptEmail({
                         studentName,
                         courseName: itemName,

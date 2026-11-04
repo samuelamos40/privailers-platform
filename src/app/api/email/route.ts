@@ -12,10 +12,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing required fields (to, subject, html)' }, { status: 400 });
         }
 
-        // Note: Unless a custom domain is verified in Resend, 
-        // 'onboarding@resend.dev' must be used as the from address,
-        // and emails can only be sent to the email address used to create the Resend account.
-        const fromAddress = process.env.EMAIL_FROM || 'Privailers Academy <onboarding@resend.dev>';
+        const fromAddress = process.env.EMAIL_FROM || 'Privailers Academy <info@privailers.com>';
 
         const data = await resend.emails.send({
             from: fromAddress,
