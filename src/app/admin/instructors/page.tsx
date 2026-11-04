@@ -118,6 +118,37 @@ export default function AdminInstructorsPage() {
         }
     };
 
+    const handleDeleteInstructor = async (userId: string, fullName: string, email: string) => {
+        if (!confirm(`Are you sure you want to permanently delete instructor ${fullName || email} (${email})?\n\nThis will permanently delete their account and login credentials.`)) return;
+
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.access_token) {
+                alert("Authentication error: Please log in again.");
+                return;
+            }
+
+            const res = await fetch('/api/admin/delete-user', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({ userId })
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+                alert(`Error deleting user: ${data.error}`);
+            } else {
+                alert("Instructor account permanently deleted.");
+                fetchData();
+            }
+        } catch (err: any) {
+            alert(`Unexpected error: ${err.message}`);
+        }
+    };
+
     return (
         <div>
             <div className="portal-header">
@@ -215,7 +246,10 @@ export default function AdminInstructorsPage() {
                                         {new Date(inst.created_at).toLocaleDateString()}
                                     </td>
                                     <td style={{ padding: '1rem' }}>
-                                        <Button variant="ghost" size="sm" onClick={() => handleDemote(inst.id, inst.full_name)}>Remove Access</Button>
+                                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                            <Button variant="ghost" size="sm" onClick={() => handleDemote(inst.id, inst.full_name)}>Demote to Student</Button>
+                                            <Button variant="outline" size="sm" style={{ color: '#dc2626', borderColor: '#fecaca' }} onClick={() => handleDeleteInstructor(inst.id, inst.full_name, inst.email)}>Delete Account</Button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

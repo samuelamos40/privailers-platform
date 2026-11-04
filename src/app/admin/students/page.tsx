@@ -61,6 +61,38 @@ export default function AdminStudentsPage() {
         }
     };
 
+    const handleDeleteStudent = async (userId: string, fullName: string, email: string) => {
+        if (!confirm(`Are you sure you want to permanently delete ${fullName || email} (${email})?\n\nThis will remove their account, login access, and enrollments permanently.`)) return;
+
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.access_token) {
+                alert("Authentication error: Please log in again.");
+                return;
+            }
+
+            const res = await fetch('/api/admin/delete-user', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({ userId })
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+                alert(`Error deleting user: ${data.error}`);
+            } else {
+                alert("User account permanently deleted.");
+                if (selectedUser.id === userId) setIsEditOpen(false);
+                fetchStudents();
+            }
+        } catch (err: any) {
+            alert(`Unexpected error: ${err.message}`);
+        }
+    };
+
     const filteredStudents = students.filter(s => 
         s.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
         s.email?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -132,16 +164,21 @@ export default function AdminStudentsPage() {
                                             {new Date(s.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                                         </td>
                                         <td style={{ padding: '1rem' }}>
-                                            <Button size="sm" variant="outline" onClick={() => {
-                                                setSelectedUser({
-                                                    id: s.id,
-                                                    full_name: s.full_name,
-                                                    email: s.email,
-                                                    access_status: s.access_status || 'active',
-                                                    access_expires_at: s.access_expires_at ? new Date(s.access_expires_at).toISOString().slice(0, 10) : ''
-                                                });
-                                                setIsEditOpen(true);
-                                            }}>Security / Expiry</Button>
+                                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                <Button size="sm" variant="outline" onClick={() => {
+                                                    setSelectedUser({
+                                                        id: s.id,
+                                                        full_name: s.full_name,
+                                                        email: s.email,
+                                                        access_status: s.access_status || 'active',
+                                                        access_expires_at: s.access_expires_at ? new Date(s.access_expires_at).toISOString().slice(0, 10) : ''
+                                                    });
+                                                    setIsEditOpen(true);
+                                                }}>Security / Expiry</Button>
+                                                <Button size="sm" variant="outline" style={{ color: '#dc2626', borderColor: '#fecaca' }} onClick={() => handleDeleteStudent(s.id, s.full_name, s.email)}>
+                                                    Delete
+                                                </Button>
+                                            </div>
                                         </td>
                                     </tr>
                                 );
