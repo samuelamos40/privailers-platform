@@ -70,12 +70,12 @@ export default function ServicesPage() {
         {
             icon: <Calculator size={28} color="#8b5cf6" />,
             title: "Mathematical Modeling & Quantitative Simulation",
-            desc: "We translate complex real-world dynamics into rigorous mathematical models and numerical simulations. From stochastic risk forecasting to operations research and algorithmic optimization, we give organizations mathematically backed confidence.",
+            desc: "We translate complex real-world dynamics into clear mathematical models and quantitative simulations. From demand and risk forecasting to resource optimization, we give organizations data-backed confidence.",
             features: [
-                "Deterministic & stochastic mathematical modeling",
-                "Monte Carlo simulations & multi-variable sensitivity analysis",
-                "Operations research, supply chain & resource optimization algorithms",
-                "Statistical inference, probability modeling & predictive stress testing"
+                "Practical mathematical & quantitative business modeling",
+                "Scenario simulations & multi-variable sensitivity analysis",
+                "Operations research, supply chain & resource optimization",
+                "Statistical inference, probability modeling & trend forecasting"
             ],
             badge: "Applied Mathematics",
             ctaLink: "/contact",

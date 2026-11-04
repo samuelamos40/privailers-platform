@@ -237,10 +237,10 @@ export default function Home() {
                             },
                             {
                                 title: "Mathematical Modeling & Simulation",
-                                desc: "Formulate complex real-world operations into rigorous mathematical models. We deploy stochastic simulations, Monte Carlo algorithms, and numerical optimization to solve high-stakes challenges.",
+                                desc: "Formulate complex real-world operations into rigorous mathematical models. We deploy statistical forecasting, quantitative simulations, and numerical optimization to solve business challenges.",
                                 image: "/images/services/mathematical-modeling-simulation.png",
                                 icon: <Calculator size={24} color="#8b5cf6" />,
-                                tags: ["Stochastic Modeling", "Monte Carlo Simulations", "Numerical Optimization"],
+                                tags: ["Quantitative Modeling", "Statistical Forecasting", "Process Optimization"],
                                 link: "/services"
                             },
                             {

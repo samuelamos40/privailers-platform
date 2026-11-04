@@ -109,7 +109,7 @@ export default function ContactPage() {
                     },
                     {
                         title: "What mathematical modeling and simulation capabilities do you offer?",
-                        content: "Our quantitative team formulates real-world challenges using deterministic and stochastic mathematical models, Monte Carlo simulations, numerical optimization, risk modeling, and operations research algorithms to help organizations make high-stakes decisions with mathematical precision."
+                        content: "Our quantitative team formulates real-world challenges using practical mathematical models, scenario simulations, statistical forecasting, risk analysis, and resource optimization to help organizations make decisions with precision."
                     },
                     {
                         title: "Can you build custom data pipelines and web data extraction systems for our company?",
