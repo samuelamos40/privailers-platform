@@ -38,6 +38,18 @@ export default function ContactForm() {
             setError('Failed to submit form. Please try again.');
             setSubmitting(false);
         } else {
+            // Send email notification to info@privailers.com
+            try {
+                fetch('/api/email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: 'info@privailers.com',
+                        subject: `New Inquiry: ${formData.interest} — ${formData.firstName} ${formData.lastName}`,
+                        html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;border:1px solid #e2e8f0;border-radius:12px;"><h2 style="color:#061e48;margin-top:0;">New Contact Inquiry</h2><p><strong>Name:</strong> ${formData.firstName} ${formData.lastName}</p><p><strong>Email:</strong> ${formData.email}</p><p><strong>Company:</strong> ${formData.company || 'N/A'}</p><p><strong>Interest:</strong> ${formData.interest}</p><hr style="border:none;border-top:1px solid #e2e8f0;margin:16px 0;" /><p style="white-space:pre-wrap;color:#334155;">${formData.message}</p></div>`
+                    })
+                }).catch(() => {});
+            } catch (e) {}
             setSubmitted(true);
             setFormData({
                 firstName: '',

@@ -406,7 +406,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
         reference: `PS_${typeof window !== 'undefined' ? new Date().getTime() : ''}`,
         email: user?.email || "student@example.com",
         amount: Math.round(discountedPrice * 100), 
-        publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "pk_test_dummy",
+        publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "pk_live_4aa6c110ab8627130647a1328f3cbb9c212897f9",
         channels: ['card', 'bank', 'ussd', 'qr', 'mobile_money'] // EXPLICITLY ENABLED CHANNELS
     };
     

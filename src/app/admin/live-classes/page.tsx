@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { getLiveClassAnnouncementEmail } from "@/lib/emailTemplates";
 
 export default function AdminLiveClassesPage() {
     const [classes, setClasses] = useState<any[]>([]);
@@ -94,6 +95,49 @@ export default function AdminLiveClassesPage() {
                         console.error("Could not post general announcement:", annErr);
                     }
                 }
+                // Dispatch Live Class email alerts to target students
+                try {
+                    const formattedDate = new Date(formData.scheduled_at).toLocaleString([], { dateStyle: 'long', timeStyle: 'short' });
+                    const joinLink = resolvedMeetingUrl.startsWith('http')
+                        ? resolvedMeetingUrl
+                        : `${window.location.origin}/student/live-classes`;
+
+                    let targetStudents: { full_name: string; email: string }[] = [];
+                    if (formData.audienceType === 'general') {
+                        const { data: stu } = await supabase.from('users').select('full_name, email').eq('role', 'student');
+                        targetStudents = stu || [];
+                    } else if (formData.audienceType === 'course' && formData.course_id) {
+                        const { data: enr } = await supabase.from('enrollments').select('user:users(full_name, email)').eq('course_id', formData.course_id).eq('status', 'active');
+                        targetStudents = (enr || []).map((r: any) => r.user).filter(Boolean);
+                    } else if (formData.audienceType === 'cohort' && formData.cohort_id) {
+                        const { data: enr } = await supabase.from('enrollments').select('user:users(full_name, email)').eq('cohort_id', formData.cohort_id).eq('status', 'active');
+                        targetStudents = (enr || []).map((r: any) => r.user).filter(Boolean);
+                    }
+
+                    targetStudents.forEach(student => {
+                        if (student?.email) {
+                            const emailData = getLiveClassAnnouncementEmail({
+                                studentName: student.full_name || 'Student',
+                                sessionTitle: formData.title,
+                                instructorName: 'Privailers Faculty',
+                                scheduledAt: formattedDate,
+                                meetingUrl: joinLink
+                            });
+                            fetch('/api/email', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    to: student.email,
+                                    subject: emailData.subject,
+                                    html: emailData.html
+                                })
+                            }).catch(() => {});
+                        }
+                    });
+                } catch (emailErr) {
+                    console.error("Could not send live class emails:", emailErr);
+                }
+
                 alert("Created successfully! Students have been notified."); 
                 setIsFormOpen(false); 
                 fetchClasses(); 

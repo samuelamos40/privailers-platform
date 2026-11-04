@@ -9,6 +9,7 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: 'Missing userId parameter.' }, { status: 400 });
         }
 
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
         const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
         if (!serviceRoleKey) {
             return NextResponse.json({
@@ -17,7 +18,7 @@ export async function DELETE(request: Request) {
         }
 
         const supabase = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            supabaseUrl,
             serviceRoleKey,
             { auth: { autoRefreshToken: false, persistSession: false } }
         );

@@ -25,7 +25,7 @@ export default function StudentLiveClassesPage() {
         reference: `B_${new Date().getTime()}`,
         email: user?.email || "",
         amount: Math.round(cohortPrice * 100),
-        publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "pk_test_dummy",
+        publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "pk_live_4aa6c110ab8627130647a1328f3cbb9c212897f9",
     };
     const initializePayment = usePaystackPayment(paystackConfig as any);
 

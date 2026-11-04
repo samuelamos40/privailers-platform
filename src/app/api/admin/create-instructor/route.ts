@@ -6,6 +6,7 @@ export async function POST(request: Request) {
         const { email, full_name, password } = await request.json();
 
         // 1. Ensure Service Role Key exists
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
         const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
         if (!serviceRoleKey) {
             return NextResponse.json({ 
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
         
         // Use the Service Role Key to bypass RLS and interact with the Admin Auth API
         const supabase = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            supabaseUrl,
             serviceRoleKey,
             { auth: { autoRefreshToken: false, persistSession: false } }
         );

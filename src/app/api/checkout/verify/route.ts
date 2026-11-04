@@ -89,7 +89,7 @@ export async function POST(req: Request) {
                     if (co?.name) itemName = co.name;
                 }
 
-                if (studentEmail && process.env.RESEND_API_KEY) {
+                if (studentEmail) {
                     const fromAddress = process.env.EMAIL_FROM || 'Privailers Academy <info@privailers.com>';
                     const emailTemplate = getPaymentReceiptEmail({
                         studentName,

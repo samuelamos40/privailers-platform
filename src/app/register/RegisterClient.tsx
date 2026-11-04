@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Link from 'next/link';
+import { getWelcomeEmail } from '@/lib/emailTemplates';
 
 export default function RegisterClient() {
     const searchParams = useSearchParams();
@@ -147,6 +148,23 @@ export default function RegisterClient() {
 
             // Auto-signin if session was established
             await supabase.auth.signInWithPassword({ email: formData.email, password: formData.password });
+
+            // Dispatch Welcome Email asynchronously (non-blocking)
+            try {
+                const welcome = getWelcomeEmail({
+                    studentName: formData.fullName || 'Student',
+                    loginUrl: `${window.location.origin}/student`
+                });
+                fetch('/api/email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: formData.email,
+                        subject: welcome.subject,
+                        html: welcome.html
+                    })
+                }).catch(() => {});
+            } catch (e) {}
             
             if (redirectTo) {
                 router.push(redirectTo);
@@ -200,6 +218,23 @@ export default function RegisterClient() {
 
             // Sign in
             await supabase.auth.signInWithPassword({ email: formData.email, password: formData.password });
+
+            // Dispatch Welcome Email asynchronously (non-blocking)
+            try {
+                const welcome = getWelcomeEmail({
+                    studentName: formData.fullName || 'Student',
+                    loginUrl: `${window.location.origin}/student`
+                });
+                fetch('/api/email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: formData.email,
+                        subject: welcome.subject,
+                        html: welcome.html
+                    })
+                }).catch(() => {});
+            } catch (e) {}
 
             // Direct forward to checkout
             const refParam = refCode ? `&ref=${refCode.toUpperCase()}` : '';

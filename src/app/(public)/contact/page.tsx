@@ -43,7 +43,7 @@ export default function ContactPage() {
                             </div>
                             <div>
                                 <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.25rem', color: 'var(--foreground)' }}>Email</h3>
-                                <p style={{ color: 'var(--text-muted)' }}>privailerdataconsult@gmail.com</p>
+                                <p style={{ color: 'var(--text-muted)' }}>info@privailers.com</p>
                                 <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>For general inquiries and support</p>
                             </div>
                         </div>

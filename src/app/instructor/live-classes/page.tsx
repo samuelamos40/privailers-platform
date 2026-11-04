@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { getLiveClassAnnouncementEmail } from "@/lib/emailTemplates";
 
 export default function InstructorLiveClassesPage() {
     const [classes, setClasses] = useState<any[]>([]);
@@ -79,7 +80,45 @@ export default function InstructorLiveClassesPage() {
         } else {
             const { error } = await supabase.from('live_classes').insert([payload]);
             if (error) alert("Error creating: " + error.message);
-            else { alert("Created successfully!"); setIsFormOpen(false); fetchClasses(); }
+            else {
+                try {
+                    const formattedDate = new Date(formData.scheduled_at).toLocaleString([], { dateStyle: 'long', timeStyle: 'short' });
+                    const joinLink = resolvedMeetingUrl.startsWith('http')
+                        ? resolvedMeetingUrl
+                        : `${window.location.origin}/student/live-classes`;
+
+                    const { data: enr } = await supabase
+                        .from('enrollments')
+                        .select('user:users(full_name, email)')
+                        .eq('course_id', formData.course_id)
+                        .eq('status', 'active');
+
+                    const targetStudents = (enr || []).map((r: any) => r.user).filter(Boolean);
+                    targetStudents.forEach((student: any) => {
+                        if (student?.email) {
+                            const emailData = getLiveClassAnnouncementEmail({
+                                studentName: student.full_name || 'Student',
+                                sessionTitle: formData.title,
+                                instructorName: 'Course Instructor',
+                                scheduledAt: formattedDate,
+                                meetingUrl: joinLink
+                            });
+                            fetch('/api/email', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    to: student.email,
+                                    subject: emailData.subject,
+                                    html: emailData.html
+                                })
+                            }).catch(() => {});
+                        }
+                    });
+                } catch (emailErr) {
+                    console.error("Could not send live class emails:", emailErr);
+                }
+                alert("Created successfully!"); setIsFormOpen(false); fetchClasses();
+            }
         }
     };
 
