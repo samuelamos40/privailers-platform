@@ -100,8 +100,8 @@ export default function Home() {
                             <div style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 600, textTransform: 'uppercase' }}>Students Trained</div>
                         </div>
                         <div>
-                            <div style={{ fontSize: '2.5rem', fontWeight: 700, color: '#0f172a' }}>2+</div>
-                            <div style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 600, textTransform: 'uppercase' }}>Corporate Projects</div>
+                            <div style={{ fontSize: '2.5rem', fontWeight: 700, color: '#0f172a' }}>100%</div>
+                            <div style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 600, textTransform: 'uppercase' }}>Hands-On Projects</div>
                         </div>
                         <div>
                             <div style={{ fontSize: '2.5rem', fontWeight: 700, color: '#0f172a' }}>98%</div>
@@ -224,7 +224,7 @@ export default function Home() {
                                 desc: "Deep dive into your business metrics. We uncover hidden trends, automate executive reporting, and provide actionable insights to drive revenue growth.",
                                 image: "/images/services/business-intelligence-bi.png",
                                 icon: <BarChart3 size={24} color="#00b4d8" />,
-                                tags: ["Executive Dashboards", "Power BI & Tableau", "Revenue Growth"],
+                                tags: ["Executive Dashboards", "Power BI & Excel", "Revenue Growth"],
                                 link: "/services"
                             },
                             {
@@ -382,7 +382,7 @@ export default function Home() {
                     }}>
                         <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 700, marginBottom: '1.5rem', wordBreak: 'break-word' }}>Ready to Transform Your Career?</h2>
                         <p style={{ color: '#cbd5e1', fontSize: '1.1rem', marginBottom: '2.5rem', maxWidth: '600px', margin: '0 auto 2.5rem' }}>
-                            Join hundreds of students who have landed jobs at top tech companies after training with us.
+                            Join a growing community of learners mastering practical, job-ready data skills through hands-on projects and mentorship.
                         </p>
                         <Link href="/register">
                             <Button variant="accent" size="lg" style={{ fontWeight: 700, padding: '1rem 2.5rem', fontSize: '1.05rem', boxShadow: '0 10px 15px -3px rgba(0, 168, 156, 0.3)' }}>

@@ -16,7 +16,7 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://privailers-platform.vercel.app'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://privailers.com'),
   title: {
     default: "Privailers Data Consult | Premier Data Academy & Analytics",
     template: "%s | Privailers Data Consult"
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://privailers-platform.vercel.app",
+    url: "https://privailers.com",
     siteName: "Privailers Data Consult",
     title: "Privailers Data Consult | Premier Data Academy & Analytics",
     description: "Empowering individuals and businesses with in-demand data skills, self-paced courses, live cohort bootcamps, automated data pipelines, and quantitative mathematical modeling.",

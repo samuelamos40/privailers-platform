@@ -19,7 +19,7 @@ export interface AppSettings {
 
 const DEFAULT_SETTINGS: AppSettings = {
     platformName: 'Privailers',
-    whatsappNumber: '2348000000000',
+    whatsappNumber: '2347078865107',
     supportEmail: 'info@privailers.com',
     instagramUrl: '#',
     twitterUrl: '#',

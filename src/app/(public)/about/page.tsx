@@ -58,7 +58,7 @@ export default function AboutPage() {
                     <div style={{ fontSize: '1.75rem', marginBottom: '0.75rem' }}>🎯</div>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary-blue)', marginBottom: '0.75rem' }}>Proven Traction & Job Placement</h3>
                     <p style={{ color: 'var(--text-muted)', lineHeight: 1.6, fontSize: '0.95rem' }}>
-                        Our inaugural Advanced Data Analytics bootcamp successfully graduated a cohort where two students secured full-time employment and one secured an internship immediately upon completion.
+                        Our hands-on Data Analytics bootcamps have trained 75+ learners, with top graduates securing full-time data roles and industry internships immediately upon completion.
                     </p>
                 </div>
 
@@ -66,7 +66,7 @@ export default function AboutPage() {
                     <div style={{ fontSize: '1.75rem', marginBottom: '0.75rem' }}>🏛️</div>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary-blue)', marginBottom: '0.75rem' }}>Team & Innovation Hub</h3>
                     <p style={{ color: 'var(--text-muted)', lineHeight: 1.6, fontSize: '0.95rem' }}>
-                        Powered by a multidisciplinary team of 10 professionals—mathematicians, data scientists, analysts, and software engineers—with strategic plans for a physical Privailers Innovation Hub in Ado-Ekiti.
+                        Powered by a dedicated leadership, administrative, and data analytics team—with strategic expansion plans for a physical Privailers Innovation Hub in Ado-Ekiti.
                     </p>
                 </div>
             </div>

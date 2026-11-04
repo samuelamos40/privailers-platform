@@ -31,7 +31,7 @@ export default function ServicesPage() {
             desc: "We architect and deploy scalable, automated data pipelines that ingest, transform, and load disparate data streams into unified data lakes and warehouses. Keep your business metrics fresh, structured, and audit-ready.",
             features: [
                 "Automated ETL/ELT pipeline architecture & workflow orchestration",
-                "Cloud data warehousing & migration (PostgreSQL, BigQuery, Snowflake)",
+                "Database design, cloud storage & SQL data warehousing (PostgreSQL, SQL Server)",
                 "Real-time stream and batch data ingestion engines",
                 "Automated data validation, quality control, and governance"
             ],
@@ -44,7 +44,7 @@ export default function ServicesPage() {
             title: "Business Intelligence & Executive Analytics",
             desc: "Convert raw numbers into strategic growth engines. We build interactive executive dashboards, automate multi-department reporting, and deploy predictive models to forecast demand and eliminate customer churn.",
             features: [
-                "Interactive executive dashboards (Power BI & Tableau)",
+                "Interactive executive dashboards (Power BI & Advanced Excel)",
                 "Customer segmentation, churn mitigation, & LTV modeling",
                 "Operational cost-reduction audits & financial performance tracking",
                 "Automated multi-department KPI reporting systems"
@@ -231,7 +231,7 @@ export default function ServicesPage() {
                     Quantitative, Mathematical & Data Engineering Toolset
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem 2rem', justifyContent: 'center', alignItems: 'center', fontSize: '1.05rem', fontWeight: 600, color: '#334155' }}>
-                    {['Mathematical Modeling', 'Monte Carlo Simulation', 'Python (NumPy, SciPy)', 'SQL & PostgreSQL', 'Next.js & React', 'Power BI & Tableau', 'ETL Pipelines', 'Optimization Algorithms', 'Advanced Microsoft Excel'].map(tool => (
+                    {['Mathematical Modeling', 'Statistical Analysis', 'Python (Pandas, NumPy)', 'SQL & PostgreSQL', 'Next.js & React', 'Power BI Dashboards', 'Automated ETL Pipelines', 'Operations Optimization', 'Advanced Microsoft Excel'].map(tool => (
                         <span key={tool} style={{
                             padding: '0.5rem 1.1rem',
                             backgroundColor: '#f1f5f9',

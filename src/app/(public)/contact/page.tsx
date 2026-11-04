@@ -101,7 +101,7 @@ export default function ContactPage() {
                 <Accordion items={[
                     {
                         title: "What services does Privailers Data Consult provide for businesses?",
-                        content: "We provide end-to-end quantitative and data solutions: applied mathematical modeling, stochastic simulations, Monte Carlo analysis, automated ETL/ELT data pipelines, analytics-ready web platforms with custom data extraction, executive Business Intelligence dashboards (Power BI & Tableau), and tailored corporate training."
+                        content: "We provide end-to-end quantitative and data solutions: applied mathematical modeling, statistical analysis, automated ETL/ELT data pipelines, analytics-ready web platforms with custom data extraction, executive Business Intelligence dashboards (Power BI & Advanced Excel), and tailored corporate training."
                     },
                     {
                         title: "Can I buy self-paced courses and enroll in individual training?",
