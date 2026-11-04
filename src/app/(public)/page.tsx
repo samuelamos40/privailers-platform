@@ -224,7 +224,7 @@ export default function Home() {
                                 desc: "Deep dive into your business metrics. We uncover hidden trends, automate executive reporting, and provide actionable insights to drive revenue growth.",
                                 image: "/images/services/business-intelligence-bi.png",
                                 icon: <BarChart3 size={24} color="#00b4d8" />,
-                                tags: ["Executive Dashboards", "Power BI & Excel", "Revenue Growth"],
+                                tags: ["Executive Dashboards", "Power BI & Tableau", "Revenue Growth"],
                                 link: "/services"
                             },
                             {
@@ -237,10 +237,10 @@ export default function Home() {
                             },
                             {
                                 title: "Mathematical Modeling & Simulation",
-                                desc: "Formulate complex real-world operations into rigorous mathematical models. We deploy statistical forecasting, quantitative simulations, and numerical optimization to solve business challenges.",
+                                desc: "Formulate complex real-world operations into rigorous mathematical models. We deploy stochastic simulations, Monte Carlo algorithms, and numerical optimization to solve high-stakes challenges.",
                                 image: "/images/services/mathematical-modeling-simulation.png",
                                 icon: <Calculator size={24} color="#8b5cf6" />,
-                                tags: ["Quantitative Modeling", "Statistical Forecasting", "Process Optimization"],
+                                tags: ["Stochastic Modeling", "Monte Carlo Simulations", "Numerical Optimization"],
                                 link: "/services"
                             },
                             {

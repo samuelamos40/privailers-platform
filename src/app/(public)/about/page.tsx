@@ -50,7 +50,7 @@ export default function AboutPage() {
                     <div style={{ fontSize: '1.75rem', marginBottom: '0.75rem' }}>📐</div>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary-blue)', marginBottom: '0.75rem' }}>Mathematical Modeling & Simulation</h3>
                     <p style={{ color: 'var(--text-muted)', lineHeight: 1.6, fontSize: '0.95rem' }}>
-                        We formulate real-world operations using practical mathematical models, statistical forecasting, and quantitative optimization to solve business and operational problems with precision.
+                        We formulate real-world operations using deterministic & stochastic mathematical models, Monte Carlo simulations, and numerical optimization to solve high-stakes business and financial problems with precision.
                     </p>
                 </div>
 

@@ -101,7 +101,7 @@ export default function ContactPage() {
                 <Accordion items={[
                     {
                         title: "What services does Privailers Data Consult provide for businesses?",
-                        content: "We provide end-to-end quantitative and data solutions: applied mathematical modeling, statistical analysis, automated ETL/ELT data pipelines, analytics-ready web platforms with custom data extraction, executive Business Intelligence dashboards (Power BI & Advanced Excel), and tailored corporate training."
+                        content: "We provide end-to-end quantitative and data solutions: applied mathematical modeling, stochastic simulations, Monte Carlo analysis, automated ETL/ELT data pipelines, analytics-ready web platforms with custom data extraction, executive Business Intelligence dashboards (Power BI & Tableau), and tailored corporate training."
                     },
                     {
                         title: "Can I buy self-paced courses and enroll in individual training?",
@@ -109,7 +109,7 @@ export default function ContactPage() {
                     },
                     {
                         title: "What mathematical modeling and simulation capabilities do you offer?",
-                        content: "Our quantitative team formulates real-world challenges using practical mathematical models, scenario simulations, statistical forecasting, risk analysis, and resource optimization to help organizations make decisions with precision."
+                        content: "Our quantitative team formulates real-world challenges using deterministic and stochastic mathematical models, Monte Carlo simulations, numerical optimization, risk modeling, and operations research algorithms to help organizations make high-stakes decisions with mathematical precision."
                     },
                     {
                         title: "Can you build custom data pipelines and web data extraction systems for our company?",
