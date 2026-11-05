@@ -106,7 +106,9 @@ const Footer = () => {
                             <li><Link href="/services" style={{ opacity: 0.8 }} onMouseOver={(e) => e.currentTarget.style.opacity = '1'}>Consulting & Modeling</Link></li>
                             <li><Link href="/courses" style={{ opacity: 0.8 }} onMouseOver={(e) => e.currentTarget.style.opacity = '1'}>Courses & Bootcamps</Link></li>
                             <li><Link href="/contact" style={{ opacity: 0.8 }} onMouseOver={(e) => e.currentTarget.style.opacity = '1'}>Contact</Link></li>
-                            <li><Link href="/admin-login" style={{ opacity: 0.8 }} onMouseOver={(e) => e.currentTarget.style.opacity = '1'}>Admin Access</Link></li>
+                            <li><Link href="/privacy" style={{ opacity: 0.8 }} onMouseOver={(e) => e.currentTarget.style.opacity = '1'}>Privacy Policy</Link></li>
+                            <li><Link href="/terms" style={{ opacity: 0.8 }} onMouseOver={(e) => e.currentTarget.style.opacity = '1'}>Terms of Service</Link></li>
+                            <li><Link href="/refund-policy" style={{ opacity: 0.8 }} onMouseOver={(e) => e.currentTarget.style.opacity = '1'}>Refund Policy</Link></li>
                         </ul>
                     </div>
 

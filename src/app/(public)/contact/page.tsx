@@ -14,9 +14,9 @@ export default function ContactPage() {
     return (
         <div className="container" style={{ padding: '4rem 1rem' }}>
             <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-                <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--primary-blue)', wordBreak: 'break-word' }}>Let's Start a Conversation</h1>
+                <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--primary-blue)', wordBreak: 'break-word' }}>Let&apos;s Start a Conversation</h1>
                 <p style={{ fontSize: 'clamp(1rem, 2vw, 1.25rem)', color: 'var(--text-muted)', maxWidth: '700px', margin: '0 auto', lineHeight: 1.6 }}>
-                    Whether you're looking to transform your business with data or launch your career, we're here to help.
+                    Whether you&apos;re looking to transform your business with data or launch your career, we&apos;re here to help.
                 </p>
             </div>
 
@@ -63,19 +63,31 @@ export default function ContactPage() {
                     <div>
                         <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--foreground)' }}>Connect With Us</h3>
                         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                            {['LinkedIn', 'Twitter', 'Facebook', 'Instagram'].map(social => (
-                                <div key={social} style={{
-                                    padding: '0.5rem 1rem',
-                                    border: '1px solid var(--border-color)',
-                                    borderRadius: '2rem',
-                                    fontSize: '0.875rem',
-                                    fontWeight: 500,
-                                    color: 'var(--primary-blue)',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s'
-                                }}>
-                                    {social}
-                                </div>
+                            {[
+                                { label: 'LinkedIn', href: 'https://www.linkedin.com/company/privailers-data-consult' },
+                                { label: 'Twitter / X', href: 'https://x.com/privailers' },
+                                { label: 'Facebook', href: 'https://www.facebook.com/privailers' },
+                                { label: 'Instagram', href: 'https://www.instagram.com/privailers' },
+                                { label: 'WhatsApp', href: 'https://wa.me/2347078865107' }
+                            ].map(social => (
+                                <a
+                                    key={social.label}
+                                    href={social.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                        padding: '0.5rem 1rem',
+                                        border: '1px solid var(--border-color)',
+                                        borderRadius: '2rem',
+                                        fontSize: '0.875rem',
+                                        fontWeight: 600,
+                                        color: 'var(--primary-blue)',
+                                        textDecoration: 'none',
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    {social.label}
+                                </a>
                             ))}
                         </div>
                     </div>

@@ -75,7 +75,7 @@ export default function Home() {
                     <div style={{ display: 'flex', gap: '1.25rem', justifyContent: 'center', flexWrap: 'wrap' }}>
                         <Link href="/courses">
                             <Button variant="accent" size="lg" style={{ minWidth: '180px', height: '56px', fontSize: '1.05rem', boxShadow: '0 10px 15px -3px rgba(0, 168, 156, 0.3)' }}>
-                                Start Learning
+                                Start Learning (Academy)
                             </Button>
                         </Link>
                         <Link href="/services">
@@ -83,7 +83,7 @@ export default function Home() {
                                 minWidth: '180px', height: '56px', fontSize: '1.05rem',
                                 color: 'white', borderColor: 'rgba(255,255,255,0.2)', backgroundColor: 'rgba(255,255,255,0.02)'
                             }}>
-                                Hire Our Team
+                                Enterprise Consulting
                             </Button>
                         </Link>
                     </div>
@@ -96,8 +96,8 @@ export default function Home() {
                 <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '2rem', textAlign: 'center' }}>
                         <div>
-                            <div style={{ fontSize: '2.5rem', fontWeight: 700, color: '#0f172a' }}>75+</div>
-                            <div style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 600, textTransform: 'uppercase' }}>Students Trained</div>
+                            <div style={{ fontSize: '2.5rem', fontWeight: 700, color: '#0f172a' }}>500+</div>
+                            <div style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 600, textTransform: 'uppercase' }}>Hours of Practical Training</div>
                         </div>
                         <div>
                             <div style={{ fontSize: '2.5rem', fontWeight: 700, color: '#0f172a' }}>100%</div>
@@ -265,7 +265,8 @@ export default function Home() {
                                 <div style={{ position: 'relative', height: '200px', width: '100%', overflow: 'hidden' }}>
                                     <img 
                                         src={service.image} 
-                                        alt={service.title} 
+                                        alt=""
+                                        aria-hidden="true" 
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                                     />
                                     <div style={{

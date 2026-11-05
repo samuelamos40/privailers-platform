@@ -8,6 +8,7 @@ import Button from "@/components/ui/Button";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import LoginModal from "@/components/ui/LoginModal";
+import WhatsAppFloat from "@/components/ui/WhatsAppFloat";
 
 export default function CourseDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const { user } = useAuth();
@@ -211,6 +212,7 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ id: st
                 </div>
             </main>
 
+            <WhatsAppFloat />
             <Footer />
 
             <LoginModal 
