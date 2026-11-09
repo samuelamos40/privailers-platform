@@ -16,7 +16,7 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://privailers.com'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.privailers.com'),
   title: {
     default: "Privailers Data Consult | Premier Data Academy & Analytics",
     template: "%s | Privailers Data Consult"
