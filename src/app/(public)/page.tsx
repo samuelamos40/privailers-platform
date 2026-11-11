@@ -204,43 +204,11 @@ export default function Home() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '2rem' }}>
                         {[
                             {
-                                title: "EdTech Academy & Course Marketplace",
-                                desc: "Empowering individuals with in-demand data skills. We sell premium self-paced online courses and conduct live cohort-based bootcamps with hands-on real-world projects and career support.",
-                                image: "/images/services/edtech-academy-course-marketplace.png",
-                                icon: <BookOpen size={24} color="#f59e0b" />,
-                                tags: ["Self-Paced Courses", "Live Cohorts", "Job Placement Support"],
-                                link: "/courses"
-                            },
-                            {
                                 title: "Data Pipelines & ETL Engineering",
                                 desc: "We design and deploy automated data pipelines that ingest, clean, and consolidate disparate data into centralized, analytics-ready cloud data warehouses.",
                                 image: "/images/services/data-pipelines-etl-engineering.png",
                                 icon: <Database size={24} color="#0284c7" />,
                                 tags: ["Automated ETL/ELT", "Data Warehousing", "Stream Processing"],
-                                link: "/services"
-                            },
-                            {
-                                title: "Business Intelligence & BI",
-                                desc: "Deep dive into your business metrics. We uncover hidden trends, automate executive reporting, and provide actionable insights to drive revenue growth.",
-                                image: "/images/services/business-intelligence-bi.png",
-                                icon: <BarChart3 size={24} color="#00b4d8" />,
-                                tags: ["Executive Dashboards", "Power BI & Tableau", "Revenue Growth"],
-                                link: "/services"
-                            },
-                            {
-                                title: "Analytics-Ready Web Platforms",
-                                desc: "We build modern web applications and platforms engineered with built-in data extraction and user tracking for real-time operational analysis.",
-                                image: "/images/services/analytics-ready-web-platforms.png",
-                                icon: <Globe2 size={24} color="#0ea5e9" />,
-                                tags: ["Custom Web Apps", "Telemetry Tracking", "Data Extraction"],
-                                link: "/services"
-                            },
-                            {
-                                title: "Mathematical Modeling & Simulation",
-                                desc: "Formulate complex real-world operations into rigorous mathematical models. We deploy stochastic simulations, Monte Carlo algorithms, and numerical optimization to solve high-stakes challenges.",
-                                image: "/images/services/mathematical-modeling-simulation.png",
-                                icon: <Calculator size={24} color="#8b5cf6" />,
-                                tags: ["Stochastic Modeling", "Monte Carlo Simulations", "Numerical Optimization"],
                                 link: "/services"
                             },
                             {
@@ -252,12 +220,44 @@ export default function Home() {
                                 link: "/services"
                             },
                             {
+                                title: "Business Intelligence & BI",
+                                desc: "Deep dive into your business metrics. We uncover hidden trends, automate executive reporting, and provide actionable insights to drive revenue growth.",
+                                image: "/images/services/business-intelligence-bi.png",
+                                icon: <BarChart3 size={24} color="#00b4d8" />,
+                                tags: ["Executive Dashboards", "Power BI & Tableau", "Revenue Growth"],
+                                link: "/services"
+                            },
+                            {
+                                title: "Mathematical Modeling & Simulation",
+                                desc: "Formulate complex real-world operations into rigorous mathematical models. We deploy stochastic simulations, Monte Carlo algorithms, and numerical optimization to solve high-stakes challenges.",
+                                image: "/images/services/mathematical-modeling-simulation.png",
+                                icon: <Calculator size={24} color="#8b5cf6" />,
+                                tags: ["Stochastic Modeling", "Monte Carlo Simulations", "Numerical Optimization"],
+                                link: "/services"
+                            },
+                            {
+                                title: "Analytics-Ready Web Platforms",
+                                desc: "We build modern web applications and platforms engineered with built-in data extraction and user tracking for real-time operational analysis.",
+                                image: "/images/services/analytics-ready-web-platforms.png",
+                                icon: <Globe2 size={24} color="#0ea5e9" />,
+                                tags: ["Custom Web Apps", "Telemetry Tracking", "Data Extraction"],
+                                link: "/services"
+                            },
+                            {
                                 title: "Corporate Team Training",
                                 desc: "Upskill your workforce with hands-on, instructor-led bootcamps in Excel, SQL, and Power BI tailored specifically to your organization's workflow.",
                                 image: "/images/services/corporate-team-training.png",
                                 icon: <GraduationCap size={24} color="#10b981" />,
                                 tags: ["Custom Bootcamps", "Hands-on Projects", "Team Mastery"],
                                 link: "/services"
+                            },
+                            {
+                                title: "EdTech Academy & Course Marketplace",
+                                desc: "Empowering individuals with in-demand data skills. We sell premium self-paced online courses and conduct live cohort-based bootcamps with hands-on real-world projects and career support.",
+                                image: "/images/services/edtech-academy-course-marketplace.png",
+                                icon: <BookOpen size={24} color="#f59e0b" />,
+                                tags: ["Self-Paced Courses", "Live Cohorts", "Job Placement Support"],
+                                link: "/courses"
                             }
                         ].map((service, i) => (
                             <div key={i} style={{
