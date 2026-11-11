@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Privailers - How We Turn Raw Data Into Revenue In 3 Steps</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0b1528;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    /* Flyer Canvas - 4:5 Social Media Poster Ratio (1080 x 1350 scale) */
+    .flyer {
+      width: 100%;
+      max-width: 680px;
+      aspect-ratio: 4 / 5;
+      background: radial-gradient(circle at 80% 10%, #0a3d62 0%, #061e44 45%, #030f24 100%);
+      border-radius: 28px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0, 242, 254, 0.15);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 3rem 2.75rem 2.5rem;
+      color: white;
+    }
+
+    /* Ambient Background Glow & Waves */
+    .glow-top {
+      position: absolute;
+      top: -120px;
+      right: -80px;
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(circle, rgba(0, 242, 254, 0.22) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(40px);
+    }
+    .glow-bottom {
+      position: absolute;
+      bottom: -100px;
+      left: -80px;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(14, 116, 144, 0.25) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(40px);
+    }
+
+    /* Background Neon Curve Ribbons */
+    .wave-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.35;
+    }
+
+    /* Header Section */
+    .header {
+      position: relative;
+      z-index: 2;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+    .brand-logo-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 242, 254, 0.35);
+    }
+    .brand-name {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+      line-height: 1.1;
+    }
+    .brand-sub {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #00f2fe;
+    }
+
+    /* Main Big Question Title */
+    .headline {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(1.85rem, 4.8vw, 2.45rem);
+      font-weight: 900;
+      line-height: 1.15;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      text-align: center;
+      margin: 0 auto;
+      max-width: 540px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    }
+    .headline span {
+      background: linear-gradient(90deg, #00f2fe 0%, #38ef7d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* S-Curve Timeline Canvas */
+    .timeline-container {
+      position: relative;
+      z-index: 2;
+      margin: 2.25rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Dotted Connecting S-Path SVG */
+    .curved-track {
+      position: absolute;
+      top: 35px;
+      bottom: 35px;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: calc(100% - 70px);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Step Rows */
+    .step-row {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    /* Pill Card */
+    .step-pill {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 999px;
+      padding: 0.85rem 1.4rem;
+      color: #0f172a;
+      box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      gap: 1.15rem;
+      max-width: 410px;
+      transition: transform 0.2s ease;
+    }
+    .step-pill:hover {
+      transform: translateY(-2px);
+    }
+
+    .pill-text {
+      flex: 1;
+    }
+    .pill-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #0a2540;
+      margin-bottom: 0.15rem;
+      line-height: 1.2;
+    }
+    .pill-desc {
+      font-size: 0.78rem;
+      color: #475569;
+      line-height: 1.35;
+      font-weight: 500;
+    }
+    .pill-highlight {
+      font-size: 0.72rem;
+      color: #0284c7;
+      font-weight: 700;
+      margin-top: 0.2rem;
+      letter-spacing: 0.01em;
+    }
+
+    /* Circular 3D Icon Badge */
+    .icon-badge {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #00f2fe 0%, #0077b6 70%, #03045e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 18px rgba(0, 180, 216, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.6);
+      flex-shrink: 0;
+      border: 3px solid #ffffff;
+      color: white;
+    }
+    .icon-badge svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    /* Target Connector Ring */
+    .target-ring {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 3px solid #ffffff;
+      background: #0284c7;
+      box-shadow: 0 0 10px #00f2fe;
+      position: absolute;
+      z-index: 3;
+    }
+
+    /* Giant STEP Label */
+    .step-label-group {
+      display: flex;
+      flex-direction: column;
+      line-height: 0.9;
+    }
+    .step-label-text {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+    .step-label-number {
+      font-family: 'Poppins', sans-serif;
+      font-size: 2.85rem;
+      font-weight: 900;
+      color: #00f2fe;
+      letter-spacing: -0.04em;
+      text-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+    }
+
+    /* Row Alignments to match S-Curve */
+    /* Row 1: Pill on Left, STEP 01 on Right */
+    .row-1 {
+      justify-content: space-between;
+      padding-right: 1.5rem;
+    }
+    .row-1 .target-ring {
+      right: 135px;
+    }
+
+    /* Row 2: STEP 02 on Left, Pill on Right */
+    .row-2 {
+      justify-content: space-between;
+      padding-left: 1.5rem;
+      flex-direction: row-reverse;
+    }
+    .row-2 .step-pill {
+      flex-direction: row-reverse;
+      text-align: right;
+    }
+    .row-2 .target-ring {
+      left: 135px;
+    }
+
+    /* Row 3: Pill on Left, STEP 03 on Right */
+    .row-3 {
+      justify-content: space-between;
+      padding-right: 1.5rem;
+    }
+    .row-3 .target-ring {
+      right: 135px;
+    }
+
+    /* Footer Contact Bar */
+    .footer {
+      position: relative;
+      z-index: 2;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      padding-top: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .contact-left {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      color: #cbd5e1;
+    }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .contact-item svg {
+      color: #00f2fe;
+    }
+    .social-right {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+    .social-label {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      font-weight: 500;
+      margin-right: 0.25rem;
+    }
+    .social-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      transition: background 0.2s ease;
+    }
+    .social-icon:hover {
+      background: #00f2fe;
+      color: #030f24;
+    }
+
+    /* Responsive scaling */
+    @media (max-width: 600px) {
+      .flyer {
+        padding: 2rem 1.25rem;
+      }
+      .step-pill {
+        max-width: 250px;
+        padding: 0.6rem 0.85rem;
+      }
+      .pill-title { font-size: 0.9rem; }
+      .pill-desc { font-size: 0.7rem; }
+      .icon-badge { width: 44px; height: 44px; }
+      .step-label-number { font-size: 2.2rem; }
+      .row-1 .target-ring, .row-3 .target-ring { right: 85px; }
+      .row-2 .target-ring { left: 85px; }
+      .footer { flex-direction: column; gap: 1rem; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="flyer">
+    <!-- Glowing background elements -->
+    <div class="glow-top"></div>
+    <div class="glow-bottom"></div>
+
+    <!-- Background Smooth SVG Wave Texture -->
+    <svg class="wave-bg" viewBox="0 0 800 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M-50 200 C 250 150, 400 450, 850 350" stroke="rgba(0, 242, 254, 0.2)" stroke-width="2.5" stroke-dasharray="6 6" fill="none" />
+      <path d="M-50 750 C 350 650, 500 950, 850 800" stroke="rgba(255, 255, 255, 0.15)" stroke-width="2" fill="none" />
+    </svg>
+
+    <!-- Top Header & Brand -->
+    <div class="header">
+      <div class="brand">
+        <div class="brand-logo-icon">
+          <!-- Privailers Growth Icon -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#030f24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18" />
+            <path d="m19 9-5 5-4-4-3 3" />
+            <circle cx="19" cy="9" r="1.5" fill="#030f24" />
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name">PRIVAILERS</div>
+          <div class="brand-sub">DATA CONSULT</div>
+        </div>
+      </div>
+
+      <!-- Core Question Hook Headline -->
+      <h1 class="headline">
+        HOW WE TURN RAW DATA INTO <span>REVENUE IN 3 STEPS?</span>
+      </h1>
+    </div>
+
+    <!-- S-Curve Timeline Steps -->
+    <div class="timeline-container">
+
+      <!-- Connecting SVG Path behind dots -->
+      <svg class="curved-track" viewBox="0 0 500 360" preserveAspectRatio="none" fill="none">
+        <path d="M 400 30 C 470 30, 470 180, 250 180 C 30 180, 30 330, 100 330 C 250 330, 450 330, 450 330" 
+              stroke="rgba(255, 255, 255, 0.4)" stroke-width="2.5" stroke-dasharray="6 6" />
+      </svg>
+
+      <!-- STEP 01 -->
+      <div class="step-row row-1">
+        <div class="step-pill">
+          <div class="icon-badge">
+            <!-- Database / Pipeline Icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <ellipse cx="12" cy="5" rx="9" ry="3"/>
+              <path d="M3 5V19A9 3 0 0 0 21 19V5"/>
+              <path d="M3 12A9 3 0 0 0 21 12"/>
+            </svg>
+          </div>
+          <div class="pill-text">
+            <div class="pill-title">Automate Ingestion</div>
+            <div class="pill-desc">Extract & centralize messy data into cloud data warehouses.</div>
+            <div class="pill-highlight">Zero Silos • Real-Time ETL</div>
+          </div>
+        </div>
+
+        <div class="step-label-group">
+          <div class="step-label-text">STEP</div>
+          <div class="step-label-number">01</div>
+        </div>
+      </div>
+
+      <!-- STEP 02 -->
+      <div class="step-row row-2">
+        <div class="step-pill">
+          <div class="icon-badge">
+            <!-- Brain / Data Science Icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a6 6 0 0 0-6 6c0 1.5.5 3 1.5 4L6 14v4h4l2 4 2-4h4v-4l-1.5-2C17.5 11 18 9.5 18 8a6 6 0 0 0-6-6z"/>
+              <path d="M9 8h6"/>
+              <path d="M12 5v6"/>
+            </svg>
+          </div>
+          <div class="pill-text">
+            <div class="pill-title">Predictive Intelligence</div>
+            <div class="pill-desc">Deploy machine learning & stochastic models to forecast churn.</div>
+            <div class="pill-highlight">Monte Carlo • Predictive AI</div>
+          </div>
+        </div>
+
+        <div class="step-label-group">
+          <div class="step-label-text">STEP</div>
+          <div class="step-label-number">02</div>
+        </div>
+      </div>
+
+      <!-- STEP 03 -->
+      <div class="step-row row-3">
+        <div class="step-pill">
+          <div class="icon-badge">
+            <!-- Executive Dashboard / Growth Icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </div>
+          <div class="pill-text">
+            <div class="pill-title">Executive Action</div>
+            <div class="pill-desc">Power BI & Tableau dashboards that drive high-margin decisions.</div>
+            <div class="pill-highlight">Actionable KPIs = Revenue Growth</div>
+          </div>
+        </div>
+
+        <div class="step-label-group">
+          <div class="step-label-text">STEP</div>
+          <div class="step-label-number">03</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer Bar -->
+    <div class="footer">
+      <div class="contact-left">
+        <div class="contact-item">
+          <!-- Phone Icon -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+          </svg>
+          <span>0707 886 5107</span>
+        </div>
+        <div class="contact-item">
+          <!-- Globe Icon -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+          <span>www.privailers.com</span>
+        </div>
+      </div>
+
+      <div class="social-right">
+        <span class="social-label">Follow Us</span>
+        <!-- Facebook -->
+        <div class="social-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </div>
+        <!-- Instagram -->
+        <div class="social-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </div>
+        <!-- X (Twitter) -->
+        <div class="social-icon">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </div>
+        <!-- LinkedIn -->
+        <div class="social-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
