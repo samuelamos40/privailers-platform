@@ -244,6 +244,14 @@ export default function Home() {
                                 link: "/services"
                             },
                             {
+                                title: "Data Science & Machine Learning",
+                                desc: "Deploy predictive algorithms and machine learning models to forecast demand, classify trends, and automate complex decision-making with statistical confidence.",
+                                image: "/images/services/business-intelligence-bi.png",
+                                icon: <BrainCircuit size={24} color="#6366f1" />,
+                                tags: ["Predictive Analytics", "Machine Learning (Python)", "Customer Intelligence"],
+                                link: "/services"
+                            },
+                            {
                                 title: "Corporate Team Training",
                                 desc: "Upskill your workforce with hands-on, instructor-led bootcamps in Excel, SQL, and Power BI tailored specifically to your organization's workflow.",
                                 image: "/images/services/corporate-team-training.png",

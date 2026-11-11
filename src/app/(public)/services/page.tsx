@@ -2,7 +2,7 @@ import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Database, Globe2, BarChart3, GraduationCap, ArrowRight, CheckCircle2, Calculator, BookOpen } from "lucide-react";
+import { Database, Globe2, BarChart3, GraduationCap, ArrowRight, CheckCircle2, Calculator, BookOpen, BrainCircuit } from "lucide-react";
 
 export const metadata: Metadata = {
     title: "Consulting & Engineering Services - Privailers Data Consult",
@@ -80,6 +80,20 @@ export default function ServicesPage() {
             badge: "Applied Mathematics",
             ctaLink: "/contact",
             ctaText: "Request Modeling Consultation"
+        },
+        {
+            icon: <BrainCircuit size={28} color="#6366f1" />,
+            title: "Data Science & Machine Learning Solutions",
+            desc: "Harness the power of machine learning and statistical modeling to anticipate customer behavior, optimize operations, and unlock predictive capabilities. From classification algorithms to demand forecasting, we turn historical data into forward-looking intelligence.",
+            features: [
+                "Predictive modeling, customer churn & lifetime value (LTV) forecasting",
+                "Supervised & unsupervised machine learning models (Python, Scikit-Learn)",
+                "Natural Language Processing (NLP) & recommendation engines",
+                "Production model deployment, REST API integration & continuous monitoring"
+            ],
+            badge: "Predictive AI & Data Science",
+            ctaLink: "/contact",
+            ctaText: "Inquire About Data Science"
         },
         {
             icon: <GraduationCap size={28} color="#ec4899" />,
