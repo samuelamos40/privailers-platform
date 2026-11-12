@@ -6,11 +6,12 @@ import Button from "@/components/ui/Button";
 import Link from "next/link";
 import Card from "@/components/ui/Card";
 import CourseIcon from "@/components/ui/CourseIcon";
-import { BarChart3, BrainCircuit, GraduationCap, ArrowRight, Database, Globe2, Calculator, BookOpen } from "lucide-react";
+import { BarChart3, BrainCircuit, GraduationCap, ArrowRight, Database, Globe2, Calculator, BookOpen, Calendar, Users, Sparkles, CheckCircle2 } from "lucide-react";
 
 export default function Home() {
     const [featuredCourses, setFeaturedCourses] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [upcomingCohort, setUpcomingCohort] = useState<any>(null);
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -28,6 +29,25 @@ export default function Home() {
         }
 
         let isMounted = true;
+        const fetchCohort = async () => {
+            try {
+                const { data } = await supabase
+                    .from('cohorts')
+                    .select('*, instructor:users(full_name)')
+                    .eq('status', 'open')
+                    .gte('start_date', new Date().toISOString().split('T')[0])
+                    .order('start_date', { ascending: true })
+                    .limit(1)
+                    .single();
+                if (data && isMounted) {
+                    setUpcomingCohort(data);
+                }
+            } catch (err) {
+                // If no open cohort or table check fails
+            }
+        };
+        fetchCohort();
+
         const fetchCourses = async () => {
             try {
                 const { data } = await supabase
@@ -52,6 +72,47 @@ export default function Home() {
 
     return (
         <div>
+            {/* Live Cohort Top Notification Banner */}
+            <div style={{
+                background: 'linear-gradient(90deg, #0a2e6b 0%, #00a89c 50%, #0a2e6b 100%)',
+                color: 'white',
+                padding: '0.65rem 1rem',
+                textAlign: 'center',
+                fontSize: '0.9rem',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.75rem',
+                flexWrap: 'wrap',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            }}>
+                <span style={{
+                    backgroundColor: 'rgba(255,255,255,0.2)',
+                    padding: '0.2rem 0.6rem',
+                    borderRadius: '999px',
+                    fontSize: '0.75rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    fontWeight: 700
+                }}>
+                    🔥 FREE LIVE BOOTCAMP
+                </span>
+                <span>
+                    <strong>Data Analysis with PowerBI Bootcamp</strong> kicks off <strong>Nov 23, 2026</strong>! Limited to 50 participants.
+                </span>
+                <Link href="/register?cohort=powerbi" style={{
+                    color: '#ffffff',
+                    textDecoration: 'underline',
+                    fontWeight: 700,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.25rem'
+                }}>
+                    Claim Free Seat →
+                </Link>
+            </div>
+
             {/* Hero Section */}
             <section style={{
                 padding: 'clamp(5rem, 10vw, 9rem) 1rem clamp(3.5rem, 7vw, 7rem)',
@@ -90,6 +151,155 @@ export default function Home() {
                 </div>
             </section>
 
+
+            {/* Featured Live Cohort Showcase Section */}
+            <section style={{
+                padding: '3rem 1rem',
+                background: 'linear-gradient(180deg, #020b1c 0%, #061e48 50%, #f8fafc 100%)',
+                position: 'relative'
+            }}>
+                <div className="container" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+                    <div style={{
+                        backgroundColor: '#ffffff',
+                        borderRadius: '1.5rem',
+                        boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.25)',
+                        border: '2px solid var(--accent-teal)',
+                        overflow: 'hidden',
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))'
+                    }}>
+                        {/* Left Column: Cohort Overview & Urgency */}
+                        <div style={{
+                            padding: 'clamp(2rem, 4vw, 3rem)',
+                            background: 'radial-gradient(circle at top left, #0a2e6b 0%, #061e48 100%)',
+                            color: 'white',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between'
+                        }}>
+                            <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
+                                    <span style={{
+                                        backgroundColor: '#10b981',
+                                        color: '#ffffff',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 800,
+                                        padding: '0.35rem 0.75rem',
+                                        borderRadius: '999px',
+                                        letterSpacing: '0.05em',
+                                        textTransform: 'uppercase',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '0.35rem'
+                                    }}>
+                                        <Sparkles size={14} /> 100% FREE ADMISSION
+                                    </span>
+                                    <span style={{
+                                        backgroundColor: 'rgba(255,255,255,0.15)',
+                                        color: '#cbd5e1',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 600,
+                                        padding: '0.35rem 0.65rem',
+                                        borderRadius: '999px'
+                                    }}>
+                                        LIVE INTERACTIVE
+                                    </span>
+                                </div>
+
+                                <h2 style={{
+                                    fontSize: 'clamp(1.6rem, 3.5vw, 2.2rem)',
+                                    fontWeight: 800,
+                                    lineHeight: 1.2,
+                                    marginBottom: '1rem',
+                                    color: '#ffffff'
+                                }}>
+                                    {upcomingCohort ? upcomingCohort.name : 'Data Analysis with PowerBI Bootcamp'}
+                                </h2>
+
+                                <p style={{ color: '#cbd5e1', fontSize: '0.975rem', lineHeight: 1.6, marginBottom: '2rem' }}>
+                                    Master Power BI from ground zero to advanced interactive dashboards. Real-world business cases, direct instructor mentoring, and cohort peer collaboration.
+                                </p>
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.12)' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#e2e8f0', fontSize: '0.95rem' }}>
+                                    <Calendar size={18} color="var(--accent-teal)" />
+                                    <span><strong>Starts:</strong> November 23, 2026 (Live Sessions)</span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#e2e8f0', fontSize: '0.95rem' }}>
+                                    <Users size={18} color="var(--accent-teal)" />
+                                    <span><strong>Cohort Size:</strong> Strictly 50 Learners (First Come, First Served)</span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#e2e8f0', fontSize: '0.95rem' }}>
+                                    <GraduationCap size={18} color="var(--accent-teal)" />
+                                    <span><strong>Instructor:</strong> {upcomingCohort?.instructor?.full_name || 'Samuel Amos'}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right Column: Curriculum Highlights & CTA */}
+                        <div style={{
+                            padding: 'clamp(2rem, 4vw, 3rem)',
+                            backgroundColor: '#ffffff',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between'
+                        }}>
+                            <div>
+                                <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#0f172a', marginBottom: '1.25rem' }}>
+                                    What You Will Achieve In This Cohort:
+                                </h3>
+                                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 2rem 0', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                                    {[
+                                        "Data Ingestion & Cleaning in Power Query",
+                                        "DAX Calculations & Measure Modeling",
+                                        "Building Executive Real-Time Sales Dashboards",
+                                        "Live Q&A Sessions with Instructor Mentorship",
+                                        "Verified Certificate of Completion for your CV"
+                                    ].map((item, idx) => (
+                                        <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem', fontSize: '0.925rem', color: '#334155' }}>
+                                            <CheckCircle2 size={18} color="#10b981" style={{ flexShrink: 0, marginTop: '0.15rem' }} />
+                                            <span>{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                    <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 600 }}>Tuition:</span>
+                                    <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#16a34a' }}>FREE (₦0)</span>
+                                </div>
+                                <Link href="/register?cohort=powerbi" style={{ textDecoration: 'none' }}>
+                                    <Button variant="accent" size="lg" style={{
+                                        width: '100%',
+                                        justifyContent: 'center',
+                                        fontWeight: 700,
+                                        fontSize: '1.05rem',
+                                        boxShadow: '0 8px 16px -2px rgba(0, 168, 156, 0.35)'
+                                    }}>
+                                        Enroll Now (Free) →
+                                    </Button>
+                                </Link>
+                                <a
+                                    href="https://wa.me/2347078865107?text=Hello%2C%20I%20want%20to%20register%20for%20the%20free%20PowerBI%20Bootcamp%20starting%20Nov%2023"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                        textAlign: 'center',
+                                        fontSize: '0.85rem',
+                                        color: '#64748b',
+                                        textDecoration: 'none',
+                                        display: 'block'
+                                    }}
+                                >
+                                    Questions? Chat with Admissions on WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             {/* Stats Section */}
             <section style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: 'white' }}>
