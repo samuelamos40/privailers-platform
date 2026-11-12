@@ -42,7 +42,18 @@ export default function RegisterClient() {
 
             if (cohorts && cohorts.length > 0) {
                 setActiveCohorts(cohorts);
-                setSelectedCohortId(cohorts[0].id);
+                const targetCohortId = searchParams.get('cohortId');
+                if (targetCohortId && cohorts.some(c => c.id === targetCohortId)) {
+                    setSelectedCohortId(targetCohortId);
+                    setIntent('cohort');
+                    setStep(2);
+                } else if (searchParams.get('intent') === 'cohort') {
+                    setSelectedCohortId(cohorts[0].id);
+                    setIntent('cohort');
+                    setStep(2);
+                } else {
+                    setSelectedCohortId(cohorts[0].id);
+                }
             }
 
             // Fetch Premium Self-Paced Courses

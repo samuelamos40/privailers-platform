@@ -9,65 +9,66 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CourseIcon from "@/components/ui/CourseIcon";
 import WhatsAppFloat from "@/components/ui/WhatsAppFloat";
+import CohortCard, { CohortItem } from "@/components/ui/CohortCard";
 
 interface CoursesClientProps {
     initialCourses: any[];
+    initialCohorts?: any[];
 }
 
-export default function CoursesClient({ initialCourses }: CoursesClientProps) {
+export default function CoursesClient({ initialCourses, initialCohorts }: CoursesClientProps) {
     const [courses, setCourses] = useState<any[]>(initialCourses || []);
+    const [cohorts, setCohorts] = useState<CohortItem[]>(initialCohorts || []);
     const [loading, setLoading] = useState<boolean>(!initialCourses || initialCourses.length === 0);
     const [searchQuery, setSearchQuery] = useState("");
+    const [activeTab, setActiveTab] = useState<'all' | 'cohorts' | 'courses'>('all');
 
     useEffect(() => {
         if (typeof window !== "undefined") {
             try {
                 if (initialCourses && initialCourses.length > 0) {
                     sessionStorage.setItem("privailers_courses_cache", JSON.stringify(initialCourses));
-                } else {
-                    const cached = sessionStorage.getItem("privailers_courses_cache");
-                    if (cached) {
-                        const parsed = JSON.parse(cached);
-                        if (parsed && Array.isArray(parsed) && parsed.length > 0) {
-                            setCourses(parsed);
-                            setLoading(false);
-                        }
-                    }
                 }
             } catch (e) {}
         }
 
         let isMounted = true;
 
-        const fetchCourses = async () => {
+        const fetchData = async () => {
             try {
-                // Optimized lightweight select (avoids heavy blobs or unused fields)
-                const { data, error } = await supabase
-                    .from('courses')
-                    .select('id, title, description, price, tier, published')
-                    .order('created_at', { ascending: false });
+                const [coursesRes, cohortsRes] = await Promise.all([
+                    supabase
+                        .from('courses')
+                        .select('id, title, description, price, tier, published')
+                        .order('created_at', { ascending: false }),
+                    supabase
+                        .from('cohorts')
+                        .select('id, name, start_date, end_date, capacity, price, status, instructor:users(full_name)')
+                        .order('created_at', { ascending: false })
+                ]);
 
-                if (error) throw error;
-                if (data && isMounted) {
-                    setCourses(data);
-                    try {
-                        sessionStorage.setItem("privailers_courses_cache", JSON.stringify(data));
-                    } catch (e) {}
+                if (isMounted) {
+                    if (coursesRes.data) setCourses(coursesRes.data);
+                    if (cohortsRes.data) setCohorts(cohortsRes.data);
                 }
             } catch (err) {
-                console.error("Error fetching courses:", err);
+                console.error("Error fetching courses/cohorts:", err);
             } finally {
                 if (isMounted) setLoading(false);
             }
         };
 
-        fetchCourses();
+        fetchData();
         return () => { isMounted = false; };
     }, [initialCourses]);
 
     const filteredCourses = courses.filter(course => 
         course.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
         (course.description && course.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+
+    const filteredCohorts = cohorts.filter(cohort =>
+        cohort.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
@@ -102,19 +103,19 @@ export default function CoursesClient({ initialCourses }: CoursesClientProps) {
                     }
                 `}</style>
                 <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1rem' }}>
-                    <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
                         <h1 className="page-title" style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--primary-blue)', marginBottom: '1rem', letterSpacing: '-0.02em' }}>
-                            Course Catalog
+                            Course Catalog & Live Bootcamps
                         </h1>
-                        <p className="page-subtitle" style={{ color: '#64748b', fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto 2rem' }}>
-                            Master the tools of the trade. From Excel basics to advanced Machine Learning.
+                        <p className="page-subtitle" style={{ color: '#64748b', fontSize: '1.2rem', maxWidth: '650px', margin: '0 auto 2rem' }}>
+                            Choose your preferred format: interactive live cohorts with mentors or flexible self-paced video modules.
                         </p>
                         
                         {/* Search Bar */}
-                        <div style={{ maxWidth: '500px', margin: '0 auto', position: 'relative' }}>
+                        <div style={{ maxWidth: '500px', margin: '0 auto 2rem', position: 'relative' }}>
                             <input 
                                 type="text"
-                                placeholder="Search courses... (e.g. SQL, Excel)"
+                                placeholder="Search courses or cohorts... (e.g. Power BI, SQL)"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 style={{
@@ -131,6 +132,58 @@ export default function CoursesClient({ initialCourses }: CoursesClientProps) {
                                 onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
                             />
                         </div>
+
+                        {/* Filter Tabs */}
+                        <div style={{ display: 'inline-flex', padding: '0.35rem', backgroundColor: '#e2e8f0', borderRadius: '999px', gap: '0.35rem' }}>
+                            <button
+                                onClick={() => setActiveTab('all')}
+                                style={{
+                                    padding: '0.6rem 1.4rem',
+                                    borderRadius: '999px',
+                                    border: 'none',
+                                    fontWeight: 700,
+                                    fontSize: '0.9rem',
+                                    cursor: 'pointer',
+                                    backgroundColor: activeTab === 'all' ? 'var(--primary-blue)' : 'transparent',
+                                    color: activeTab === 'all' ? '#ffffff' : '#475569',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                All Programs
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('cohorts')}
+                                style={{
+                                    padding: '0.6rem 1.4rem',
+                                    borderRadius: '999px',
+                                    border: 'none',
+                                    fontWeight: 700,
+                                    fontSize: '0.9rem',
+                                    cursor: 'pointer',
+                                    backgroundColor: activeTab === 'cohorts' ? 'var(--primary-blue)' : 'transparent',
+                                    color: activeTab === 'cohorts' ? '#ffffff' : '#475569',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                🔥 Live Cohort Bootcamps ({cohorts.length})
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('courses')}
+                                style={{
+                                    padding: '0.6rem 1.4rem',
+                                    borderRadius: '999px',
+                                    border: 'none',
+                                    fontWeight: 700,
+                                    fontSize: '0.9rem',
+                                    cursor: 'pointer',
+                                    backgroundColor: activeTab === 'courses' ? 'var(--primary-blue)' : 'transparent',
+                                    color: activeTab === 'courses' ? '#ffffff' : '#475569',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                💻 Self-Paced Courses ({courses.length})
+                            </button>
+                        </div>
                     </div>
 
                     {loading ? (
@@ -146,52 +199,93 @@ export default function CoursesClient({ initialCourses }: CoursesClientProps) {
                             ))}
                         </div>
                     ) : (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '2rem' }}>
-                            {filteredCourses.length > 0 ? filteredCourses.map(course => (
-                                <Card key={course.id} style={{ display: 'flex', flexDirection: 'column', transition: 'transform 0.2s', borderRadius: '1rem', overflow: 'hidden' }}>
-                                    <div style={{
-                                        height: '200px',
-                                        background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)',
-                                        margin: '-1.5rem -1.5rem 1.5rem -1.5rem',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        borderTopLeftRadius: '1rem',
-                                        borderTopRightRadius: '1rem',
-                                        padding: '1.5rem'
-                                    }}>
-                                        <CourseIcon title={course.title} size="lg" />
-                                    </div>
-                                    <div style={{ marginBottom: '0.5rem', display: 'flex', gap: '0.5rem' }}>
-                                        <span style={{
-                                            fontSize: '0.75rem', fontWeight: 600,
-                                            padding: '0.25rem 0.5rem', borderRadius: '4px',
-                                            backgroundColor: course.tier === 'paid' ? '#fef3c7' : '#dcfce7',
-                                            color: course.tier === 'paid' ? '#d97706' : '#16a34a'
-                                        }}>
-                                            {course.tier === 'paid' ? 'PREMIUM' : 'FREE'}
-                                        </span>
-                                    </div>
-                                    <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#1e293b', marginBottom: '0.5rem' }}>
-                                        {course.title}
-                                    </h3>
-                                    <p style={{ color: '#475569', fontSize: '0.95rem', marginBottom: '1.5rem', flex: 1, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                        {course.description}
-                                    </p>
-                                    <div style={{ marginTop: 'auto', borderTop: '1px solid #f1f5f9', paddingTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        <div style={{ fontWeight: 700, fontSize: '1.25rem', color: '#0f172a' }}>
-                                            {course.tier === 'paid' ? `₦${course.price?.toLocaleString() || '0'}` : 'Free'}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '3.5rem' }}>
+                            
+                            {/* Live Cohorts Section */}
+                            {(activeTab === 'all' || activeTab === 'cohorts') && filteredCohorts.length > 0 && (
+                                <div>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                                        <div>
+                                            <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                                                Interactive Live Cohort Bootcamps
+                                            </h2>
+                                            <p style={{ color: '#64748b', fontSize: '0.95rem', margin: '0.25rem 0 0 0' }}>
+                                                Cohort-based masterclasses with real-time lectures, instructor mentorship, and peer collaboration.
+                                            </p>
                                         </div>
-                                        <Link href={`/courses/${course.id}`}>
-                                            <Button variant="primary">View Course</Button>
-                                        </Link>
                                     </div>
-                                </Card>
-                            )) : (
-                                <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '4rem', color: '#94a3b8' }}>
-                                    No courses found matching your search.
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))', gap: '2rem' }}>
+                                        {filteredCohorts.map(cohort => (
+                                            <CohortCard key={cohort.id} cohort={cohort} />
+                                        ))}
+                                    </div>
                                 </div>
                             )}
+
+                            {/* Self-Paced Courses Section */}
+                            {(activeTab === 'all' || activeTab === 'courses') && (
+                                <div>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                                        <div>
+                                            <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                                                Self-Paced Online Courses
+                                            </h2>
+                                            <p style={{ color: '#64748b', fontSize: '0.95rem', margin: '0.25rem 0 0 0' }}>
+                                                On-demand video lessons with lifetime access, portfolio projects, and certificates.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '2rem' }}>
+                                        {filteredCourses.length > 0 ? filteredCourses.map(course => (
+                                            <Card key={course.id} style={{ display: 'flex', flexDirection: 'column', transition: 'transform 0.2s', borderRadius: '1rem', overflow: 'hidden' }}>
+                                                <div style={{
+                                                    height: '200px',
+                                                    background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)',
+                                                    margin: '-1.5rem -1.5rem 1.5rem -1.5rem',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    borderTopLeftRadius: '1rem',
+                                                    borderTopRightRadius: '1rem',
+                                                    padding: '1.5rem'
+                                                }}>
+                                                    <CourseIcon title={course.title} size="lg" />
+                                                </div>
+                                                <div style={{ marginBottom: '0.5rem', display: 'flex', gap: '0.5rem' }}>
+                                                    <span style={{
+                                                        fontSize: '0.75rem', fontWeight: 600,
+                                                        padding: '0.25rem 0.5rem', borderRadius: '4px',
+                                                        backgroundColor: course.tier === 'paid' ? '#fef3c7' : '#dcfce7',
+                                                        color: course.tier === 'paid' ? '#d97706' : '#16a34a'
+                                                    }}>
+                                                        {course.tier === 'paid' ? 'PREMIUM' : 'FREE'}
+                                                    </span>
+                                                </div>
+                                                <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#1e293b', marginBottom: '0.5rem' }}>
+                                                    {course.title}
+                                                </h3>
+                                                <p style={{ color: '#475569', fontSize: '0.95rem', marginBottom: '1.5rem', flex: 1, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                                    {course.description}
+                                                </p>
+                                                <div style={{ marginTop: 'auto', borderTop: '1px solid #f1f5f9', paddingTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                    <div style={{ fontWeight: 700, fontSize: '1.25rem', color: '#0f172a' }}>
+                                                        {course.tier === 'paid' ? `₦${course.price?.toLocaleString() || '0'}` : 'Free'}
+                                                    </div>
+                                                    <Link href={`/courses/${course.id}`}>
+                                                        <Button variant="primary">View Course</Button>
+                                                    </Link>
+                                                </div>
+                                            </Card>
+                                        )) : (
+                                            <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '4rem', color: '#94a3b8' }}>
+                                                No courses found matching your search.
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
                         </div>
                     )}
                 </div>
