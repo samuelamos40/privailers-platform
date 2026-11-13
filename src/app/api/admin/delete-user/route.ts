@@ -3,10 +3,10 @@ import { createClient } from '@supabase/supabase-js';
 
 export async function DELETE(request: Request) {
     try {
-        const { userId } = await request.json();
+        const { userId, email } = await request.json();
 
-        if (!userId) {
-            return NextResponse.json({ error: 'Missing userId parameter.' }, { status: 400 });
+        if (!userId && !email) {
+            return NextResponse.json({ error: 'Missing userId or email parameter.' }, { status: 400 });
         }
 
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -51,15 +51,30 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: 'Unauthorized. Only admins can delete user accounts.' }, { status: 403 });
         }
 
-        // Clean up dependent records in public schema first
-        await supabase.from('enrollments').delete().eq('user_id', userId);
-        await supabase.from('submissions').delete().eq('student_id', userId);
-        await supabase.from('users').delete().eq('id', userId);
+        // Get user email before deletion if not provided
+        let targetEmail = email;
+        if (userId && !targetEmail) {
+            const { data: targetUser } = await supabase.from('users').select('email').eq('id', userId).single();
+            if (targetUser?.email) targetEmail = targetUser.email;
+        }
 
-        // Delete user from Supabase Auth
-        const { error: deleteAuthError } = await supabase.auth.admin.deleteUser(userId);
-        if (deleteAuthError && !deleteAuthError.message?.toLowerCase().includes('not found')) {
-            return NextResponse.json({ error: `Auth Deletion Error: ${deleteAuthError.message}` }, { status: 400 });
+        // Clean up dependent records in public schema first
+        if (userId) {
+            await supabase.from('enrollments').delete().eq('user_id', userId);
+            await supabase.from('submissions').delete().eq('student_id', userId);
+            await supabase.from('users').delete().eq('id', userId);
+
+            // Delete user from Supabase Auth by ID
+            await supabase.auth.admin.deleteUser(userId);
+        }
+
+        // Also purge any matching user in auth.users by email to prevent orphaned auth accounts
+        if (targetEmail) {
+            const { data: authList } = await supabase.auth.admin.listUsers();
+            const matchingAuth = authList?.users?.find(u => u.email?.toLowerCase() === targetEmail.toLowerCase());
+            if (matchingAuth) {
+                await supabase.auth.admin.deleteUser(matchingAuth.id);
+            }
         }
 
         return NextResponse.json({ success: true, message: 'User account permanently deleted.' });

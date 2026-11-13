@@ -94,7 +94,8 @@ export default function RegisterClient() {
 
     const executeRegistration = async () => {
         try {
-            // 1. Create auth user
+            // 1. Create auth user or sign in if already registered
+            let targetUserId: string | null = null;
             const { data: authData, error: authError } = await supabase.auth.signUp({
                 email: formData.email,
                 password: formData.password,
@@ -106,16 +107,36 @@ export default function RegisterClient() {
                 }
             });
 
-            if (authError) throw authError;
+            if (authError) {
+                const msg = authError.message?.toLowerCase() || '';
+                if (msg.includes('already registered') || msg.includes('already exists')) {
+                    const { data: loginData, error: loginErr } = await supabase.auth.signInWithPassword({
+                        email: formData.email,
+                        password: formData.password
+                    });
+                    if (loginErr) {
+                        setError('An account with this email already exists. Please verify your password or sign in to continue.');
+                        setLoading(false);
+                        return;
+                    }
+                    targetUserId = loginData.user?.id || null;
+                } else {
+                    throw authError;
+                }
+            } else {
+                targetUserId = authData?.user?.id || null;
+                // Sign in if not already signed in
+                await supabase.auth.signInWithPassword({ email: formData.email, password: formData.password });
+            }
 
             // 2. Direct enrollment for free tracks
-            if (authData?.user) {
+            if (targetUserId) {
                 if (intent === 'cohort' && selectedCohortId) {
                     const cohort = activeCohorts.find(c => c.id === selectedCohortId);
                     if (cohort) {
                         await supabase.from('enrollments').insert([
                             {
-                                user_id: authData.user.id,
+                                user_id: targetUserId,
                                 course_id: cohort.course_id || null,
                                 cohort_id: cohort.id,
                                 status: 'active'
@@ -125,7 +146,7 @@ export default function RegisterClient() {
                 } else if (intent === 'paid' && selectedCourseId) {
                     await supabase.from('enrollments').insert([
                         {
-                            user_id: authData.user.id,
+                            user_id: targetUserId,
                             course_id: selectedCourseId,
                             status: 'active'
                         }
@@ -134,7 +155,7 @@ export default function RegisterClient() {
             }
 
             // 3. Referral record for free accounts
-            if (refCode && authData?.user) {
+            if (refCode && targetUserId) {
                 const { data: amb } = await supabase
                     .from('ambassadors')
                     .select('*')
@@ -145,7 +166,7 @@ export default function RegisterClient() {
                 if (amb) {
                     await supabase.from('referrals').insert([{
                         ambassador_id: amb.id,
-                        referred_user_id: authData.user.id,
+                        referred_user_id: targetUserId,
                         referred_email: formData.email,
                         amount_paid: 0,
                         commission_amount: 0,
@@ -156,9 +177,6 @@ export default function RegisterClient() {
                     }).eq('id', amb.id);
                 }
             }
-
-            // Auto-signin if session was established
-            await supabase.auth.signInWithPassword({ email: formData.email, password: formData.password });
 
             // Dispatch Welcome Email asynchronously (non-blocking)
             try {
@@ -222,13 +240,26 @@ export default function RegisterClient() {
             });
 
             if (authError) {
-                setError(authError.message);
-                setLoading(false);
-                return;
+                const msg = authError.message?.toLowerCase() || '';
+                if (msg.includes('already registered') || msg.includes('already exists')) {
+                    const { error: loginErr } = await supabase.auth.signInWithPassword({
+                        email: formData.email,
+                        password: formData.password
+                    });
+                    if (loginErr) {
+                        setError('An account with this email already exists. Please verify your password or sign in to continue.');
+                        setLoading(false);
+                        return;
+                    }
+                } else {
+                    setError(authError.message);
+                    setLoading(false);
+                    return;
+                }
+            } else {
+                // Sign in newly created user
+                await supabase.auth.signInWithPassword({ email: formData.email, password: formData.password });
             }
-
-            // Sign in
-            await supabase.auth.signInWithPassword({ email: formData.email, password: formData.password });
 
             // Direct forward to checkout (Welcome & Receipt email will be sent upon payment confirmation)
             const refParam = refCode ? `&ref=${refCode.toUpperCase()}` : '';
