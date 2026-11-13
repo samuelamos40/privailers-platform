@@ -49,7 +49,7 @@ export default function AdminCohortManagementPage() {
                 *,
                 course:courses(title),
                 instructor:users(full_name),
-                enrollments(id, status, created_at, user:users(id, full_name, email))
+                enrollments(id, status, user:users(id, full_name, email))
             `)
             .order('created_at', { ascending: false });
 
