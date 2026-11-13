@@ -34,12 +34,27 @@ export default function CheckoutClient() {
                 return;
             }
 
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
+            const paramUid = searchParams.get('uid');
+            const paramEmail = searchParams.get('email');
+            const paramName = searchParams.get('name');
+
+            const { data: { user: sessionUser } } = await supabase.auth.getUser();
+            if (paramUid && paramEmail) {
+                setUser({
+                    id: paramUid,
+                    email: paramEmail,
+                    full_name: paramName || sessionUser?.user_metadata?.full_name || 'Student'
+                });
+            } else if (sessionUser) {
+                setUser({
+                    id: sessionUser.id,
+                    email: sessionUser.email,
+                    full_name: sessionUser.user_metadata?.full_name || ''
+                });
+            } else {
                 router.push('/login');
                 return;
             }
-            setUser(user);
 
             let fetchError;
             if (checkoutType === 'cohort') {
@@ -120,7 +135,9 @@ export default function CheckoutClient() {
                 reference: reference.reference || reference.transaction,
                 courseId: type === 'cohort' ? item.course_id : item.id,
                 cohortId: type === 'cohort' ? item.id : null,
-                userId: user.id
+                userId: user.id,
+                studentEmail: user.email,
+                studentName: user.full_name
             })
         });
 
@@ -174,7 +191,16 @@ export default function CheckoutClient() {
             <div className="container" style={{ maxWidth: '600px', margin: '4rem auto', padding: '0 1rem' }}>
                 <Card padding="lg">
                     <h1 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '0.25rem' }}>Secure Checkout</h1>
-                    <p style={{ color: '#64748b', marginBottom: '2rem' }}>Complete your enrollment for the mentored batch.</p>
+                    <p style={{ color: '#64748b', marginBottom: '1.25rem' }}>Complete your enrollment for the mentored batch.</p>
+
+                    {/* Enrolling Student Banner */}
+                    {user && (
+                        <div style={{ backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', padding: '0.75rem 1rem', borderRadius: '0.75rem', marginBottom: '1.25rem', fontSize: '0.85rem', color: '#1e3a8a', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                            <div>
+                                👤 Enrolling Account: <strong>{user.full_name ? `${user.full_name} (${user.email})` : user.email}</strong>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Order Summary */}
                     <div style={{ backgroundColor: '#f1f5f9', padding: '1.5rem', borderRadius: '1rem', marginBottom: '1.5rem' }}>

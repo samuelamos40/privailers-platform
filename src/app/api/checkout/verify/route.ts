@@ -4,7 +4,7 @@ import { Resend } from 'resend';
 import { getPaymentReceiptEmail } from '@/lib/emailTemplates';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const resend = new Resend(process.env.RESEND_API_KEY || 're_123_dummy_build_key');
@@ -12,7 +12,7 @@ const resend = new Resend(process.env.RESEND_API_KEY || 're_123_dummy_build_key'
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { reference, courseId, userId, cohortId } = body;
+        const { reference, courseId, userId, cohortId, studentEmail: bodyEmail, studentName: bodyName } = body;
 
         if (!reference || !userId) {
             return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
@@ -45,13 +45,29 @@ export async function POST(req: Request) {
         }
 
         if (isSuccess) {
+            // Ensure user record exists in public.users before creating foreign-key linked enrollment
+            const { data: existingProfile } = await supabase
+                .from('users')
+                .select('id, full_name, email')
+                .eq('id', userId)
+                .maybeSingle();
+
+            if (!existingProfile && (bodyEmail || customerEmail)) {
+                await supabase.from('users').upsert([{
+                    id: userId,
+                    email: bodyEmail || customerEmail,
+                    full_name: bodyName || 'Student',
+                    role: 'student'
+                }], { onConflict: 'id', ignoreDuplicates: true });
+            }
+
             // Check if enrollment exists (pending)
             const { data: existing } = await supabase
                 .from('enrollments')
                 .select('*')
                 .eq('user_id', userId)
                 .match(cohortId ? { cohort_id: cohortId } : { course_id: courseId })
-                .single();
+                .maybeSingle();
 
             if (existing) {
                 await supabase.from('enrollments').update({ status: 'active' }).eq('id', existing.id);

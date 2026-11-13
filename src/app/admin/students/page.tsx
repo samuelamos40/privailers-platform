@@ -33,14 +33,27 @@ export default function AdminStudentsPage() {
                 enrollments(
                     id, 
                     status, 
-                    cohort:cohorts(name, price)
+                    cohort:cohorts(name, price),
+                    course:courses(title, price)
                 )
             `)
-            .eq('role', 'student')
             .order('created_at', { ascending: false });
 
-        if (!error) setStudents(data || []);
+        if (!error && data) {
+            const visibleUsers = data.filter((u: any) => u.role === 'student' || (u.enrollments && u.enrollments.length > 0));
+            setStudents(visibleUsers);
+        }
         setLoading(false);
+    };
+
+    const handleRemoveEnrollments = async (userId: string, fullName: string) => {
+        if (!confirm(`Remove all course/cohort enrollments for ${fullName}?`)) return;
+        const { error } = await supabase.from('enrollments').delete().eq('user_id', userId);
+        if (error) alert("Error removing enrollments: " + error.message);
+        else {
+            alert("Enrollments removed.");
+            fetchStudents();
+        }
     };
 
     const handleUpdateAccess = async (e: React.FormEvent) => {
@@ -131,12 +144,19 @@ export default function AdminStudentsPage() {
                         <tbody>
                             {filteredStudents.map(s => {
                                 const hasEnrollments = s.enrollments && s.enrollments.length > 0;
-                                const activeCohorts = s.enrollments?.filter((e: any) => e.cohort).map((e: any) => e.cohort.name).join(', ');
+                                const activePrograms = s.enrollments?.map((e: any) => e.cohort?.name || e.course?.title).filter(Boolean).join(', ');
                                 
                                 return (
                                     <tr key={s.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                                         <td style={{ padding: '1rem' }}>
-                                            <div style={{ fontWeight: 600 }}>{s.full_name}</div>
+                                            <div style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                                <span>{s.full_name}</span>
+                                                {s.role !== 'student' && (
+                                                    <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem', borderRadius: '4px', backgroundColor: '#e0e7ff', color: '#4338ca', fontWeight: 700, textTransform: 'uppercase' }}>
+                                                        {s.role}
+                                                    </span>
+                                                )}
+                                            </div>
                                             <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{s.email}</div>
                                         </td>
                                         <td style={{ padding: '1rem' }}>
@@ -159,8 +179,8 @@ export default function AdminStudentsPage() {
                                             </span>
                                         </td>
                                         <td style={{ padding: '1rem', fontSize: '0.875rem' }}>
-                                            {activeCohorts ? (
-                                                <span style={{ color: '#0f172a', fontWeight: 600 }}>{activeCohorts}</span>
+                                            {activePrograms ? (
+                                                <span style={{ color: '#0f172a', fontWeight: 600 }}>{activePrograms}</span>
                                             ) : (
                                                 <span style={{ color: '#b45309', fontSize: '0.8rem', fontWeight: 600, backgroundColor: '#fef3c7', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
                                                     None (Checkout Not Paid)
@@ -182,9 +202,16 @@ export default function AdminStudentsPage() {
                                                     });
                                                     setIsEditOpen(true);
                                                 }}>Security / Expiry</Button>
-                                                <Button size="sm" variant="outline" style={{ color: '#dc2626', borderColor: '#fecaca' }} onClick={() => handleDeleteStudent(s.id, s.full_name, s.email)}>
-                                                    Delete
-                                                </Button>
+                                                {hasEnrollments && (
+                                                    <Button size="sm" variant="outline" style={{ color: '#b45309', borderColor: '#fde68a' }} onClick={() => handleRemoveEnrollments(s.id, s.full_name || s.email)}>
+                                                        Unenroll
+                                                    </Button>
+                                                )}
+                                                {s.role === 'student' && (
+                                                    <Button size="sm" variant="outline" style={{ color: '#dc2626', borderColor: '#fecaca' }} onClick={() => handleDeleteStudent(s.id, s.full_name, s.email)}>
+                                                        Delete
+                                                    </Button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>

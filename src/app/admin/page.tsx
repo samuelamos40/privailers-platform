@@ -61,10 +61,10 @@ export default function AdminDashboard() {
         } catch (e) {}
 
         const fetchDashboardData = async () => {
-            // Get Student Count
-            const { count: studentCount } = await supabase
+            // Get Student Users
+            const { data: studentUsers } = await supabase
                 .from('users')
-                .select('*', { count: 'exact', head: true })
+                .select('id')
                 .eq('role', 'student');
 
             // Get Courses Count
@@ -72,40 +72,45 @@ export default function AdminDashboard() {
                 .from('courses')
                 .select('*', { count: 'exact', head: true });
 
-            // Calculate Revenue (Sum of all active enrollments joined with courses price)
+            // Calculate Revenue (Sum of all active enrollments joined with courses & cohorts price)
             const { data: enrollmentsData } = await supabase
                 .from('enrollments')
-                .select('status, courses(price)')
+                .select('user_id, status, courses(price), cohorts(price)')
                 .eq('status', 'active');
 
             let totalRevenue = 0;
+            const uniqueStudentIds = new Set<string>((studentUsers || []).map(u => u.id));
             if (enrollmentsData) {
                 enrollmentsData.forEach(enrollment => {
-                    const price = (enrollment.courses as any)?.price;
-                    if (price) {
-                        totalRevenue += Number(price);
+                    if (enrollment.user_id) uniqueStudentIds.add(enrollment.user_id);
+                    const coursePrice = (enrollment.courses as any)?.price;
+                    const cohortPrice = (enrollment.cohorts as any)?.price;
+                    const itemPrice = cohortPrice ?? coursePrice;
+                    if (itemPrice) {
+                        totalRevenue += Number(itemPrice);
                     }
                 });
             }
 
             const freshStats = {
-                students: studentCount || 0,
+                students: uniqueStudentIds.size,
                 courses: coursesCount || 0,
                 revenue: totalRevenue
             };
             setStats(freshStats);
 
-            // Fetch Recent Activity (Top 5 Enrollments)
+            // Fetch Recent Activity (Top 10 Enrollments)
             const { data: recent, error: recentError } = await supabase
                 .from('enrollments')
                 .select(`
                     id, 
                     enrolled_at,
-                    user:users(email),
-                    course:courses(title)
+                    user:users(full_name, email),
+                    course:courses(title),
+                    cohort:cohorts(name)
                 `)
                 .order('enrolled_at', { ascending: false })
-                .limit(5);
+                .limit(10);
 
             if (recentError) {
                 console.error("Error fetching recent activity:", recentError.message || recentError);
@@ -217,7 +222,7 @@ export default function AdminDashboard() {
                                         <thead>
                                             <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
                                                 <th style={{ padding: '0.75rem 0', color: 'var(--text-muted)', fontSize: '0.875rem' }}>Student</th>
-                                                <th style={{ padding: '0.75rem 0', color: 'var(--text-muted)', fontSize: '0.875rem' }}>Course Enrolled</th>
+                                                <th style={{ padding: '0.75rem 0', color: 'var(--text-muted)', fontSize: '0.875rem' }}>Program / Cohort Enrolled</th>
                                                 <th style={{ padding: '0.75rem 0', color: 'var(--text-muted)', fontSize: '0.875rem' }}>Date</th>
                                             </tr>
                                         </thead>
@@ -225,8 +230,13 @@ export default function AdminDashboard() {
                                     {recentActivity.length > 0 ? (
                                         recentActivity.map((activity) => (
                                             <tr key={activity.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                                <td style={{ padding: '1rem 0', fontWeight: 500, color: '#334155' }}>{(activity.user as any)?.email || 'Unknown User'}</td>
-                                                <td style={{ padding: '1rem 0', color: '#0f172a' }}>{(activity.course as any)?.title || 'Unknown Course'}</td>
+                                                <td style={{ padding: '1rem 0' }}>
+                                                    <div style={{ fontWeight: 600, color: '#0f172a' }}>{(activity.user as any)?.full_name || 'Student'}</div>
+                                                    <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{(activity.user as any)?.email || 'Unknown Email'}</div>
+                                                </td>
+                                                <td style={{ padding: '1rem 0', color: '#0f172a', fontWeight: 500 }}>
+                                                    {(activity.cohort as any)?.name || (activity.course as any)?.title || 'Program Enrollment'}
+                                                </td>
                                                 <td style={{ padding: '1rem 0', color: '#64748b', fontSize: '0.875rem' }}>
                                                     {new Date(activity.enrolled_at).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                                 </td>

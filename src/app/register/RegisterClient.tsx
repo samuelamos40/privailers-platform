@@ -129,8 +129,15 @@ export default function RegisterClient() {
                 await supabase.auth.signInWithPassword({ email: formData.email, password: formData.password });
             }
 
-            // 2. Direct enrollment for free tracks
+            // 2. Ensure public.users row exists and direct enrollment for free tracks
             if (targetUserId) {
+                await supabase.from('users').upsert([{
+                    id: targetUserId,
+                    email: formData.email,
+                    full_name: formData.fullName,
+                    role: 'student'
+                }], { onConflict: 'id', ignoreDuplicates: true });
+
                 if (intent === 'cohort' && selectedCohortId) {
                     const cohort = activeCohorts.find(c => c.id === selectedCohortId);
                     if (cohort) {
@@ -239,10 +246,12 @@ export default function RegisterClient() {
                 }
             });
 
+            let targetUserId = authData?.user?.id || '';
+
             if (authError) {
                 const msg = authError.message?.toLowerCase() || '';
                 if (msg.includes('already registered') || msg.includes('already exists')) {
-                    const { error: loginErr } = await supabase.auth.signInWithPassword({
+                    const { data: loginData, error: loginErr } = await supabase.auth.signInWithPassword({
                         email: formData.email,
                         password: formData.password
                     });
@@ -251,6 +260,7 @@ export default function RegisterClient() {
                         setLoading(false);
                         return;
                     }
+                    targetUserId = loginData.user?.id || '';
                 } else {
                     setError(authError.message);
                     setLoading(false);
@@ -258,12 +268,27 @@ export default function RegisterClient() {
                 }
             } else {
                 // Sign in newly created user
-                await supabase.auth.signInWithPassword({ email: formData.email, password: formData.password });
+                const { data: loginData } = await supabase.auth.signInWithPassword({ email: formData.email, password: formData.password });
+                if (!targetUserId && loginData?.user?.id) {
+                    targetUserId = loginData.user.id;
+                }
+            }
+
+            if (targetUserId) {
+                await supabase.from('users').upsert([{
+                    id: targetUserId,
+                    email: formData.email,
+                    full_name: formData.fullName,
+                    role: 'student'
+                }], { onConflict: 'id', ignoreDuplicates: true });
             }
 
             // Direct forward to checkout (Welcome & Receipt email will be sent upon payment confirmation)
             const refParam = refCode ? `&ref=${refCode.toUpperCase()}` : '';
-            router.push(`/checkout?type=${checkoutType}&id=${courseId}${refParam}`);
+            const studentParams = targetUserId
+                ? `&uid=${encodeURIComponent(targetUserId)}&email=${encodeURIComponent(formData.email)}&name=${encodeURIComponent(formData.fullName)}`
+                : '';
+            router.push(`/checkout?type=${checkoutType}&id=${courseId}${refParam}${studentParams}`);
         } else {
             executeRegistration();
         }

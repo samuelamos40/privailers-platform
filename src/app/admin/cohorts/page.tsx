@@ -42,13 +42,14 @@ export default function AdminCohortManagementPage() {
         const { data: instData } = await supabase.from('users').select('id, full_name').eq('role', 'instructor');
         setInstructors(instData || []);
 
-        // 3. Fetch All Cohorts
+        // 3. Fetch All Cohorts with Enrolled Students
         const { data: cohortsData, error } = await supabase
             .from('cohorts')
             .select(`
                 *,
                 course:courses(title),
-                instructor:users(full_name)
+                instructor:users(full_name),
+                enrollments(id, status, created_at, user:users(id, full_name, email))
             `)
             .order('created_at', { ascending: false });
 
@@ -171,9 +172,23 @@ export default function AdminCohortManagementPage() {
                                             </div>
                                             <div style={{ fontSize: '0.9rem', color: '#0369a1', marginBottom: '0.25rem' }}>Course: {c.course?.title || 'Standalone Batch'}</div>
                                             <div style={{ fontSize: '0.9rem', color: '#059669', marginBottom: '0.5rem' }}>Instructor: {c.instructor?.full_name || 'Unassigned'}</div>
-                                            <div style={{ fontSize: '0.85rem', color: '#64748b' }}>
-                                                Timeline: {c.start_date} to {c.end_date} &bull; Capacity: {c.capacity} students
+                                            <div style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '0.75rem' }}>
+                                                Timeline: {c.start_date} to {c.end_date} &bull; Enrolled: <strong>{c.enrollments?.length || 0} / {c.capacity}</strong> students
                                             </div>
+                                            {c.enrollments && c.enrollments.length > 0 && (
+                                                <div style={{ backgroundColor: '#f8fafc', padding: '0.65rem 0.85rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                                                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
+                                                        Enrolled Students ({c.enrollments.length}):
+                                                    </div>
+                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                                                        {c.enrollments.map((en: any) => (
+                                                            <span key={en.id} style={{ fontSize: '0.78rem', backgroundColor: '#e0f2fe', color: '#0369a1', padding: '0.2rem 0.55rem', borderRadius: '0.35rem', fontWeight: 600 }}>
+                                                                👤 {en.user?.full_name || 'Student'} ({en.user?.email || 'No email'})
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                                             <Button size="sm" variant="outline" onClick={() => handleEdit(c)}>Edit</Button>
