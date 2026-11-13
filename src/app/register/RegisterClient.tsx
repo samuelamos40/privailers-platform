@@ -185,14 +185,14 @@ export default function RegisterClient() {
                 }
             }
 
-            // Dispatch Welcome Email asynchronously (non-blocking)
+            // Dispatch Welcome Email before navigating so the request is never aborted
             try {
                 const welcome = getWelcomeEmail({
                     studentName: formData.fullName || 'Student',
                     loginUrl: `${window.location.origin}/student`,
                     whatsappGroupUrl: intent === 'cohort' ? 'https://chat.whatsapp.com/Ihon2APJRQ20rEOEuK99mJ?s=cl&p=a&iam=2' : undefined
                 });
-                fetch('/api/email', {
+                await fetch('/api/email', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -200,14 +200,10 @@ export default function RegisterClient() {
                         subject: welcome.subject,
                         html: welcome.html
                     })
-                }).catch(() => {});
+                });
             } catch (e) {}
             
-            if (redirectTo) {
-                router.push(redirectTo);
-            } else {
-                router.push('/student');
-            }
+            window.location.href = redirectTo || '/student';
         } catch (err: any) {
             setError(err.message || 'Registration failed. Please check your details and try again.');
             setLoading(false);
