@@ -112,7 +112,8 @@ export async function POST(req: Request) {
                         courseName: itemName,
                         amountPaid: amountPaid || 0,
                         reference,
-                        classroomUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.privailers.com'}/student/courses`
+                        classroomUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.privailers.com'}/student/courses`,
+                        whatsappGroupUrl: cohortId ? 'https://chat.whatsapp.com/Ihon2APJRQ20rEOEuK99mJ?s=cl&p=a&iam=2' : undefined
                     });
 
                     await resend.emails.send({

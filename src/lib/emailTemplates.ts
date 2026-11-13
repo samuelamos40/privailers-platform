@@ -10,11 +10,13 @@ interface PaymentReceiptParams {
     reference: string;
     paidAt?: string;
     classroomUrl?: string;
+    whatsappGroupUrl?: string;
 }
 
 interface WelcomeEmailParams {
     studentName: string;
     loginUrl?: string;
+    whatsappGroupUrl?: string;
 }
 
 interface LiveClassEmailParams {
@@ -31,7 +33,8 @@ export function getPaymentReceiptEmail({
     amountPaid,
     reference,
     paidAt = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-    classroomUrl = 'https://privailers.com/student/courses'
+    classroomUrl = 'https://privailers.com/student/courses',
+    whatsappGroupUrl
 }: PaymentReceiptParams): { subject: string; html: string } {
     const formattedAmount = `₦${amountPaid.toLocaleString('en-NG')}`;
 
@@ -111,6 +114,16 @@ export function getPaymentReceiptEmail({
               <a href="${classroomUrl}" style="display: inline-block; background-color: #00a89c; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 700; font-size: 15px; box-shadow: 0 4px 10px rgba(0, 168, 156, 0.3);">
                 Go to My Classroom & Start Learning →
               </a>
+              ${whatsappGroupUrl ? `
+              <div style="margin-top: 20px; padding: 16px; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px;">
+                <p style="margin: 0 0 10px; font-size: 14px; font-weight: 700; color: #166534;">
+                  Join Your Cohort WhatsApp Community
+                </p>
+                <a href="${whatsappGroupUrl}" style="display: inline-block; background-color: #16a34a; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px;">
+                  Join Cohort WhatsApp Group →
+                </a>
+              </div>
+              ` : ''}
               <p style="margin: 16px 0 0; font-size: 13px; color: #94a3b8;">
                 Your verified digital certificate will be generated automatically upon course completion.
               </p>
@@ -145,7 +158,8 @@ export function getPaymentReceiptEmail({
 
 export function getWelcomeEmail({
     studentName,
-    loginUrl = 'https://privailers.com/login'
+    loginUrl = 'https://privailers.com/login',
+    whatsappGroupUrl
 }: WelcomeEmailParams): { subject: string; html: string } {
     const html = `
 <!DOCTYPE html>
@@ -188,6 +202,16 @@ export function getWelcomeEmail({
                   Access Student Portal →
                 </a>
               </div>
+              ${whatsappGroupUrl ? `
+              <div style="margin-top: 20px; padding: 16px; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; text-align: center;">
+                <p style="margin: 0 0 10px; font-size: 14px; font-weight: 700; color: #166534;">
+                  Join Your Cohort WhatsApp Community for Updates & Class Links
+                </p>
+                <a href="${whatsappGroupUrl}" style="display: inline-block; background-color: #16a34a; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px;">
+                  Join Cohort WhatsApp Group →
+                </a>
+              </div>
+              ` : ''}
             </td>
           </tr>
           <tr>

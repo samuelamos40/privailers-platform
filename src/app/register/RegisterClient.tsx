@@ -189,7 +189,8 @@ export default function RegisterClient() {
             try {
                 const welcome = getWelcomeEmail({
                     studentName: formData.fullName || 'Student',
-                    loginUrl: `${window.location.origin}/student`
+                    loginUrl: `${window.location.origin}/student`,
+                    whatsappGroupUrl: intent === 'cohort' ? 'https://chat.whatsapp.com/Ihon2APJRQ20rEOEuK99mJ?s=cl&p=a&iam=2' : undefined
                 });
                 fetch('/api/email', {
                     method: 'POST',
