@@ -71,7 +71,8 @@ export default function AdminCohortManagementPage() {
             end_date: formData.end_date,
             capacity: formData.capacity,
             price: numericPrice,
-            status: formData.status
+            status: formData.status,
+            updated_at: new Date().toISOString()
         };
 
         if (formData.id) {

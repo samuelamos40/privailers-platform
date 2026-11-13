@@ -230,24 +230,7 @@ export default function RegisterClient() {
             // Sign in
             await supabase.auth.signInWithPassword({ email: formData.email, password: formData.password });
 
-            // Dispatch Welcome Email asynchronously (non-blocking)
-            try {
-                const welcome = getWelcomeEmail({
-                    studentName: formData.fullName || 'Student',
-                    loginUrl: `${window.location.origin}/student`
-                });
-                fetch('/api/email', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        to: formData.email,
-                        subject: welcome.subject,
-                        html: welcome.html
-                    })
-                }).catch(() => {});
-            } catch (e) {}
-
-            // Direct forward to checkout
+            // Direct forward to checkout (Welcome & Receipt email will be sent upon payment confirmation)
             const refParam = refCode ? `&ref=${refCode.toUpperCase()}` : '';
             router.push(`/checkout?type=${checkoutType}&id=${courseId}${refParam}`);
         } else {
@@ -483,8 +466,8 @@ export default function RegisterClient() {
                                             ? `Course: ${selectedCourse?.title || 'Premium Course'}`
                                             : 'Free Starter Track'}
                                     </div>
-                                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                                        {price > 0 ? `Fee: ₦${price.toLocaleString()}` : 'Free Access'}
+                                    <div style={{ fontSize: '0.75rem', color: price > 0 ? '#b45309' : '#15803d', fontWeight: 600 }}>
+                                        {price > 0 ? `Tuition: ₦${price.toLocaleString()} • Payment required on next step` : 'Free Access'}
                                     </div>
                                 </div>
                             </div>
@@ -496,6 +479,12 @@ export default function RegisterClient() {
                                 Change Track
                             </button>
                         </div>
+
+                        {price > 0 && (
+                            <div style={{ padding: '0.75rem 1rem', backgroundColor: '#fffbeb', border: '1px solid #fde68a', borderRadius: '0.75rem', marginBottom: '1.25rem', fontSize: '0.825rem', color: '#92400e', lineHeight: 1.4 }}>
+                                ℹ️ <strong>Payment Required:</strong> Creating your account will immediately open secure Paystack checkout for <strong>₦{price.toLocaleString()}</strong>. Your cohort enrollment will be activated once payment is confirmed.
+                            </div>
+                        )}
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                             <Input
@@ -564,7 +553,7 @@ export default function RegisterClient() {
                             disabled={loading}
                             style={{ width: '100%', justifyContent: 'center', marginTop: '1.75rem', borderRadius: '0.75rem', padding: '0.875rem', fontWeight: 700 }}
                         >
-                            {loading ? 'Creating Your Account...' : (price > 0 ? 'Create Account & Proceed to Checkout →' : 'Complete Registration →')}
+                            {loading ? 'Processing...' : (price > 0 ? `Proceed to Secure Payment (₦${price.toLocaleString()}) →` : 'Complete Free Registration →')}
                         </Button>
                     </form>
                 )}

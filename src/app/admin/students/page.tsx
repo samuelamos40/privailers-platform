@@ -33,7 +33,7 @@ export default function AdminStudentsPage() {
                 enrollments(
                     id, 
                     status, 
-                    cohort:cohorts(name)
+                    cohort:cohorts(name, price)
                 )
             `)
             .eq('role', 'student')
@@ -130,7 +130,7 @@ export default function AdminStudentsPage() {
                             </thead>
                         <tbody>
                             {filteredStudents.map(s => {
-                                const hasPaidEnrollment = s.enrollments?.length > 0;
+                                const hasEnrollments = s.enrollments && s.enrollments.length > 0;
                                 const activeCohorts = s.enrollments?.filter((e: any) => e.cohort).map((e: any) => e.cohort.name).join(', ');
                                 
                                 return (
@@ -140,25 +140,32 @@ export default function AdminStudentsPage() {
                                             <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{s.email}</div>
                                         </td>
                                         <td style={{ padding: '1rem' }}>
-                                            <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.4rem' }}>
+                                            <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.4rem', flexWrap: 'wrap' }}>
                                                 <span style={{ 
-                                                    fontSize: '0.65rem', fontWeight: 800, padding: '0.1rem 0.4rem', borderRadius: '4px',
-                                                    backgroundColor: hasPaidEnrollment ? '#ebf5ff' : '#f1f5f9',
-                                                    color: hasPaidEnrollment ? '#2563eb' : '#64748b'
+                                                    fontSize: '0.65rem', fontWeight: 800, padding: '0.15rem 0.5rem', borderRadius: '4px',
+                                                    backgroundColor: hasEnrollments ? '#dcfce7' : '#fef3c7',
+                                                    color: hasEnrollments ? '#15803d' : '#b45309',
+                                                    border: hasEnrollments ? '1px solid #bbf7d0' : '1px solid #fde68a'
                                                 }}>
-                                                    {hasPaidEnrollment ? 'PREMIUM' : 'FREE / TRIAL'}
+                                                    {hasEnrollments ? '✅ ENROLLED' : '⚠️ UNPAID / NO ACCESS'}
                                                 </span>
                                             </div>
                                             <span style={{ 
                                                 fontSize: '0.75rem', fontWeight: 700, padding: '0.2rem 0.5rem', borderRadius: '1rem',
-                                                backgroundColor: s.access_status === 'active' ? '#dcfce7' : '#fee2e2',
-                                                color: s.access_status === 'active' ? '#166534' : '#991b1b'
+                                                backgroundColor: s.access_status === 'active' ? '#f1f5f9' : '#fee2e2',
+                                                color: s.access_status === 'active' ? '#475569' : '#991b1b'
                                             }}>
-                                                {s.access_status?.toUpperCase() || 'ACTIVE'}
+                                                ACCOUNT: {s.access_status?.toUpperCase() || 'ACTIVE'}
                                             </span>
                                         </td>
-                                        <td style={{ padding: '1rem', fontSize: '0.875rem', color: '#475569' }}>
-                                            {activeCohorts || <span style={{ color: '#cbd5e1' }}>None</span>}
+                                        <td style={{ padding: '1rem', fontSize: '0.875rem' }}>
+                                            {activeCohorts ? (
+                                                <span style={{ color: '#0f172a', fontWeight: 600 }}>{activeCohorts}</span>
+                                            ) : (
+                                                <span style={{ color: '#b45309', fontSize: '0.8rem', fontWeight: 600, backgroundColor: '#fef3c7', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
+                                                    None (Checkout Not Paid)
+                                                </span>
+                                            )}
                                         </td>
                                         <td style={{ padding: '1rem', color: '#64748b', fontSize: '0.875rem' }}>
                                             {new Date(s.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
