@@ -32,19 +32,30 @@ export default function Home() {
         let isMounted = true;
         const fetchCohort = async () => {
             try {
-                const { data } = await supabase
+                // Prioritize open or live (full) cohort, otherwise fallback to the most recent one
+                let { data } = await supabase
                     .from('cohorts')
                     .select('*, instructor:users(full_name)')
-                    .eq('status', 'open')
-                    .gte('start_date', new Date().toISOString().split('T')[0])
+                    .in('status', ['open', 'full'])
                     .order('start_date', { ascending: true })
                     .limit(1)
-                    .single();
+                    .maybeSingle();
+
+                if (!data) {
+                    const { data: latest } = await supabase
+                        .from('cohorts')
+                        .select('*, instructor:users(full_name)')
+                        .order('created_at', { ascending: false })
+                        .limit(1)
+                        .maybeSingle();
+                    data = latest;
+                }
+
                 if (data && isMounted) {
                     setUpcomingCohort(data);
                 }
             } catch (err) {
-                // If no open cohort or table check fails
+                // If table check fails
             }
         };
         fetchCohort();
@@ -137,16 +148,16 @@ export default function Home() {
                 <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1rem' }}>
                     <div style={{ textAlign: 'center', marginBottom: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
                         <div style={{ textAlign: 'left' }}>
-                            <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 700, color: '#1e293b', marginBottom: '0.5rem' }}>Featured Courses</h2>
-                            <p style={{ color: '#64748b', maxWidth: '600px' }}>Start your journey with our top-rated programs.</p>
+                            <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 700, color: '#1e293b', marginBottom: '0.5rem' }}>Featured Programs & Live Cohorts</h2>
+                            <p style={{ color: '#64748b', maxWidth: '600px' }}>Start your journey with our top-rated programs and interactive live cohorts.</p>
                         </div>
                         <Link href="/courses">
-                            <Button variant="outline">View All Courses →</Button>
+                            <Button variant="outline">View All Programs →</Button>
                         </Link>
                     </div>
 
                     {loading ? (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '2rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: '2rem' }}>
                             {[1, 2, 3].map(i => (
                                 <div key={i} style={{
                                     background: 'white',
@@ -167,7 +178,10 @@ export default function Home() {
                             ))}
                         </div>
                     ) : (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '2rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: '2rem' }}>
+                            {upcomingCohort && (
+                                <CohortCard cohort={upcomingCohort} />
+                            )}
                             {featuredCourses.map(course => (
                                 <Card key={course.id} style={{ display: 'flex', flexDirection: 'column', transition: 'transform 0.2s' }}>
                                     <div style={{

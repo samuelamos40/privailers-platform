@@ -179,10 +179,10 @@ export default function AdminCohortManagementPage() {
                                             <Button size="sm" variant="ghost" style={{ color: '#ef4444' }} onClick={() => handleDelete(c.id)}>Delete</Button>
                                             <span style={{ 
                                                 fontSize: '0.75rem', fontWeight: 700, padding: '0.25rem 0.65rem', borderRadius: '1rem', textTransform: 'uppercase',
-                                                backgroundColor: c.status === 'open' ? '#dcfce7' : c.status === 'active' ? '#fee2e2' : '#f1f5f9', 
-                                                color: c.status === 'open' ? '#166534' : c.status === 'active' ? '#991b1b' : '#475569'
+                                                backgroundColor: c.status === 'open' ? '#dcfce7' : (c.status === 'full' || c.status === 'active' || c.status === 'closed') ? '#fee2e2' : '#f1f5f9', 
+                                                color: c.status === 'open' ? '#166534' : (c.status === 'full' || c.status === 'active' || c.status === 'closed') ? '#991b1b' : '#475569'
                                             }}>
-                                                {c.status === 'open' ? '🟢 Open (Registration)' : c.status === 'active' ? '🔴 Live / Closed' : c.status}
+                                                {c.status === 'open' ? '🟢 Open (Registration)' : (c.status === 'full' || c.status === 'active' || c.status === 'closed') ? '🔴 Full / Closed' : c.status}
                                             </span>
                                         </div>
                                     </div>
@@ -261,7 +261,7 @@ export default function AdminCohortManagementPage() {
                             {/* Registration / Batch Status */}
                             <div>
                                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: '#475569' }}>
-                                    Batch Status (Lifecycle)
+                                    Batch Status
                                 </label>
                                 <select 
                                     style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', fontWeight: 600 }} 
@@ -269,12 +269,11 @@ export default function AdminCohortManagementPage() {
                                     onChange={e => setFormData({...formData, status: e.target.value})}
                                 >
                                     <option value="open">🟢 Open (Registration Open on Website)</option>
-                                    <option value="active">🔴 Active / Live (Registration Closed)</option>
-                                    <option value="closed">⛔ Closed (Registration Manually Closed)</option>
+                                    <option value="full">🔴 Full / Closed (Registration Closed)</option>
                                     <option value="completed">⚫ Completed (Cohort Concluded)</option>
                                 </select>
                                 <p style={{ fontSize: '0.75rem', color: '#64748b', margin: '0.35rem 0 0 0' }}>
-                                    Changing to "Active" or "Closed" immediately stops new registrations on the website.
+                                    Selecting "Full / Closed" immediately stops new registrations on the website.
                                 </p>
                             </div>
 

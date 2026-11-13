@@ -10,7 +10,7 @@ export interface CohortItem {
     end_date: string;
     capacity: number;
     price?: number | null;
-    status: 'open' | 'active' | 'completed' | 'cancelled' | string;
+    status: 'open' | 'full' | 'completed' | 'active' | 'closed' | string;
     instructor?: { full_name?: string } | { full_name?: string }[] | any;
     enrolled_count?: number;
 }
@@ -41,6 +41,7 @@ export function getCohortStage(cohort: CohortItem) {
     }
 
     if (
+        cohort.status === 'full' ||
         cohort.status === 'active' ||
         cohort.status === 'closed' ||
         isCapacityFull ||
