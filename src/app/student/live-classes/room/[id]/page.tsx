@@ -63,7 +63,7 @@ export default function StudentLiveRoom({ params }: { params: Promise<{ id: stri
                 ) : (
                     <iframe
                         allow="camera; microphone; display-capture; fullscreen; clipboard-read; clipboard-write; speaker"
-                        src={`https://meet.ffrn.de/${jitsiRoomName}#userInfo.displayName="${encodeURIComponent(user?.full_name || user?.email || 'Student')}"&config.startWithAudioMuted=true&config.prejoinPageEnabled=false`}
+                        src={`https://jitsi.riot.im/${jitsiRoomName}#userInfo.displayName="${encodeURIComponent(user?.full_name || user?.email || 'Student')}"&config.startWithAudioMuted=true&config.prejoinPageEnabled=false`}
                         style={{ height: '100%', width: '100%', border: 0 }}
                     />
                 )}
