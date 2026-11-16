@@ -10,14 +10,44 @@ export default function StudentLiveRoom({ params }: { params: Promise<{ id: stri
     const resolvedParams = use(params);
     const classId = resolvedParams.id;
     const [classData, setClassData] = useState<any>(null);
+    const [notFound, setNotFound] = useState(false);
 
     useEffect(() => {
         const fetchClass = async () => {
-            const { data } = await supabase.from('live_classes').select('*').eq('id', classId).single();
-            if (data) setClassData(data);
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                const res = await fetch('/api/student/live-classes', {
+                    headers: session?.access_token
+                        ? { Authorization: `Bearer ${session.access_token}` }
+                        : {}
+                });
+                if (res.ok) {
+                    const json = await res.json();
+                    const found = json.classes?.find((c: any) => c.id === classId);
+                    if (found) {
+                        setClassData(found);
+                        return;
+                    }
+                }
+                const { data } = await supabase.from('live_classes').select('*').eq('id', classId).maybeSingle();
+                if (data) {
+                    setClassData(data);
+                    return;
+                }
+                setNotFound(true);
+            } catch {
+                setNotFound(true);
+            }
         };
         fetchClass();
     }, [classId]);
+
+    if (notFound) return (
+        <div style={{ padding: '2rem', color: 'white', backgroundColor: '#0f172a', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
+            <p style={{ margin: 0, fontSize: '1.1rem' }}>Live classroom not found or access denied.</p>
+            <Link href="/student/live-classes" style={{ color: '#38bdf8', textDecoration: 'underline' }}>← Back to Live Classes</Link>
+        </div>
+    );
 
     if (!classData) return <div style={{ padding: '2rem', color: 'white', backgroundColor: '#0f172a', height: '100vh' }}>Loading classroom...</div>;
 
