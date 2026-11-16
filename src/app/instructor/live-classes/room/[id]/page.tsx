@@ -63,7 +63,7 @@ export default function InstructorLiveRoom({ params }: { params: Promise<{ id: s
                 ) : (
                     <iframe
                         allow="camera; microphone; display-capture; fullscreen; clipboard-read; clipboard-write; speaker"
-                        src={`https://jitsi.riot.im/${jitsiRoomName}#userInfo.displayName="${encodeURIComponent(user?.full_name || 'Instructor')}"&config.startWithAudioMuted=false&config.prejoinPageEnabled=false`}
+                        src={`https://meet.element.io/${jitsiRoomName}#userInfo.displayName="${encodeURIComponent(user?.full_name || 'Instructor')}"&config.startWithAudioMuted=false&config.prejoinPageEnabled=false`}
                         style={{ height: '100%', width: '100%', border: 0 }}
                     />
                 )}

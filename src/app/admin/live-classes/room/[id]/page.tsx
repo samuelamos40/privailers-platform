@@ -63,7 +63,7 @@ export default function AdminLiveRoom({ params }: { params: Promise<{ id: string
                 ) : (
                     <iframe
                         allow="camera; microphone; display-capture; fullscreen"
-                        src={`https://jitsi.riot.im/${jitsiRoomName}#userInfo.displayName="${encodeURIComponent(user?.email || 'Admin')}"&config.startWithAudioMuted=false&config.prejoinPageEnabled=false`}
+                        src={`https://meet.element.io/${jitsiRoomName}#userInfo.displayName="${encodeURIComponent(user?.email || 'Admin')}"&config.startWithAudioMuted=false&config.prejoinPageEnabled=false`}
                         style={{ height: '100%', width: '100%', border: 0 }}
                     />
                 )}
