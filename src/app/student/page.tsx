@@ -9,6 +9,7 @@ import Button from '@/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import CourseIcon from '@/components/ui/CourseIcon';
 import Card from '@/components/ui/Card';
+import RecordingPlayerModal from '@/components/ui/RecordingPlayerModal';
 
 // Premium Light Card
 const LightCard = ({ children, style, className }: { children: React.ReactNode, style?: React.CSSProperties, className?: string }) => (
@@ -41,6 +42,7 @@ export default function StudentDashboard() {
     const [announcements, setAnnouncements] = useState<any[]>([]);
     const [myClasses, setMyClasses] = useState<any[]>([]);
     const [generalLiveAlert, setGeneralLiveAlert] = useState<any>(null);
+    const [activeRecording, setActiveRecording] = useState<{ title: string; url: string } | null>(null);
 
     useEffect(() => {
         if (user) {
@@ -535,9 +537,7 @@ export default function StudentDashboard() {
                                             {isExternal ? '▶ Join via Google Meet / Zoom' : '▶ Join Live Room'}
                                         </Button>
                                     ) : cls.recording_url ? (
-                                        <a href={cls.recording_url} target="_blank" style={{ textDecoration: 'none' }}>
-                                            <Button style={{ width: '100%', backgroundColor: '#7c3aed' }}>🎥 Watch Recording</Button>
-                                        </a>
+                                        <Button onClick={() => setActiveRecording({ title: cls.title, url: cls.recording_url })} style={{ width: '100%', backgroundColor: '#7c3aed' }}>🎥 Watch Recording</Button>
                                     ) : (
                                         <Button variant="outline" disabled style={{ width: '100%', opacity: 0.6 }}>
                                             {cls.status === 'completed' ? 'Session Ended' : `Starts at ${new Date(cls.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
@@ -845,6 +845,13 @@ export default function StudentDashboard() {
                         ))}
                     </div>
                 </section>
+            )}
+            {activeRecording && (
+                <RecordingPlayerModal
+                    title={activeRecording.title}
+                    url={activeRecording.url}
+                    onClose={() => setActiveRecording(null)}
+                />
             )}
         </div>
     );

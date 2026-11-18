@@ -9,6 +9,7 @@ import Link from "next/link";
 
 export default function AdminResourcesPage() {
     const [resources, setResources] = useState<any[]>([]);
+    const [cohorts, setCohorts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
 
@@ -16,17 +17,32 @@ export default function AdminResourcesPage() {
     const [formData, setFormData] = useState({
         title: '',
         category: 'Dataset',
+        cohortId: '',
         fileUrl: '',
         fileSize: ''
     });
 
     useEffect(() => {
         fetchResources();
+        fetchCohorts();
     }, []);
 
+    const fetchCohorts = async () => {
+        const { data } = await supabase.from('cohorts').select('id, name').order('created_at', { ascending: false });
+        if (data) setCohorts(data);
+    };
+
     const fetchResources = async () => {
-        const { data } = await supabase.from('resources').select('*').order('created_at', { ascending: false });
-        if (data) setResources(data);
+        const { data, error } = await supabase
+            .from('resources')
+            .select('*, cohort:cohorts(name)')
+            .order('created_at', { ascending: false });
+        if (!error && data) {
+            setResources(data);
+        } else {
+            const { data: fallback } = await supabase.from('resources').select('*').order('created_at', { ascending: false });
+            if (fallback) setResources(fallback);
+        }
         setLoading(false);
     };
 
@@ -72,17 +88,22 @@ export default function AdminResourcesPage() {
         e.preventDefault();
         if (!formData.fileUrl) return alert("Please upload a file first.");
 
-        const { error } = await supabase.from('resources').insert([{
+        const payload: any = {
             title: formData.title,
             category: formData.category,
             file_url: formData.fileUrl,
             file_size: formData.fileSize
-        }]);
+        };
+        if (formData.cohortId) {
+            payload.cohort_id = formData.cohortId;
+        }
+
+        const { error } = await supabase.from('resources').insert([payload]);
 
         if (!error) {
             alert("Resource added!");
             setIsFormOpen(false);
-            setFormData({ title: '', category: 'Dataset', fileUrl: '', fileSize: '' });
+            setFormData({ title: '', category: 'Dataset', cohortId: '', fileUrl: '', fileSize: '' });
             fetchResources();
         } else {
             alert("Error: " + error.message);
@@ -131,6 +152,20 @@ export default function AdminResourcesPage() {
                         </div>
 
                         <div style={{ marginBottom: '1rem' }}>
+                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Target Cohort (Access Scope)</label>
+                            <select
+                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1' }}
+                                value={formData.cohortId}
+                                onChange={e => setFormData({ ...formData, cohortId: e.target.value })}
+                            >
+                                <option value="">🌐 General (All Students)</option>
+                                {cohorts.map(c => (
+                                    <option key={c.id} value={c.id}>👥 {c.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div style={{ marginBottom: '1rem' }}>
                             <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>File Upload</label>
                             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                                 <label style={{
@@ -162,8 +197,14 @@ export default function AdminResourcesPage() {
                         <div style={{ minWidth: '220px', flex: '1 1 220px' }}>
                             <span style={{
                                 fontSize: '0.75rem', fontWeight: 700, color: '#64748b',
-                                backgroundColor: '#f1f5f9', padding: '0.2rem 0.5rem', borderRadius: '4px', marginRight: '0.75rem'
+                                backgroundColor: '#f1f5f9', padding: '0.2rem 0.5rem', borderRadius: '4px', marginRight: '0.5rem'
                             }}>{res.category}</span>
+                            <span style={{
+                                fontSize: '0.75rem', fontWeight: 700,
+                                color: res.cohort?.name ? '#0369a1' : '#059669',
+                                backgroundColor: res.cohort?.name ? '#e0f2fe' : '#ecfdf5',
+                                padding: '0.2rem 0.5rem', borderRadius: '4px', marginRight: '0.75rem'
+                            }}>{res.cohort?.name ? `👥 ${res.cohort.name}` : '🌐 All Students'}</span>
                             <span style={{ fontWeight: 600, fontSize: '1.1rem', wordBreak: 'break-word' }}>{res.title}</span>
                             <span style={{ color: '#94a3b8', marginLeft: '0.75rem', fontSize: '0.875rem' }}>{res.file_size}</span>
                         </div>

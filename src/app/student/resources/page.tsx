@@ -2,24 +2,51 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 
 export default function ResourcesPage() {
+    const { user } = useAuth();
     const [resources, setResources] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchResources = async () => {
-            const { data } = await supabase
+            let enrolledCohortIds: string[] = [];
+            if (user?.id) {
+                const { data: enrollments } = await supabase
+                    .from('enrollments')
+                    .select('cohort_id')
+                    .eq('user_id', user.id)
+                    .eq('status', 'active');
+                if (enrollments) {
+                    enrolledCohortIds = enrollments.map((e: any) => e.cohort_id).filter(Boolean);
+                }
+            }
+
+            const { data, error } = await supabase
                 .from('resources')
-                .select('*')
+                .select('*, cohort:cohorts(name)')
                 .order('created_at', { ascending: false });
-            if (data) setResources(data);
+
+            if (!error && data) {
+                const visible = data.filter((res: any) => !res.cohort_id || enrolledCohortIds.includes(res.cohort_id));
+                setResources(visible);
+            } else {
+                const { data: fallback } = await supabase
+                    .from('resources')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                if (fallback) {
+                    const visible = fallback.filter((res: any) => !res.cohort_id || enrolledCohortIds.includes(res.cohort_id));
+                    setResources(visible);
+                }
+            }
             setLoading(false);
         };
         fetchResources();
-    }, []);
+    }, [user]);
 
     // Helper to determine icon/color based on category
     const getCategoryStyle = (type: string) => {
@@ -49,13 +76,24 @@ export default function ResourcesPage() {
                             <Card key={idx} padding="md" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flex: 1 }}>
                                     <div>
-                                        <span style={{
-                                            fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 600,
-                                            color: style.color, backgroundColor: style.bg,
-                                            padding: '0.25rem 0.5rem', borderRadius: '0.25rem'
-                                        }}>
-                                            {style.label}
-                                        </span>
+                                        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                                            <span style={{
+                                                fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 600,
+                                                color: style.color, backgroundColor: style.bg,
+                                                padding: '0.25rem 0.5rem', borderRadius: '0.25rem'
+                                            }}>
+                                                {style.label}
+                                            </span>
+                                            {res.cohort?.name && (
+                                                <span style={{
+                                                    fontSize: '0.72rem', fontWeight: 700,
+                                                    color: '#0369a1', backgroundColor: '#e0f2fe',
+                                                    padding: '0.25rem 0.5rem', borderRadius: '0.25rem'
+                                                }}>
+                                                    👥 {res.cohort.name}
+                                                </span>
+                                            )}
+                                        </div>
                                         <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginTop: '0.75rem', marginBottom: '0.25rem' }}>
                                             {res.title}
                                         </h3>

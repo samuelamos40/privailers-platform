@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePaystackPayment } from 'react-paystack';
+import RecordingPlayerModal from "@/components/ui/RecordingPlayerModal";
 
 export default function StudentLiveClassesPage() {
     const { user } = useAuth();
@@ -18,6 +19,7 @@ export default function StudentLiveClassesPage() {
     const [loading, setLoading] = useState(true);
     const [targetCohort, setTargetCohort] = useState<any>(null);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [activeRecording, setActiveRecording] = useState<{ title: string; url: string } | null>(null);
 
     // Paystack Config
     const cohortPrice = targetCohort ? parseFloat(targetCohort.price || targetCohort.course?.price || "0") : 0;
@@ -355,9 +357,7 @@ export default function StudentLiveClassesPage() {
                                             </a>
                                         )
                                     ) : c.recording_url ? (
-                                        <a href={c.recording_url} target="_blank" style={{ textDecoration: 'none' }}>
-                                            <Button style={{ width: '100%', backgroundColor: '#7c3aed', color: 'white', borderColor: '#7c3aed' }}>🎥 Watch Recording</Button>
-                                        </a>
+                                        <Button onClick={() => setActiveRecording({ title: c.title, url: c.recording_url })} style={{ width: '100%', backgroundColor: '#7c3aed', color: 'white', borderColor: '#7c3aed' }}>🎥 Watch Recording</Button>
                                     ) : (
                                         <Button variant="outline" disabled style={{ width: '100%', justifyContent: 'center', backgroundColor: '#f8fafc', color: '#94a3b8' }}>
                                             {c.status === 'completed' ? 'Session Ended' : `Starts at ${new Date(c.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
@@ -368,6 +368,13 @@ export default function StudentLiveClassesPage() {
                         );
                     })}
                 </div>
+            )}
+            {activeRecording && (
+                <RecordingPlayerModal
+                    title={activeRecording.title}
+                    url={activeRecording.url}
+                    onClose={() => setActiveRecording(null)}
+                />
             )}
         </div>
     );
