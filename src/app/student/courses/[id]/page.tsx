@@ -1091,9 +1091,10 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
                     </p>
                 </div>
 
-                {/* Certificate Button (Only shows if 100% complete and all projects graded) */}
+                {/* Certificate Button (Course 100% complete OR Standalone Cohort completed, plus all projects graded) */}
                 {(() => {
-                    const allModulesDone = modules.length > 0 && completedModuleIds.size === modules.length;
+                    const isStandaloneCohortCompleted = Boolean(course?.isCohortOnly && targetCohort?.status === 'completed');
+                    const allModulesDone = (modules.length > 0 && completedModuleIds.size === modules.length) || isStandaloneCohortCompleted;
                     const allProjectsGraded = projects.length === 0 || projects.every(p => 
                         submissions.find(s => s.project_id === p.id && s.status === 'graded')
                     );
@@ -1112,7 +1113,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
                         );
                     }
                     
-                    // Optional: Show a "Progress" indicator if modules are done but projects aren't
+                    // Optional: Show a "Progress" indicator if modules/cohort are done but projects aren't
                     if (allModulesDone && !allProjectsGraded) {
                         return (
                             <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #cbd5e1', backgroundColor: '#f8fafc' }}>
