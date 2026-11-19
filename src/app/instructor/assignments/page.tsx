@@ -37,17 +37,37 @@ export default function InstructorAssignmentsPage() {
                 user:users(email, full_name),
                 project:projects!inner(
                     title, 
-                    course:courses!inner(title, instructor_id)
+                    course:courses(title, instructor_id),
+                    cohort:cohorts(name, instructor_id)
                 )
             `)
-            .eq('project.course.instructor_id', session.user.id)
             .order('created_at', { ascending: false });
 
         if (error) {
-            console.error("Error fetching submissions:", JSON.stringify(error, null, 2));
-            alert("Error fetching submissions: " + error.message);
+            const { data: fallback, error: fbErr } = await supabase
+                .from('project_submissions')
+                .select(`
+                    *,
+                    user:users(email, full_name),
+                    project:projects!inner(
+                        title, 
+                        course:courses!inner(title, instructor_id)
+                    )
+                `)
+                .eq('project.course.instructor_id', session.user.id)
+                .order('created_at', { ascending: false });
+            if (fbErr) {
+                console.error("Error fetching submissions:", JSON.stringify(fbErr, null, 2));
+                alert("Error fetching submissions: " + fbErr.message);
+            } else {
+                setSubmissions(fallback || []);
+            }
         } else {
-            setSubmissions(data || []);
+            const mine = (data || []).filter((s: any) =>
+                s.project?.course?.instructor_id === session.user.id ||
+                s.project?.cohort?.instructor_id === session.user.id
+            );
+            setSubmissions(mine);
         }
         setLoading(false);
     };

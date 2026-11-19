@@ -126,14 +126,26 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ id: str
         }
         setModules(moduleData);
 
-        // 3. Fetch Projects
+        // 3. Fetch Projects (linked to course OR cohort)
         let projectData: any[] = [];
-        if (actualCourseId && actualCourseId !== 'standalone' && actualCourseId !== 'undefined') {
-            const { data: pData } = await supabase
-                .from('projects')
-                .select('*')
-                .eq('course_id', actualCourseId);
-            projectData = pData || [];
+        const hasCourse = actualCourseId && actualCourseId !== 'standalone' && actualCourseId !== 'undefined';
+        const hasCohort = cohortLookupId && cohortLookupId !== 'standalone' && cohortLookupId !== 'undefined';
+        if (hasCourse || hasCohort) {
+            let projQuery = supabase.from('projects').select('*');
+            if (hasCourse && hasCohort) {
+                projQuery = projQuery.or(`course_id.eq.${actualCourseId},cohort_id.eq.${cohortLookupId}`);
+            } else if (hasCourse) {
+                projQuery = projQuery.eq('course_id', actualCourseId);
+            } else if (hasCohort) {
+                projQuery = projQuery.eq('cohort_id', cohortLookupId);
+            }
+            const { data: pData, error: pErr } = await projQuery;
+            if (!pErr && pData) {
+                projectData = pData;
+            } else if (hasCourse) {
+                const { data: fallback } = await supabase.from('projects').select('*').eq('course_id', actualCourseId);
+                projectData = fallback || [];
+            }
         }
         setProjects(projectData);
 

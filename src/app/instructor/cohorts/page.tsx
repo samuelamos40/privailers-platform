@@ -59,6 +59,13 @@ export default function CohortManagementPage() {
     const [batchSummary, setBatchSummary] = useState<any[]>([]);
     const [isSummaryOpen, setIsSummaryOpen] = useState(false);
 
+    // Cohort Resources & Graded Assignments
+    const [cohortResources, setCohortResources] = useState<any[]>([]);
+    const [newResource, setNewResource] = useState({ title: '', category: 'Dataset', fileUrl: '', fileSize: '' });
+    const [uploadingResource, setUploadingResource] = useState(false);
+    const [cohortProjects, setCohortProjects] = useState<any[]>([]);
+    const [newProject, setNewProject] = useState({ title: '', description: '', due_date: '' });
+
     const [formData, setFormData] = useState({
         id: '',
         name: '',
@@ -169,6 +176,90 @@ export default function CohortManagementPage() {
 
         const { data: annData } = await supabase.from('cohort_announcements').select('*').eq('cohort_id', cohort.id).order('created_at', { ascending: false });
         setAnnouncements(annData || []);
+
+        const { data: resData, error: resErr } = await supabase.from('resources').select('*').eq('cohort_id', cohort.id).order('created_at', { ascending: false });
+        setCohortResources(!resErr && resData ? resData : []);
+
+        const { data: projData, error: projErr } = await supabase.from('projects').select('*').eq('cohort_id', cohort.id).order('due_date', { ascending: true });
+        setCohortProjects(!projErr && projData ? projData : []);
+    };
+
+    const handleResourceFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files?.[0]) return;
+        const file = e.target.files[0];
+        setUploadingResource(true);
+        const sizeStr = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
+        const data = new FormData();
+        data.append("file", file);
+        data.append("upload_preset", "privailers_upload");
+        data.append("resource_type", "auto");
+        try {
+            const res = await fetch("https://api.cloudinary.com/v1_1/dnymde4mn/auto/upload", { method: "POST", body: data });
+            const json = await res.json();
+            if (json.secure_url) {
+                setNewResource(prev => ({ ...prev, fileUrl: json.secure_url, fileSize: sizeStr, title: prev.title || file.name }));
+            } else {
+                throw new Error(json.error?.message || "Upload failed");
+            }
+        } catch (err: any) {
+            alert("Upload error: " + err.message);
+        } finally {
+            setUploadingResource(false);
+        }
+    };
+
+    const handleAddCohortResource = async () => {
+        if (!selectedCohort || !newResource.title || !newResource.fileUrl) {
+            alert("Please enter a title and upload a file first.");
+            return;
+        }
+        const { error } = await supabase.from('resources').insert([{
+            title: newResource.title,
+            category: newResource.category,
+            file_url: newResource.fileUrl,
+            file_size: newResource.fileSize,
+            cohort_id: selectedCohort.id
+        }]);
+        if (error) {
+            alert("Error saving resource: " + error.message);
+        } else {
+            alert("Cohort resource added!");
+            setNewResource({ title: '', category: 'Dataset', fileUrl: '', fileSize: '' });
+            handleManage(selectedCohort);
+        }
+    };
+
+    const handleDeleteCohortResource = async (id: string) => {
+        if (!confirm("Delete this resource?")) return;
+        const { error } = await supabase.from('resources').delete().eq('id', id);
+        if (!error && selectedCohort) handleManage(selectedCohort);
+    };
+
+    const handleAddCohortProject = async () => {
+        if (!selectedCohort || !newProject.title) {
+            alert("Please enter an assignment title.");
+            return;
+        }
+        const { error } = await supabase.from('projects').insert([{
+            title: newProject.title,
+            description: newProject.description,
+            due_date: newProject.due_date || null,
+            course_id: selectedCohort.course_id || null,
+            cohort_id: selectedCohort.id
+        }]);
+        if (error) {
+            alert("Error creating assignment: " + error.message);
+        } else {
+            alert("Cohort assignment created!");
+            setNewProject({ title: '', description: '', due_date: '' });
+            handleManage(selectedCohort);
+        }
+    };
+
+    const handleDeleteCohortProject = async (id: string) => {
+        if (!confirm("Delete this assignment?")) return;
+        const { error } = await supabase.from('projects').delete().eq('id', id);
+        if (!error && selectedCohort) handleManage(selectedCohort);
     };
 
     const handleAddClass = async () => {
@@ -522,6 +613,60 @@ export default function CohortManagementPage() {
                                 <div style={{ fontWeight: 700, marginBottom: '0.5rem' }}>{a.title}</div>
                                 <div style={{ fontSize: '0.9rem', color: '#475569' }} dangerouslySetInnerHTML={{ __html: a.content }} />
                                 <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '1rem' }}>{new Date(a.created_at).toLocaleDateString()}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Cohort Resources & Graded Assignments */}
+                <div className="content-split portal-split-layout equal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))', gap: '2rem', marginTop: '2.5rem' }}>
+                    <div>
+                        <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>📁 Cohort Resources</h2>
+                        <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '1rem', border: '1px solid #e2e8f0', marginBottom: '1.5rem' }}>
+                            <input type="text" placeholder="Resource Title" value={newResource.title} onChange={e => setNewResource({ ...newResource, title: e.target.value })} style={{ width: '100%', padding: '0.75rem', marginBottom: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1' }} />
+                            <select value={newResource.category} onChange={e => setNewResource({ ...newResource, category: e.target.value })} style={{ width: '100%', padding: '0.75rem', marginBottom: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1' }}>
+                                <option>Dataset</option>
+                                <option>Guide</option>
+                                <option>Template</option>
+                                <option>Software</option>
+                                <option>Other</option>
+                            </select>
+                            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '1rem' }}>
+                                <label style={{ backgroundColor: uploadingResource ? '#e2e8f0' : '#f1f5f9', padding: '0.5rem 1rem', borderRadius: '0.375rem', cursor: uploadingResource ? 'wait' : 'pointer', border: '1px solid #cbd5e1', fontSize: '0.85rem', fontWeight: 600 }}>
+                                    {uploadingResource ? 'Uploading...' : 'Choose File'}
+                                    <input type="file" onChange={handleResourceFileUpload} disabled={uploadingResource} style={{ display: 'none' }} />
+                                </label>
+                                {newResource.fileUrl && <span style={{ color: '#059669', fontSize: '0.85rem', fontWeight: 600 }}>✓ Ready ({newResource.fileSize})</span>}
+                            </div>
+                            <button onClick={handleAddCohortResource} style={{ width: '100%', padding: '0.75rem', backgroundColor: '#0284c7', color: 'white', border: 'none', borderRadius: '0.5rem', fontWeight: 700, cursor: 'pointer' }}>Upload Resource for Cohort</button>
+                        </div>
+                        {cohortResources.map(r => (
+                            <div key={r.id} style={{ padding: '1rem', backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e2e8f0', marginBottom: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+                                <div>
+                                    <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#0369a1', backgroundColor: '#e0f2fe', padding: '0.15rem 0.45rem', borderRadius: '4px', marginRight: '0.5rem' }}>{r.category}</span>
+                                    <span style={{ fontWeight: 600 }}>{r.title}</span>
+                                </div>
+                                <button onClick={() => handleDeleteCohortResource(r.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>Delete</button>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div>
+                        <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>📝 Graded Cohort Assignments</h2>
+                        <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '1rem', border: '1px solid #e2e8f0', marginBottom: '1.5rem' }}>
+                            <input type="text" placeholder="Assignment / Project Title" value={newProject.title} onChange={e => setNewProject({ ...newProject, title: e.target.value })} style={{ width: '100%', padding: '0.75rem', marginBottom: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1' }} />
+                            <textarea placeholder="Instructions & Deliverables..." value={newProject.description} onChange={e => setNewProject({ ...newProject, description: e.target.value })} style={{ width: '100%', padding: '0.75rem', marginBottom: '0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', minHeight: '90px' }} />
+                            <label style={{ display: 'block', fontSize: '0.8rem', color: '#64748b', marginBottom: '0.25rem' }}>Due Date (optional)</label>
+                            <input type="date" value={newProject.due_date} onChange={e => setNewProject({ ...newProject, due_date: e.target.value })} style={{ width: '100%', padding: '0.75rem', marginBottom: '1rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1' }} />
+                            <button onClick={handleAddCohortProject} style={{ width: '100%', padding: '0.75rem', backgroundColor: '#059669', color: 'white', border: 'none', borderRadius: '0.5rem', fontWeight: 700, cursor: 'pointer' }}>Create Graded Assignment</button>
+                        </div>
+                        {cohortProjects.map(p => (
+                            <div key={p.id} style={{ padding: '1rem', backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e2e8f0', marginBottom: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+                                <div>
+                                    <div style={{ fontWeight: 700 }}>{p.title}</div>
+                                    {p.due_date && <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Due: {new Date(p.due_date).toLocaleDateString()}</div>}
+                                </div>
+                                <button onClick={() => handleDeleteCohortProject(p.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>Delete</button>
                             </div>
                         ))}
                     </div>

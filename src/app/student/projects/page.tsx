@@ -28,7 +28,7 @@ const ProjectCard = ({ project }: { project: any }) => (
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em'
             }}>
-                {project.course?.title || 'General Course'}
+                {project.course?.title || project.cohort?.name || 'Cohort Assignment'}
             </div>
             <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.5rem', wordBreak: 'break-word' }}>
                 {project.title}
@@ -73,13 +73,20 @@ export default function StudentProjectsPage() {
             .from('projects')
             .select(`
                 *,
-                course:courses(title)
+                course:courses(title),
+                cohort:cohorts(name)
             `)
             .order('due_date', { ascending: true });
 
-        if (error) console.error("Error fetching projects:", error);
-
-        setProjects(data || []);
+        if (error) {
+            const { data: fallback } = await supabase
+                .from('projects')
+                .select(`*, course:courses(title)`)
+                .order('due_date', { ascending: true });
+            setProjects(fallback || []);
+        } else {
+            setProjects(data || []);
+        }
         setLoading(false);
     };
 
