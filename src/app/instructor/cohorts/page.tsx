@@ -208,31 +208,53 @@ export default function CohortManagementPage() {
         }
     };
 
+    const callCohortItemsApi = async (method: 'POST' | 'DELETE', body: Record<string, any>) => {
+        const { data: { session } } = await supabase.auth.getSession();
+        const res = await fetch('/api/instructor/cohort-items', {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {})
+            },
+            body: JSON.stringify(body)
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Request failed');
+        return json;
+    };
+
     const handleAddCohortResource = async () => {
         if (!selectedCohort || !newResource.title || !newResource.fileUrl) {
             alert("Please enter a title and upload a file first.");
             return;
         }
-        const { error } = await supabase.from('resources').insert([{
-            title: newResource.title,
-            category: newResource.category,
-            file_url: newResource.fileUrl,
-            file_size: newResource.fileSize,
-            cohort_id: selectedCohort.id
-        }]);
-        if (error) {
-            alert("Error saving resource: " + error.message);
-        } else {
+        try {
+            await callCohortItemsApi('POST', {
+                itemType: 'resource',
+                payload: {
+                    title: newResource.title,
+                    category: newResource.category,
+                    file_url: newResource.fileUrl,
+                    file_size: newResource.fileSize,
+                    cohort_id: selectedCohort.id
+                }
+            });
             alert("Cohort resource added!");
             setNewResource({ title: '', category: 'Dataset', fileUrl: '', fileSize: '' });
             handleManage(selectedCohort);
+        } catch (err: any) {
+            alert("Error saving resource: " + err.message);
         }
     };
 
     const handleDeleteCohortResource = async (id: string) => {
         if (!confirm("Delete this resource?")) return;
-        const { error } = await supabase.from('resources').delete().eq('id', id);
-        if (!error && selectedCohort) handleManage(selectedCohort);
+        try {
+            await callCohortItemsApi('DELETE', { itemType: 'resource', id, cohortId: selectedCohort?.id });
+            if (selectedCohort) handleManage(selectedCohort);
+        } catch (err: any) {
+            alert("Error deleting resource: " + err.message);
+        }
     };
 
     const handleAddCohortProject = async () => {
@@ -240,26 +262,33 @@ export default function CohortManagementPage() {
             alert("Please enter an assignment title.");
             return;
         }
-        const { error } = await supabase.from('projects').insert([{
-            title: newProject.title,
-            description: newProject.description,
-            due_date: newProject.due_date || null,
-            course_id: selectedCohort.course_id || null,
-            cohort_id: selectedCohort.id
-        }]);
-        if (error) {
-            alert("Error creating assignment: " + error.message);
-        } else {
+        try {
+            await callCohortItemsApi('POST', {
+                itemType: 'project',
+                payload: {
+                    title: newProject.title,
+                    description: newProject.description,
+                    due_date: newProject.due_date || null,
+                    course_id: selectedCohort.course_id || null,
+                    cohort_id: selectedCohort.id
+                }
+            });
             alert("Cohort assignment created!");
             setNewProject({ title: '', description: '', due_date: '' });
             handleManage(selectedCohort);
+        } catch (err: any) {
+            alert("Error creating assignment: " + err.message);
         }
     };
 
     const handleDeleteCohortProject = async (id: string) => {
         if (!confirm("Delete this assignment?")) return;
-        const { error } = await supabase.from('projects').delete().eq('id', id);
-        if (!error && selectedCohort) handleManage(selectedCohort);
+        try {
+            await callCohortItemsApi('DELETE', { itemType: 'project', id, cohortId: selectedCohort?.id });
+            if (selectedCohort) handleManage(selectedCohort);
+        } catch (err: any) {
+            alert("Error deleting assignment: " + err.message);
+        }
     };
 
     const handleAddClass = async () => {

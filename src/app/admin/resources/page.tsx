@@ -88,32 +88,55 @@ export default function AdminResourcesPage() {
         e.preventDefault();
         if (!formData.fileUrl) return alert("Please upload a file first.");
 
-        const payload: any = {
-            title: formData.title,
-            category: formData.category,
-            file_url: formData.fileUrl,
-            file_size: formData.fileSize
-        };
-        if (formData.cohortId) {
-            payload.cohort_id = formData.cohortId;
-        }
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            const res = await fetch('/api/instructor/cohort-items', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {})
+                },
+                body: JSON.stringify({
+                    itemType: 'resource',
+                    payload: {
+                        title: formData.title,
+                        category: formData.category,
+                        file_url: formData.fileUrl,
+                        file_size: formData.fileSize,
+                        cohort_id: formData.cohortId || null
+                    }
+                })
+            });
+            const json = await res.json();
+            if (!res.ok) throw new Error(json.error || 'Error saving resource');
 
-        const { error } = await supabase.from('resources').insert([payload]);
-
-        if (!error) {
             alert("Resource added!");
             setIsFormOpen(false);
             setFormData({ title: '', category: 'Dataset', cohortId: '', fileUrl: '', fileSize: '' });
             fetchResources();
-        } else {
-            alert("Error: " + error.message);
+        } catch (err: any) {
+            alert("Error: " + err.message);
         }
     };
 
     const handleDelete = async (id: string) => {
         if (!confirm("Delete this resource?")) return;
-        const { error } = await supabase.from('resources').delete().eq('id', id);
-        if (!error) fetchResources();
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            const res = await fetch('/api/instructor/cohort-items', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {})
+                },
+                body: JSON.stringify({ itemType: 'resource', id })
+            });
+            const json = await res.json();
+            if (!res.ok) throw new Error(json.error || 'Error deleting resource');
+            fetchResources();
+        } catch (err: any) {
+            alert("Error deleting resource: " + err.message);
+        }
     };
 
     return (
