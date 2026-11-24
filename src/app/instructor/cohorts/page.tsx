@@ -191,7 +191,7 @@ export default function CohortManagementPage() {
         const sizeStr = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
         const data = new FormData();
         data.append("file", file);
-        data.append("upload_preset", "privailers_upload");
+        data.append("upload_preset", "privailers_public");
         data.append("resource_type", "auto");
         try {
             const res = await fetch("https://api.cloudinary.com/v1_1/dnymde4mn/auto/upload", { method: "POST", body: data });

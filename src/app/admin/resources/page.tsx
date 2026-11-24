@@ -56,7 +56,7 @@ export default function AdminResourcesPage() {
 
         const data = new FormData();
         data.append("file", file);
-        data.append("upload_preset", "privailers_upload");
+        data.append("upload_preset", "privailers_public");
         // 'auto' detects PDF, ZIP, IMG etc.
         data.append("resource_type", "auto");
 
