@@ -15,25 +15,28 @@ export default function ForgotPasswordPage() {
         setLoading(true);
         setMessage(null);
 
-        // Redirect to the update-password page after clicking the email link
-        // We assume the app is hosted at the origin, Supabase handles the domain.
-        const redirectTo = typeof window !== 'undefined'
-            ? `${window.location.origin}/auth/update-password`
-            : undefined;
-
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo,
-        });
-
-        if (error) {
-            setMessage({ type: 'error', text: error.message });
-        } else {
-            setMessage({
-                type: 'success',
-                text: 'Check your email! We sent you a password reset link.'
+        try {
+            const origin = typeof window !== 'undefined' ? window.location.origin : undefined;
+            const res = await fetch('/api/auth/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, origin })
             });
+            const data = await res.json();
+
+            if (!res.ok) {
+                setMessage({ type: 'error', text: data.error || 'Could not send reset link.' });
+            } else {
+                setMessage({
+                    type: 'success',
+                    text: data.message || 'Check your email! We sent you a password reset link.'
+                });
+            }
+        } catch (err: any) {
+            setMessage({ type: 'error', text: err.message || 'Error sending reset link.' });
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     return (

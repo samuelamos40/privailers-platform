@@ -72,15 +72,20 @@ function LoginContent() {
                         required
                     />
 
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem', marginTop: '-0.5rem' }}>
-                        <Link href="/auth/forgot-password" style={{ fontSize: '0.875rem', color: 'var(--primary-blue)', fontWeight: 500 }}>
-                            Forgot Password?
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem', marginTop: '-0.25rem' }}>
+                        <Link href="/auth/forgot-password" style={{ fontSize: '0.875rem', color: '#00877d', fontWeight: 700, textDecoration: 'underline' }}>
+                            Forgot / Reset Password?
                         </Link>
                     </div>
 
                     {error && (
                         <div style={{ padding: '0.75rem', backgroundColor: '#fee2e2', color: '#991b1b', borderRadius: '0.5rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
-                            {error}
+                            <div>{error}</div>
+                            <div style={{ marginTop: '0.4rem' }}>
+                                <Link href="/auth/forgot-password" style={{ color: '#991b1b', fontWeight: 700, textDecoration: 'underline' }}>
+                                    Reset your password here →
+                                </Link>
+                            </div>
                         </div>
                     )}
 
