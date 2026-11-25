@@ -317,20 +317,43 @@ export default function CohortManagementPage() {
 
         console.log("Saving class with date:", isoDate);
 
-        const { error } = await supabase.from('cohort_classes').insert([{
+        const { data: insertedClass, error } = await supabase.from('cohort_classes').insert([{
             cohort_id: selectedCohort.id,
             title: newClass.title,
             scheduled_at: isoDate,
             meeting_link: newClass.meeting_link,
             assignment_details: newClass.assignment_details,
             use_internal_room: newClass.use_internal_room
-        }]);
+        }]).select('id').single();
         
         if (error) {
             console.error("Full Error Object:", error);
             alert("Error scheduling class: " + (error.message || JSON.stringify(error) || "RLS Policy Denied or Missing Column"));
         } else {
-            alert("Class Scheduled!");
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                const joinLink = !newClass.use_internal_room && newClass.meeting_link?.startsWith('http')
+                    ? newClass.meeting_link
+                    : `${window.location.origin}/classroom/${insertedClass?.id || ''}`;
+                await fetch('/api/notifications/live-class', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {})
+                    },
+                    body: JSON.stringify({
+                        audienceType: 'cohort',
+                        cohortId: selectedCohort.id,
+                        sessionTitle: `${selectedCohort.name}: ${newClass.title}`,
+                        instructorName: user?.full_name || 'Cohort Instructor',
+                        scheduledAt: isoDate,
+                        meetingUrl: joinLink
+                    })
+                });
+            } catch (emailErr) {
+                console.error("Could not send scheduled class email alerts:", emailErr);
+            }
+            alert("Class Scheduled! Enrolled students have been notified via email.");
             handleManage(selectedCohort);
             setNewClass({ title: '', scheduled_at: '', meeting_link: '', assignment_details: '', use_internal_room: true });
         }
