@@ -421,6 +421,17 @@ export default function CohortManagementPage() {
 
     const handleViewAttendance = async (classId: string) => {
         setViewingAttendance(classId);
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            const res = await fetch(`/api/attendance?classId=${encodeURIComponent(classId)}`, {
+                headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}
+            });
+            const json = await res.json();
+            if (res.ok && json.attendance) {
+                setAttendanceList(json.attendance);
+                return;
+            }
+        } catch {}
         const { data } = await supabase
             .from('cohort_attendance')
             .select('*, student:users(full_name, email)')
@@ -431,28 +442,35 @@ export default function CohortManagementPage() {
     const fetchBatchSummary = async () => {
         if (!selectedCohort) return;
         setIsSummaryOpen(true);
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            const res = await fetch(`/api/attendance?cohortId=${encodeURIComponent(selectedCohort.id)}`, {
+                headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}
+            });
+            const json = await res.json();
+            if (res.ok && json.summary) {
+                setBatchSummary(json.summary);
+                return;
+            }
+        } catch {}
         
-        // 1. Get all students in this cohort
+        // Fallback to direct client queries
         const { data: students } = await supabase
             .from('enrollments')
             .select('user_id, users(full_name, email)')
             .eq('cohort_id', selectedCohort.id);
             
-        // 2. Get all classes for this cohort
         const { data: cohortClasses } = await supabase
             .from('cohort_classes')
             .select('id')
             .eq('cohort_id', selectedCohort.id);
             
         const classIds = cohortClasses?.map(c => c.id) || [];
-        
-        // 3. Get all attendance for these classes
         const { data: allAttendance } = await supabase
             .from('cohort_attendance')
             .select('student_id, class_id')
             .in('class_id', classIds);
             
-        // 4. Calculate
         const totalClasses = classIds.length;
         const summary = students?.map(s => {
             const studentAttendance = allAttendance?.filter(a => a.student_id === s.user_id) || [];

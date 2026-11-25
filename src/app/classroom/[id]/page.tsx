@@ -45,6 +45,22 @@ export default function VirtualClassroomPage() {
                 return;
             }
 
+            // Automatically record attendance when entering the cohort classroom
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session?.access_token) {
+                    fetch('/api/attendance', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${session.access_token}`
+                        },
+                        body: JSON.stringify({ classId: id }),
+                        keepalive: true
+                    }).catch(() => {});
+                }
+            } catch {}
+
             setClassData(data);
             setLoading(false);
         };

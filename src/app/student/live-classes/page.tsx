@@ -344,13 +344,47 @@ export default function StudentLiveClassesPage() {
                                 <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #f1f5f9' }}>
                                     {isLive ? (
                                         isExternal ? (
-                                            <a href={c.meeting_url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                                            <a
+                                                href={c.meeting_url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                style={{ textDecoration: 'none' }}
+                                                onClick={async () => {
+                                                    if (c.classType === 'cohort') {
+                                                        const { data: { session } } = await supabase.auth.getSession();
+                                                        if (session?.access_token) {
+                                                            fetch('/api/attendance', {
+                                                                method: 'POST',
+                                                                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+                                                                body: JSON.stringify({ classId: c.id }),
+                                                                keepalive: true
+                                                            }).catch(() => {});
+                                                        }
+                                                    }
+                                                }}
+                                            >
                                                 <Button variant="primary" style={{ width: '100%', justifyContent: 'center', backgroundColor: '#2563eb', borderColor: '#2563eb', fontSize: '1rem', fontWeight: 600 }}>
                                                     ▶ Open Google Meet / Zoom
                                                 </Button>
                                             </a>
                                         ) : (
-                                            <a href={targetRoomLink} style={{ textDecoration: 'none' }}>
+                                            <a
+                                                href={targetRoomLink}
+                                                style={{ textDecoration: 'none' }}
+                                                onClick={async () => {
+                                                    if (c.classType === 'cohort') {
+                                                        const { data: { session } } = await supabase.auth.getSession();
+                                                        if (session?.access_token) {
+                                                            fetch('/api/attendance', {
+                                                                method: 'POST',
+                                                                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+                                                                body: JSON.stringify({ classId: c.id }),
+                                                                keepalive: true
+                                                            }).catch(() => {});
+                                                        }
+                                                    }
+                                                }}
+                                            >
                                                 <Button variant="primary" style={{ width: '100%', justifyContent: 'center', backgroundColor: '#ef4444', borderColor: '#ef4444', fontSize: '1rem', fontWeight: 600 }}>
                                                     ▶ Join Live Room
                                                 </Button>

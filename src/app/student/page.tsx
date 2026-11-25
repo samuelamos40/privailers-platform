@@ -222,6 +222,23 @@ export default function StudentDashboard() {
 
     const handleJoinClass = async (classId: string, isGlobalLiveClass?: boolean, meetingUrl?: string) => {
         if (!user) return;
+
+        if (!isGlobalLiveClass) {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session?.access_token) {
+                    await fetch('/api/attendance', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${session.access_token}`
+                        },
+                        body: JSON.stringify({ classId }),
+                        keepalive: true
+                    });
+                }
+            } catch {}
+        }
         
         if (meetingUrl && meetingUrl !== 'internal_platform_room' && meetingUrl.startsWith('http')) {
             window.open(meetingUrl, '_blank', 'noopener,noreferrer');
@@ -231,10 +248,6 @@ export default function StudentDashboard() {
         if (isGlobalLiveClass) {
             router.push(`/student/live-classes/room/${classId}`);
         } else {
-            await supabase.from('cohort_attendance').upsert(
-                [{ student_id: user.id, class_id: classId }],
-                { onConflict: 'student_id,class_id' }
-            );
             router.push(`/classroom/${classId}`);
         }
     };
